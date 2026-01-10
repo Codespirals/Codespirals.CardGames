@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36717.8 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Codespirals.CardGames.Shared", "Codespirals.CardGames.Shared\Codespirals.CardGames.Shared.csproj", "{29336F04-0EA9-4B82-A3D3-460587F1C524}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Codespirals.CardGames.FlipSeven", "Codespirals.CardGames.FlipSeven\Codespirals.CardGames.FlipSeven.csproj", "{57F69F33-D0CA-4FF8-A8CB-2EB1D5BDBABF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{29336F04-0EA9-4B82-A3D3-460587F1C524}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29336F04-0EA9-4B82-A3D3-460587F1C524}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29336F04-0EA9-4B82-A3D3-460587F1C524}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29336F04-0EA9-4B82-A3D3-460587F1C524}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57F69F33-D0CA-4FF8-A8CB-2EB1D5BDBABF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57F69F33-D0CA-4FF8-A8CB-2EB1D5BDBABF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57F69F33-D0CA-4FF8-A8CB-2EB1D5BDBABF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57F69F33-D0CA-4FF8-A8CB-2EB1D5BDBABF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1827A2B1-88D9-4A68-B0C4-FB361A160608}
+	EndGlobalSection
+EndGlobal
