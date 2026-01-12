@@ -2,6 +2,7 @@
 
 public class Card : ICard
 {
+    public bool IsFaceDown => false;
     public int Value { get; init; }
     public string Name => GetName();
     public CardType CardType { get; init; }

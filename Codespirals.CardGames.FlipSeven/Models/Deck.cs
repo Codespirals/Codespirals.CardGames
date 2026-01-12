@@ -3,13 +3,14 @@
 namespace Codespirals.CardGames.FlipSeven;
 public class Deck : IDeck<Card>
 {
-    private List<Card> _startingCards = [];
+    private readonly List<Card> _startingCards = [];
     private List<Card> _cardPool = [];
     private List<Card> _discardPile = [];
 
     public ReadOnlyCollection<Card> StartingCards => _startingCards.AsReadOnly();
     public ReadOnlyCollection<Card> CardPool => _cardPool.AsReadOnly();
     public ReadOnlyCollection<Card> DiscardPile => _discardPile.AsReadOnly();
+    public int Reshuffles { get; private set; }
 
     public Deck(int numberCards = 12, int freezes = 4, int flipThrees = 4, int secondChances = 4, int timesTwos = 1, int bonusCards = 5)
     {
@@ -26,27 +27,28 @@ public class Deck : IDeck<Card>
         }
         for (var i = 0; i < timesTwos; i++)
         {
-            _startingCards.Add(new Card(CardType.TimesTwo, 1));
+            _startingCards.Add(new Card(CardType.TimesTwo, i));
         }
         for (var i = 0; i < flipThrees; i++)
         {
-            _startingCards.Add(new Card(CardType.FlipThree, 2));
+            _startingCards.Add(new Card(CardType.FlipThree, i));
         }
         for (var i = 0; i < freezes; i++)
         {
-            _startingCards.Add(new Card(CardType.Freeze, 3));
+            _startingCards.Add(new Card(CardType.Freeze, i));
         }
         for (var i = 0; i < secondChances; i++)
         {
-            _startingCards.Add(new Card(CardType.SecondChance, 4));
+            _startingCards.Add(new Card(CardType.SecondChance, i));
         }
+        _startingCards = [.. _startingCards.OrderBy(c => c.CardType).ThenBy(c => c.Value)];
         _cardPool = _startingCards;
     }
 
-    public Card? Draw()
+    public Card Draw()
     {
         if (CardPool.Count is 0)
-            return default;
+            ShuffleDiscardPileIntoDeck();
         var card = _cardPool.First();
         _cardPool.Remove(card);
         return card;
@@ -59,19 +61,22 @@ public class Deck : IDeck<Card>
         _cardPool.RemoveRange(0, clamped);
         return cards;
     }
+
     public IEnumerable<Card> Peek(int numberOfCards) => _cardPool.Take(Math.Clamp(numberOfCards, 0, _cardPool.Count));
-    public void Shuffle() => _cardPool.Shuffle();
-    public void Discard(Card card) => _discardPile.Add(card);
-    public void ReturnDiscardPile()
+    public void PutOnDiscardPile(Card card) => _discardPile.Add(card);
+    public void ShuffleDiscardPileIntoDeck()
     {
         _cardPool.AddRange(_discardPile);
         _discardPile = [];
+        Reshuffles++;
     }
+    public void Shuffle() => _cardPool.Shuffle();
     public void Order() => _cardPool = [.. _cardPool.OrderBy(c => c.CardType).ThenBy(c => c.Value)];
     public void Reset()
     {
         _cardPool = _startingCards;
         _discardPile = [];
+        Reshuffles = 0;
         Order();
     }
 }
