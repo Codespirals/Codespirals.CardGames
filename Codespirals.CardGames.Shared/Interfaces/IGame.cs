@@ -1,8 +1,8 @@
 ﻿using System.Collections.ObjectModel;
 
 namespace Codespirals.CardGames;
-public interface IGame<TSelf, TDeck, TCard, TPlayer>
-    where TSelf : IGame<TSelf, TDeck, TCard, TPlayer>
+public interface IGame<TSelf, TPlayer, TDeck, TCard>
+    where TSelf : IGame<TSelf, TPlayer, TDeck, TCard>
     where TPlayer : IPlayer<TDeck, TCard>
     where TDeck : IDeck<TCard>
     where TCard : ICard

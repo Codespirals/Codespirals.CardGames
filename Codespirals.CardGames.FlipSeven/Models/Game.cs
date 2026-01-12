@@ -1,15 +1,16 @@
 ﻿using System.Collections.ObjectModel;
 
 namespace Codespirals.CardGames.FlipSeven;
-public class Game : IGame<Game, Deck, Card, Player>
+public class Game : IFlipSevenGame<Game, Player, Deck, Card>
 {
     private readonly List<Player> _players = [];
-    private int _currentPlayerId = 0;
+    private Player _currentPlayer;
     private int _currentRound = 0;
     private bool _roundActive;
 
     public Deck Deck { get; } = new();
     public ReadOnlyCollection<Player> Players => _players.AsReadOnly();
+    public ReadOnlyCollection<Player> ActivePlayers => _players.Where(p => !p.IsOutForRound).ToList().AsReadOnly();
     public int WinningScore { get; set; } = 200;
     public int NumbersToFlip { get; set; } = 7;
     public int RoundsPlayed => _currentRound;
@@ -24,8 +25,9 @@ public class Game : IGame<Game, Deck, Card, Player>
         Deck.Shuffle();
         for (var i = 0; i < players; i++)
         {
-            _players.Add(new Player(i, Deck, NumbersToFlip));
+            _players.Add(new Player(i));
         }
+        _currentPlayer = _players.First();
     }
 
     public static Game SetUp(int players)
@@ -36,46 +38,52 @@ public class Game : IGame<Game, Deck, Card, Player>
     public void StartRound()
     {
         _roundActive = true;
-        _currentPlayerId = _currentRound % _players.Count;
+        var startingPlayer = _currentRound % _players.Count;
+        _currentPlayer = Players[startingPlayer];
     }
+
+    public Player GetCurrentPlayer() => _currentPlayer;
+
+    public void MoveToNextPlayer()
+    {
+        if (ActivePlayers.Count == 0)
+        {
+            EndRound();
+            var startingPlayer = _currentRound % _players.Count;
+            _currentPlayer = Players[startingPlayer];
+        }
+        var currentPlayerIndex = Players.IndexOf(GetCurrentPlayer());
+        for (var i = 1; i <= Players.Count; i++)
+        {
+            var nextPlayerIndex = (currentPlayerIndex + i) % Players.Count;
+            var player = Players[nextPlayerIndex];
+            if (player.IsOutForRound)
+                continue;
+            _currentPlayer = player;
+        }
+    }
+
+    public Card Flip(Player player)
+    {
+        var card = Deck.Draw();
+        if (card.CardType is CardType.Number or CardType.SecondChance or CardType.BonusAdd or CardType.TimesTwo)
+            player.AddCardToHand(card);
+        return card;
+    }
+
+    public void Freeze(Player player)
+        => player.Freeze(Deck);
+
     public void EndRound()
     {
         foreach (var player in _players)
         {
             if (!player.IsOutForRound)
-                player.BankPoints();
-            player.State = PlayerStates.Playing;
+                player.BankPoints(Deck);
+            player.Reactivate(Deck);
         }
         _roundActive = false;
-    }
-
-    public Player GetCurrentPlayer()
-    {
-        if (_players.All(p => p.IsOutForRound))
-        {
-            EndRound();
-            return _players[CurrentRound % _players.Count];
-        }
-        else
-        {
-            var player = _players[_currentPlayerId];
-            while (player is null)
-            {
-                _currentPlayerId = (_currentPlayerId + 1) % _players.Count;
-                player = _players[_currentPlayerId];
-            }
-            return player;
-        }
-    }
-    public Player MoveToNextPlayer()
-    {
-        var player = GetCurrentPlayer();
-        if (player.HandCount >= NumbersToFlip)
-        {
-            EndRound();
-        }
-        _currentPlayerId = (_currentPlayerId + 1) % _players.Count;
-        return GetCurrentPlayer();
+        _currentRound++;
     }
 
     public Player? GetWinner()
@@ -83,18 +91,5 @@ public class Game : IGame<Game, Deck, Card, Player>
         if (!GameOver)
             return null;
         return _players.MaxBy(p => p.Points);
-    }
-
-    public static void Freeze(Player player) => player.Freeze();
-    public static IEnumerable<Card> FlipThree(Player player)
-    {
-        List<Card> cards = [];
-        for (var i = 0; i < 3; i++)
-        {
-            cards.Add(player.Draw());
-            if (player.IsOutForRound)
-                return cards;
-        }
-        return cards;
     }
 }

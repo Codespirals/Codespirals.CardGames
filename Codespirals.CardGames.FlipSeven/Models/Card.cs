@@ -1,6 +1,6 @@
 ﻿namespace Codespirals.CardGames.FlipSeven;
 
-public class Card : ICard
+public class Card : IFlipSevenCard
 {
     public bool IsFaceDown => false;
     public int Value { get; init; }
@@ -14,7 +14,7 @@ public class Card : ICard
     }
 
     public override string ToString()
-        => Value.ToString();
+        => $"Flip 7 card: {Name}";
 
     private string GetName()
         => CardType switch
