@@ -8,6 +8,16 @@ internal static class ConsoleHelper
             Console.WriteLine("Not a valid input. Try again.");
         return number;
     }
+    public static string ReadUntilAccepted()
+    {
+        var result = Console.ReadLine();
+        while (string.IsNullOrWhiteSpace(result))
+        {
+            Console.WriteLine("Not a valid input. Try again.");
+            result = Console.ReadLine();
+        }
+        return result!;
+    }
     public static string ReadUntilAccepted(params string[] acceptableValues)
     {
         var result = Console.ReadLine();
@@ -21,9 +31,9 @@ internal static class ConsoleHelper
     public static void SeperatorLine(char lineChar = '-')
         => Console.WriteLine(new string(lineChar, 40));
 
-    public static void SetColorForPlayer(int id)
+    public static void SetColorForPlayer(int index)
     {
-        switch (id)
+        switch (index)
         {
             case 0:
                 Console.ForegroundColor = ConsoleColor.Red;
