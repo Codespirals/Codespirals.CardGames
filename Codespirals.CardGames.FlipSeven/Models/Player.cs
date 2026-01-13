@@ -96,5 +96,5 @@ public class Player : IFlipSevenPlayer<Deck, Card>
     }
 
     public override string ToString()
-        => $"{Name} {(Hand.Count != 0 ? "Hand: " : "")}{string.Join('|', Hand.OrderBy(c => c.CardType).Select(c => c.ToString()))} Total Points: ({Points})";
+        => $"{Name} {(Hand.Count != 0 ? "Hand: " : "")}{string.Join('|', Hand.OrderBy(c => c.CardType).Select(c => c.Value))} Total Points: ({Points})";
 }

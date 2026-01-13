@@ -23,8 +23,8 @@ public class Card : IFlipSevenCard
             CardType.Flip => $"{Constants.FlipXName} {Value}",
             CardType.SecondChance => Constants.SecondChanceName,
             CardType.BonusAdd => $"+{Value}",
-            CardType.Multiplier => $"X{Value}",
-            CardType.Number => Value.ToString(),
-            _ => $"Flip Seven Card"
+            CardType.Multiplier => $"x{Value}",
+            CardType.Number => $"{Constants.NumberCardName} {Value}",
+            _ => $"???"
         };
 }

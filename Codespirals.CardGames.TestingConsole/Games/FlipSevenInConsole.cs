@@ -50,6 +50,7 @@ internal class FlipSevenInConsole
         {
             Console.WriteLine(player.ToString());
         }
+        Console.ReadKey();
         Console.WriteLine($"What will you do? Flip or bank?");
         var input = ConsoleHelper.ReadUntilAccepted(["flip", "bank"]);
         if (input.Equals("flip", StringComparison.InvariantCultureIgnoreCase))
