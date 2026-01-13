@@ -16,7 +16,7 @@ public class Game : IFlipSevenGame<Game, Player, Deck, Card>
     public int RoundsPlayed => _currentRound;
     public int CurrentRound => _currentRound + 1;
     public bool RoundActive => _roundActive;
-    public bool GameOver => !_roundActive && _players.Any(p => p.Points > WinningScore);
+    public bool GameOver => !_roundActive && _players.Any(p => p.BankedPoints > WinningScore);
 
     private Game(int players, Deck deck, int numbersToFlip = 7, int winningScore = 200)
     {
@@ -64,8 +64,7 @@ public class Game : IFlipSevenGame<Game, Player, Deck, Card>
     public Card Flip(Player player)
     {
         var card = Deck.Draw();
-        player.Draw(card);
-        return card;
+        return player.Flip(card);
     }
 
     public void Freeze(Player player)
@@ -88,6 +87,6 @@ public class Game : IFlipSevenGame<Game, Player, Deck, Card>
     {
         if (!GameOver)
             return null;
-        return _players.MaxBy(p => p.Points);
+        return _players.MaxBy(p => p.BankedPoints);
     }
 }

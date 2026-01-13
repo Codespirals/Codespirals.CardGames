@@ -10,7 +10,8 @@ public class Player : IFlipSevenPlayer<Deck, Card>
     public string Name { get; set; }
     public ReadOnlyCollection<Card> Hand => _hand.AsReadOnly();
     public int HandCount => _hand.Count(c => c.CardType == CardType.Number);
-    public int Points { get; private set; } = 0;
+    public int HandPoints => CalculateHandValue();
+    public int BankedPoints { get; private set; } = 0;
     public bool IsOutForRound => State != PlayerStates.Playing;
     public PlayerStates State { get; private set; }
     public Player(Game game, int id)
@@ -49,28 +50,18 @@ public class Player : IFlipSevenPlayer<Deck, Card>
         _hand.Clear();
     }
 
+    public Card Flip(Card card)
+    {
+        Draw(card);
+        return card;
+    }
+
     public void BankPoints()
     {
         var roundPoints = HandCount >= _game.NumbersToFlip ? 15 : 0;
-        foreach (var card in _hand.OrderBy(c => c.CardType))
-        {
-            switch (card.CardType)
-            {
-                case CardType.Number:
-                    roundPoints += card.Value;
-                    break;
-                case CardType.Multiplier:
-                    roundPoints *= 2;
-                    break;
-                case CardType.BonusAdd:
-                    roundPoints += card.Value;
-                    break;
-                default:
-                    break;
-            }
-        }
+        roundPoints += HandPoints;
         DiscardAll();
-        Points += roundPoints;
+        BankedPoints += roundPoints;
         State = PlayerStates.Banked;
     }
     public void Freeze()
@@ -94,7 +85,28 @@ public class Player : IFlipSevenPlayer<Deck, Card>
         DiscardAll();
         State = PlayerStates.Playing;
     }
-
+    private int CalculateHandValue()
+    {
+        var points = 0;
+        foreach (var card in _hand.OrderBy(c => c.CardType))
+        {
+            switch (card.CardType)
+            {
+                case CardType.Number:
+                    points += card.Value;
+                    break;
+                case CardType.Multiplier:
+                    points *= 2;
+                    break;
+                case CardType.BonusAdd:
+                    points += card.Value;
+                    break;
+                default:
+                    break;
+            }
+        }
+        return points;
+    }
     public override string ToString()
-        => $"{Name} {(Hand.Count != 0 ? "Hand: " : "")}{string.Join('|', Hand.OrderBy(c => c.CardType).Select(c => c.Value))} Total Points: ({Points})";
+        => $"{Name} {(Hand.Count != 0 ? "Hand: " : "")}{string.Join('|', Hand.OrderBy(c => c.CardType).Select(c => c.Name))} Hand total: {HandPoints} Banked:{BankedPoints}";
 }

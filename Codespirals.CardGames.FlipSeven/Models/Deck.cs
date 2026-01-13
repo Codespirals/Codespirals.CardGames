@@ -17,7 +17,7 @@ public class Deck : IFlipSevenDeck<Card>
     }
 
     internal void AddStartingCard(Card card) => _startingCards.Add(card);
-    internal void OrderStartingCards() => _startingCards = _startingCards.OrderBy(c => c.CardType).ThenBy(c => c.Value).ToList();
+    internal void OrderStartingCards() => _startingCards = [.. _startingCards.OrderBy(c => c.CardType).ThenBy(c => c.Value)];
     public Card Draw()
     {
         if (CardPool.Count is 0)

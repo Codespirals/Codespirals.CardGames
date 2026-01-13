@@ -24,7 +24,7 @@ public class Card : IFlipSevenCard
             CardType.SecondChance => Constants.SecondChanceName,
             CardType.BonusAdd => $"+{Value}",
             CardType.Multiplier => $"x{Value}",
-            CardType.Number => $"{Constants.NumberCardName} {Value}",
+            CardType.Number => $"{Value}",
             _ => $"???"
         };
 }

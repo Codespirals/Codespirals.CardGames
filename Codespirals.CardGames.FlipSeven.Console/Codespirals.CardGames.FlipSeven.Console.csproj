@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Codespirals.CardGames.FlipSeven.Console\Codespirals.CardGames.FlipSeven.Console.csproj" />
+    <ProjectReference Include="..\Codespirals.CardGames.FlipSeven\Codespirals.CardGames.FlipSeven.csproj" />
   </ItemGroup>
 
 </Project>

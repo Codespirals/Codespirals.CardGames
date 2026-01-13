@@ -1,7 +1,5 @@
-﻿using Codespirals.CardGames.FlipSeven;
-
-namespace Codespirals.CardGames.TestingConsole.Games;
-internal class FlipSevenInConsole
+﻿namespace Codespirals.CardGames.FlipSeven;
+public class FlipSevenInConsole
 {
     private readonly Game _game;
     private FlipSevenInConsole(int playerCount)
@@ -10,9 +8,10 @@ internal class FlipSevenInConsole
     }
     public static FlipSevenInConsole SetUp()
     {
-        Console.WriteLine("Starting a game of Flip 7");
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.WriteLine($"Starting a game of Flip7");
         Console.WriteLine("How many players are playing?");
-        var playerCount = ConsoleHelper.ReadUntilInt();
+        var playerCount = ConsoleHelper.ReadUntilInt(2, 8);
         return new(playerCount);
     }
     public void Start()
@@ -26,6 +25,7 @@ internal class FlipSevenInConsole
 
     private void PlayRound()
     {
+        ConsoleHelper.SeperatorLine('#');
         Console.WriteLine($"Starting round {_game.CurrentRound}");
         _game.StartRound();
         while (_game.RoundActive)
@@ -36,21 +36,22 @@ internal class FlipSevenInConsole
         }
         Console.WriteLine("The round is over!");
         Console.WriteLine("Here are the current scores:");
-        foreach (var player in _game.Players.OrderBy(p => p.Points))
+        foreach (var player in _game.Players.OrderBy(p => p.BankedPoints))
         {
-            Console.WriteLine($"{player.Name} has {player.Points}!");
+            Console.WriteLine($"{player.Name} has {player.BankedPoints}!");
         }
         Console.WriteLine();
     }
 
     private void PlayerTurn(Player player)
     {
+        ConsoleHelper.SeperatorLine();
+        ConsoleHelper.SetColorForPlayer(_game.Players.IndexOf(player));
         Console.WriteLine($"It's {player.Name}'s turn!");
-        if (player.Hand.Any())
+        if (player.Hand.Count != 0)
         {
             Console.WriteLine(player.ToString());
         }
-        Console.ReadKey();
         Console.WriteLine($"What will you do? Flip or bank?");
         var input = ConsoleHelper.ReadUntilAccepted(["flip", "bank"]);
         if (input.Equals("flip", StringComparison.InvariantCultureIgnoreCase))
@@ -65,6 +66,7 @@ internal class FlipSevenInConsole
     }
     private void Flip(Player player)
     {
+        ConsoleHelper.SetColorForPlayer(_game.Players.IndexOf(player));
         var drawnCard = _game.Flip(player);
         Console.WriteLine($"{player.Name} drew a {drawnCard.Name}!");
         if (drawnCard.CardType is CardType.Freeze or CardType.Flip)
@@ -73,6 +75,7 @@ internal class FlipSevenInConsole
         }
         if (player.State == PlayerStates.Busted)
         {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
             Console.WriteLine($"Oh no... busted");
         }
     }
@@ -80,7 +83,7 @@ internal class FlipSevenInConsole
     {
         Console.WriteLine($"{player.Name} chose to bank their points. That's probably sensible.");
         player.BankPoints();
-        Console.WriteLine($"{player.Name} now has {player.Points}!");
+        Console.WriteLine($"{player.Name} now has {player.BankedPoints}!");
     }
     private void UseTargetedCard(Card card)
     {
@@ -90,7 +93,7 @@ internal class FlipSevenInConsole
         var i = 1;
         foreach (var option in _game.ActivePlayers)
         {
-            Console.WriteLine($"For {option.Name} ({option.Points}) - Type: {i}");
+            Console.WriteLine($"For {option.Name} ({option.BankedPoints}) - Type: {i}");
             i++;
         }
         var selectedPlayerIndex = ConsoleHelper.ReadUntilInt(1, _game.ActivePlayers.Count);
