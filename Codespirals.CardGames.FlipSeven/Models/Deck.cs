@@ -3,7 +3,7 @@
 namespace Codespirals.CardGames.FlipSeven;
 public class Deck : IFlipSevenDeck<Card>
 {
-    private readonly List<Card> _startingCards = [];
+    private List<Card> _startingCards = [];
     private List<Card> _cardPool = [];
     private List<Card> _discardPile = [];
 
@@ -11,41 +11,13 @@ public class Deck : IFlipSevenDeck<Card>
     public ReadOnlyCollection<Card> CardPool => _cardPool.AsReadOnly();
     public ReadOnlyCollection<Card> DiscardPile => _discardPile.AsReadOnly();
     public int Reshuffles { get; private set; }
-
-    public Deck(int numberCards = 12, int freezes = 4, int flipThrees = 4, int secondChances = 4, int timesTwos = 1, int bonusCards = 5)
+    internal Deck()
     {
-        _startingCards.Add(new Card(CardType.Number, 0));
-        for (var v = numberCards; v > 0; v--)
-        {
-            for (var i = 0; i < v; i++)
-            {
-                _startingCards.Add(new Card(CardType.Number, v));
-            }
-        }
-        for (var i = 1; i <= bonusCards; i++)
-        {
-            _startingCards.Add(new Card(CardType.BonusAdd, i * 2));
-        }
-        for (var i = 0; i < timesTwos; i++)
-        {
-            _startingCards.Add(new Card(CardType.TimesTwo, 2));
-        }
-        for (var i = 0; i < flipThrees; i++)
-        {
-            _startingCards.Add(new Card(CardType.FlipThree, i));
-        }
-        for (var i = 0; i < freezes; i++)
-        {
-            _startingCards.Add(new Card(CardType.Freeze, i));
-        }
-        for (var i = 0; i < secondChances; i++)
-        {
-            _startingCards.Add(new Card(CardType.SecondChance, i));
-        }
-        _startingCards = [.. _startingCards.OrderBy(c => c.CardType).ThenBy(c => c.Value)];
-        _cardPool = _startingCards;
+        
     }
 
+    internal void AddStartingCard(Card card) => _startingCards.Add(card);
+    internal void OrderStartingCards() => _startingCards = _startingCards.OrderBy(c => c.CardType).ThenBy(c => c.Value).ToList();
     public Card Draw()
     {
         if (CardPool.Count is 0)

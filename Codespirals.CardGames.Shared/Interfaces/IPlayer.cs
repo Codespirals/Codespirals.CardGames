@@ -8,9 +8,9 @@ public interface IPlayer<TDeck, TCard>
     public string Name { get; set; }
     public int HandCount { get; }
 
-    public void AddCardToHand(TCard card);
-    public void Discard(TCard card, TDeck deck);
-    public void DiscardAll(TDeck deck);
+    public void Draw(TCard card);
+    public void Discard(TCard card);
+    public void DiscardAll();
 }
 
 public interface IPlayerInGameWithOpenHand<TDeck, TCard> : IPlayer<TDeck, TCard>

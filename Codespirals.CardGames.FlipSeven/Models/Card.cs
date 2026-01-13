@@ -14,17 +14,17 @@ public class Card : IFlipSevenCard
     }
 
     public override string ToString()
-        => $"Flip 7 card: {Name}";
+        => Name;
 
     private string GetName()
         => CardType switch
         {
             CardType.Freeze => Constants.FreezeName,
-            CardType.FlipThree => Constants.FlipThreeName,
+            CardType.Flip => $"{Constants.FlipXName} {Value}",
             CardType.SecondChance => Constants.SecondChanceName,
             CardType.BonusAdd => $"+{Value}",
-            CardType.TimesTwo => $"X{Value}",
+            CardType.Multiplier => $"X{Value}",
             CardType.Number => Value.ToString(),
-            _ => $"+{Value}"
+            _ => $"Flip Seven Card"
         };
 }

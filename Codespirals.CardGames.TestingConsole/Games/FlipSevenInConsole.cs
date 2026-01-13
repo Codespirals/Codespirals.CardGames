@@ -3,7 +3,7 @@
 namespace Codespirals.CardGames.TestingConsole.Games;
 internal class FlipSevenInConsole
 {
-    private Game _game;
+    private readonly Game _game;
     private FlipSevenInConsole(int playerCount)
     {
         _game = Game.SetUp(playerCount);
@@ -40,10 +40,16 @@ internal class FlipSevenInConsole
         {
             Console.WriteLine($"{player.Name} has {player.Points}!");
         }
+        Console.WriteLine();
     }
+
     private void PlayerTurn(Player player)
     {
         Console.WriteLine($"It's {player.Name}'s turn!");
+        if (player.Hand.Any())
+        {
+            Console.WriteLine(player.ToString());
+        }
         Console.WriteLine($"What will you do? Flip or bank?");
         var input = ConsoleHelper.ReadUntilAccepted(["flip", "bank"]);
         if (input.Equals("flip", StringComparison.InvariantCultureIgnoreCase))
@@ -52,19 +58,28 @@ internal class FlipSevenInConsole
         }
         else if (input.Equals("bank", StringComparison.InvariantCultureIgnoreCase))
         {
-            Console.WriteLine($"{player.Name} chose to bank their points. That's probably sensible.");
-            player.BankPoints(_game.Deck);
-            Console.WriteLine($"{player.Name} has {player.Points}!");
+            Bank(player);
         }
+        Console.WriteLine();
     }
     private void Flip(Player player)
     {
         var drawnCard = _game.Flip(player);
         Console.WriteLine($"{player.Name} drew a {drawnCard.Name}!");
-        if (drawnCard.CardType is CardType.Freeze or CardType.FlipThree)
+        if (drawnCard.CardType is CardType.Freeze or CardType.Flip)
         {
             UseTargetedCard(drawnCard);
         }
+        if (player.State == PlayerStates.Busted)
+        {
+            Console.WriteLine($"Oh no... busted");
+        }
+    }
+    private void Bank(Player player)
+    {
+        Console.WriteLine($"{player.Name} chose to bank their points. That's probably sensible.");
+        player.BankPoints();
+        Console.WriteLine($"{player.Name} now has {player.Points}!");
     }
     private void UseTargetedCard(Card card)
     {
@@ -75,21 +90,22 @@ internal class FlipSevenInConsole
         foreach (var option in _game.ActivePlayers)
         {
             Console.WriteLine($"For {option.Name} ({option.Points}) - Type: {i}");
+            i++;
         }
         var selectedPlayerIndex = ConsoleHelper.ReadUntilInt(1, _game.ActivePlayers.Count);
-        var target = _game.ActivePlayers[selectedPlayerIndex];
+        var target = _game.ActivePlayers[selectedPlayerIndex-1];
 
-        if (card.CardType == CardType.FlipThree)
+        if (card.CardType == CardType.Flip)
         {
             Console.WriteLine($"Do a flip!");
-            for (int j = 0; j < 3; j++)
+            for (int j = 0; j < card.Value; j++)
             {
                 Flip(target);
             }
         }
         else if (card.CardType == CardType.Freeze)
         {
-            target.Freeze(_game.Deck);
+            target.Freeze();
             Console.WriteLine($"Brr... Ice cold.");
         }
     }

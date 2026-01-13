@@ -8,7 +8,7 @@ public class Game : IFlipSevenGame<Game, Player, Deck, Card>
     private int _currentRound = 0;
     private bool _roundActive;
 
-    public Deck Deck { get; } = new();
+    public Deck Deck { get; } = FlipSevenDeckBuilder.CreateStandardDeck();
     public ReadOnlyCollection<Player> Players => _players.AsReadOnly();
     public ReadOnlyCollection<Player> ActivePlayers => _players.Where(p => !p.IsOutForRound).ToList().AsReadOnly();
     public int WinningScore { get; set; } = 200;
@@ -18,22 +18,28 @@ public class Game : IFlipSevenGame<Game, Player, Deck, Card>
     public bool RoundActive => _roundActive;
     public bool GameOver => !_roundActive && _players.Any(p => p.Points > WinningScore);
 
-    private Game(int players, int numberCards = 12, int freezes = 4, int flipThrees = 4, int secondChances = 4, int timesTwos = 1, int bonusCards = 5)
+    private Game(int players, Deck deck, int numbersToFlip = 7, int winningScore = 200)
     {
-        Deck = new Deck(numberCards, freezes, flipThrees, secondChances, timesTwos, bonusCards);
-        NumbersToFlip = (int)Math.Ceiling(numberCards / 2d) + 1;
-        Deck.Shuffle();
         for (var i = 0; i < players; i++)
         {
-            _players.Add(new Player(i));
+            _players.Add(new Player(this, i));
         }
+        Deck = deck;
+        NumbersToFlip = numbersToFlip;
+        WinningScore = winningScore;
         _currentPlayer = _players.First();
+        Deck.Shuffle();
     }
 
+    public static FlipSevenDeckBuilder StartBuildingCustomDeck()
+        => FlipSevenDeckBuilder.Begin();
+
     public static Game SetUp(int players)
-        => SetUp(players, 12, 4, 4, 4, 1, 5);
-    public static Game SetUp(int players, int numberCards, int freezes, int flipThrees, int secondChances, int timesTwos, int bonusCards)
-        => new(players, numberCards, freezes, flipThrees, secondChances, timesTwos, bonusCards);
+        => new (players, FlipSevenDeckBuilder.CreateStandardDeck());
+    public static Game SetUp(int players, Deck deck, int numbersToFlip = 7, int winningScore = 200)
+        => new(players, deck, numbersToFlip, winningScore);
+
+    public Player GetCurrentPlayer() => _currentPlayer;
 
     public void StartRound()
     {
@@ -42,48 +48,40 @@ public class Game : IFlipSevenGame<Game, Player, Deck, Card>
         _currentPlayer = Players[startingPlayer];
     }
 
-    public Player GetCurrentPlayer() => _currentPlayer;
-
     public void MoveToNextPlayer()
     {
         if (ActivePlayers.Count == 0)
         {
             EndRound();
-            var startingPlayer = _currentRound % _players.Count;
-            _currentPlayer = Players[startingPlayer];
+            return;
         }
-        var currentPlayerIndex = Players.IndexOf(GetCurrentPlayer());
-        for (var i = 1; i <= Players.Count; i++)
-        {
-            var nextPlayerIndex = (currentPlayerIndex + i) % Players.Count;
-            var player = Players[nextPlayerIndex];
-            if (player.IsOutForRound)
-                continue;
-            _currentPlayer = player;
-        }
+        var nextPlayerIndex = (Players.IndexOf(GetCurrentPlayer()) + 1) % Players.Count;
+        _currentPlayer = Players[nextPlayerIndex];
+        if (_currentPlayer.IsOutForRound)
+            MoveToNextPlayer();
     }
 
     public Card Flip(Player player)
     {
         var card = Deck.Draw();
-        if (card.CardType is CardType.Number or CardType.SecondChance or CardType.BonusAdd or CardType.TimesTwo)
-            player.AddCardToHand(card);
+        player.Draw(card);
         return card;
     }
 
     public void Freeze(Player player)
-        => player.Freeze(Deck);
+        => player.Freeze();
 
     public void EndRound()
     {
         foreach (var player in _players)
         {
             if (!player.IsOutForRound)
-                player.BankPoints(Deck);
-            player.Reactivate(Deck);
+                player.BankPoints();
+            player.Reactivate();
         }
         _roundActive = false;
         _currentRound++;
+        _currentPlayer = Players[_currentRound % _players.Count];
     }
 
     public Player? GetWinner()

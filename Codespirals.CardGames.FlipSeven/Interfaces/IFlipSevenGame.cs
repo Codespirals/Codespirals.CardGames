@@ -11,7 +11,6 @@ public interface IFlipSevenGame<TSelf, TPlayer, TDeck, TCard> : IGame<TSelf, TPl
     public int WinningScore { get; }
     public int NumbersToFlip { get; }
     public bool RoundActive { get; }
-    public static abstract TSelf SetUp(int players, int numberCards, int freezes, int flipThrees, int secondChances, int timesTwos, int bonusCards);
 
     public void StartRound();
     public Player GetCurrentPlayer();

@@ -2,9 +2,9 @@
 public enum CardType
 {
     Number,
-    FlipThree,
-    Freeze,
-    SecondChance,
+    Multiplier,
     BonusAdd,
-    TimesTwo
+    SecondChance,
+    Flip,
+    Freeze
 }

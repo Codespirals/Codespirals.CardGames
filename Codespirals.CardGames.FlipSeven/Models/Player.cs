@@ -3,6 +3,7 @@
 namespace Codespirals.CardGames.FlipSeven;
 public class Player : IFlipSevenPlayer<Deck, Card>
 {
+    private readonly Game _game;
     private readonly List<Card> _hand = [];
     private readonly int _playerNumber = 0;
 
@@ -12,28 +13,45 @@ public class Player : IFlipSevenPlayer<Deck, Card>
     public int Points { get; private set; } = 0;
     public bool IsOutForRound => State != PlayerStates.Playing;
     public PlayerStates State { get; private set; }
-    public Player(int id)
+    public Player(Game game, int id)
     {
+        _game = game;
         _playerNumber = id;
-        Name = $"Player {_playerNumber}";
+        Name = $"Player {_playerNumber + 1}";
     }
-    public void AddCardToHand(Card card) => _hand.Add(card);
 
-    public void Discard(Card card, Deck deck)
+    public void Draw(Card card)
     {
-        deck.PutOnDiscardPile(card);
+        if (card.CardType is CardType.Flip or CardType.Freeze)
+        {
+            Discard(card);
+            return;
+        }
+        if (card.CardType == CardType.Number && Hand.Any(c => c.CardType == CardType.Number && c.Value == card.Value))
+        {
+            Discard(card);
+            Bust();
+            return;
+        }
+        _hand.Add(card);
+    }
+
+    public void Discard(Card card)
+    {
+        _game.Deck.PutOnDiscardPile(card);
         _hand.Remove(card);
     }
-    public void DiscardAll(Deck deck)
+
+    public void DiscardAll()
     {
         foreach (var card in _hand)
-            deck.PutOnDiscardPile(card);
+            _game.Deck.PutOnDiscardPile(card);
         _hand.Clear();
     }
 
-    public void BankPoints(Deck deck, int numberToFlip = 7)
+    public void BankPoints()
     {
-        var roundPoints = HandCount >= numberToFlip ? 15 : 0;
+        var roundPoints = HandCount >= _game.NumbersToFlip ? 15 : 0;
         foreach (var card in _hand.OrderBy(c => c.CardType))
         {
             switch (card.CardType)
@@ -41,7 +59,7 @@ public class Player : IFlipSevenPlayer<Deck, Card>
                 case CardType.Number:
                     roundPoints += card.Value;
                     break;
-                case CardType.TimesTwo:
+                case CardType.Multiplier:
                     roundPoints *= 2;
                     break;
                 case CardType.BonusAdd:
@@ -51,23 +69,32 @@ public class Player : IFlipSevenPlayer<Deck, Card>
                     break;
             }
         }
-        DiscardAll(deck);
+        DiscardAll();
         Points += roundPoints;
         State = PlayerStates.Banked;
     }
-    public void Freeze(Deck deck)
+    public void Freeze()
     {
-        BankPoints(deck);
+        BankPoints();
         State = PlayerStates.Frozen;
     }
-    public void Bust(Deck deck)
+    public void Bust()
     {
-        DiscardAll(deck);
+        var secondChance = Hand.FirstOrDefault(c => c.CardType == CardType.SecondChance);
+        if (secondChance is not null)
+        {
+            Discard(secondChance);
+            return;
+        }
+        DiscardAll();
         State = PlayerStates.Busted;
     }
-    public void Reactivate(Deck deck)
+    public void Reactivate()
     {
-        DiscardAll(deck);
+        DiscardAll();
         State = PlayerStates.Playing;
     }
+
+    public override string ToString()
+        => $"{Name} {(Hand.Count != 0 ? "Hand: " : "")}{string.Join('|', Hand.OrderBy(c => c.CardType).Select(c => c.ToString()))} Total Points: ({Points})";
 }
