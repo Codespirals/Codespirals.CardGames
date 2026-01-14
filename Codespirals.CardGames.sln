@@ -16,6 +16,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Games\Flip7_Console.exe = Games\Flip7_Console.exe
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Codespirals.CardGames.Poker", "Codespirals.CardGames.Poker\Codespirals.CardGames.Poker.csproj", "{3ED1736A-ADBC-4863-80C9-F1697AD0BCB1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +40,10 @@ Global
 		{CDB8E695-4C19-416A-97C4-EEF4B7C79D19}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CDB8E695-4C19-416A-97C4-EEF4B7C79D19}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CDB8E695-4C19-416A-97C4-EEF4B7C79D19}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3ED1736A-ADBC-4863-80C9-F1697AD0BCB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3ED1736A-ADBC-4863-80C9-F1697AD0BCB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3ED1736A-ADBC-4863-80C9-F1697AD0BCB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3ED1736A-ADBC-4863-80C9-F1697AD0BCB1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

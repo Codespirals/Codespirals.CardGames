@@ -9,8 +9,6 @@ public interface IGame<TSelf, TPlayer, TDeck, TCard>
 {
     public TDeck Deck { get; }
     public ReadOnlyCollection<TPlayer> Players { get; }
-    public int RoundsPlayed { get; }
     public int CurrentRound { get; }
-    public bool GameOver { get; }
     public abstract static TSelf SetUp(int players);
 }

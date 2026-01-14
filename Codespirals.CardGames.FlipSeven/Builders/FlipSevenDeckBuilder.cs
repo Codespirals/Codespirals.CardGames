@@ -1,12 +1,14 @@
 ﻿namespace Codespirals.CardGames.FlipSeven;
 public class FlipSevenDeckBuilder
 {
-    private Deck _deck;
+    private readonly Deck _deck;
     private FlipSevenDeckBuilder()
     {
         _deck = new Deck();
     }
-    public static FlipSevenDeckBuilder Begin() => new();
+    public static FlipSevenDeckBuilder Begin() 
+        => new();
+
     public FlipSevenDeckBuilder WithNumberCards(int highestNumber = 12)
     {
         _deck.AddStartingCard(new Card(CardType.Number, 0));

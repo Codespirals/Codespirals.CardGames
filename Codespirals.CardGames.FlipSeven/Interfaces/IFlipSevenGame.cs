@@ -18,5 +18,6 @@ public interface IFlipSevenGame<TSelf, TPlayer, TDeck, TCard> : IGame<TSelf, TPl
     public TCard Flip(TPlayer player);
     public void Freeze(TPlayer player);
     public void EndRound();
+    public bool GameOver { get; }
     public Player? GetWinner();
 }

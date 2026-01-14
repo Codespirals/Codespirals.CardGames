@@ -13,7 +13,6 @@ public class Game : IFlipSevenGame<Game, Player, Deck, Card>
     public ReadOnlyCollection<Player> ActivePlayers => _players.Where(p => !p.IsOutForRound).ToList().AsReadOnly();
     public int WinningScore { get; set; } = 200;
     public int NumbersToFlip { get; set; } = 7;
-    public int RoundsPlayed => _currentRound;
     public int CurrentRound => _currentRound + 1;
     public bool RoundActive => _roundActive;
     public bool GameOver => !_roundActive && _players.Any(p => p.BankedPoints > WinningScore);
