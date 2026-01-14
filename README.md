@@ -8,13 +8,27 @@ This repository is the result of those thoughts. Well... those thoughts and proc
 
 Anyhow, the "Games" folder contains built .exe of the games I've made, but of course you shouldn't download exe files from strangers on the internet.
 
-Feel free to comb through the code and compile it yourself!
+Feel free to comb through the code and compile it yourself! 
+
+(If you find possible improvements feel free to notify me)
 
 ## Games
 
 ### Flip 7
 
-Currently done is the insanely fun game [Flip 7](https://theop.games/pages/flip-7-game) as a Console App (so fully text based).
+#### Description
+
+[Flip 7](https://theop.games/pages/flip-7-game) is an insanely fun Blackjack-esque game.
+
+Slowly build your score or risk it all for a few points more?
+
+Hit me.
+
+#### Implementations
+
+##### Console
+
+I've currently implemented it as a Console App (so fully text based).
 
 It's not as fun as playing it at a table, but if you want to try it out, give it a shot!
 
