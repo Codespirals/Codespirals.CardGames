@@ -2,5 +2,5 @@
 public interface IFlipSevenDeck<TCard> : IDeck<TCard>
     where TCard : IFlipSevenCard
 {
-    public int Reshuffles { get; }
+    int Reshuffles { get; }
 }

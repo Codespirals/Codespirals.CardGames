@@ -6,7 +6,7 @@ public class FlipSevenDeckBuilder
     {
         _deck = new Deck();
     }
-    public static FlipSevenDeckBuilder Begin() 
+    public static FlipSevenDeckBuilder Begin()
         => new();
 
     public FlipSevenDeckBuilder WithNumberCards(int highestNumber = 12)

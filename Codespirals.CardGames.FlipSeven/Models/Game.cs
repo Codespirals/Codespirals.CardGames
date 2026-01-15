@@ -6,7 +6,6 @@ public class Game : IFlipSevenGame<Game, Player, Deck, Card>
     private readonly List<Player> _players = [];
     private Player _currentPlayer;
     private int _currentRound = 0;
-    private bool _roundActive;
 
     public Deck Deck { get; } = FlipSevenDeckBuilder.CreateStandardDeck();
     public ReadOnlyCollection<Player> Players => _players.AsReadOnly();
@@ -14,8 +13,8 @@ public class Game : IFlipSevenGame<Game, Player, Deck, Card>
     public int WinningScore { get; set; } = 200;
     public int NumbersToFlip { get; set; } = 7;
     public int CurrentRound => _currentRound + 1;
-    public bool RoundActive => _roundActive;
-    public bool GameOver => !_roundActive && _players.Any(p => p.BankedPoints > WinningScore);
+    public bool RoundActive { get; private set; }
+    public bool GameOver => !RoundActive && _players.Any(p => p.BankedPoints > WinningScore);
 
     private Game(int players, Deck deck, int numbersToFlip = 7, int winningScore = 200)
     {
@@ -34,7 +33,7 @@ public class Game : IFlipSevenGame<Game, Player, Deck, Card>
         => FlipSevenDeckBuilder.Begin();
 
     public static Game SetUp(int players)
-        => new (players, FlipSevenDeckBuilder.CreateStandardDeck());
+        => new(players, FlipSevenDeckBuilder.CreateStandardDeck());
     public static Game SetUp(int players, Deck deck, int numbersToFlip = 7, int winningScore = 200)
         => new(players, deck, numbersToFlip, winningScore);
 
@@ -42,7 +41,7 @@ public class Game : IFlipSevenGame<Game, Player, Deck, Card>
 
     public void StartRound()
     {
-        _roundActive = true;
+        RoundActive = true;
         var startingPlayer = _currentRound % _players.Count;
         _currentPlayer = Players[startingPlayer];
     }
@@ -77,7 +76,7 @@ public class Game : IFlipSevenGame<Game, Player, Deck, Card>
                 player.BankPoints();
             player.Reactivate();
         }
-        _roundActive = false;
+        RoundActive = false;
         _currentRound++;
         _currentPlayer = Players[_currentRound % _players.Count];
     }

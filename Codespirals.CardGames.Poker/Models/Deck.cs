@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 
 namespace Codespirals.CardGames.Poker;
 public class Deck : IPokerDeck<Card>
@@ -14,9 +13,9 @@ public class Deck : IPokerDeck<Card>
 
     internal Deck()
     {
-        
+
     }
-    internal void AddStartingCard(Card card) => _startingCards.Add(card); 
+    internal void AddStartingCard(Card card) => _startingCards.Add(card);
     internal void OrderStartingCards() => _startingCards = [.. _startingCards.OrderBy(c => c.Suit).ThenBy(c => c.Value)];
 
     public Card Draw()

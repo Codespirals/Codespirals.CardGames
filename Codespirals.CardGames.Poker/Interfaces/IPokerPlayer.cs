@@ -1,10 +1,12 @@
 ﻿namespace Codespirals.CardGames.Poker;
-public interface IPokerPlayer<TDeck, TCard> : IPlayer<TDeck, TCard>
+public interface IPokerPlayer<TDeck, TCard> : IPlayer<TDeck, TCard>, ICanPlayRounds
     where TDeck : IPokerDeck<TCard>
-    where TCard : IPokerCard 
+    where TCard : IPokerCard
 {
-    public int Points { get; }
-    public int CurrentBet { get; }
+    int Points { get; }
+    int CurrentBet { get; }
+    bool TappedOut { get; }
 
-    public void Bet(int amount);
+    void Bet(int amount);
+    void AddWinnings(int amount);
 }

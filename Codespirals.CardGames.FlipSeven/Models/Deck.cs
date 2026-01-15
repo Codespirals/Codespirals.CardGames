@@ -13,7 +13,7 @@ public class Deck : IFlipSevenDeck<Card>
     public int Reshuffles { get; private set; }
     internal Deck()
     {
-        
+
     }
 
     internal void AddStartingCard(Card card) => _startingCards.Add(card);

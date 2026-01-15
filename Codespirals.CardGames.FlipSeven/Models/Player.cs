@@ -21,7 +21,7 @@ public class Player : IFlipSevenPlayer<Deck, Card>
         Name = $"Player {_playerNumber + 1}";
     }
 
-    public void Draw(Card card)
+    public void AddCardToHand(Card card)
     {
         if (card.CardType is CardType.Flip or CardType.Freeze)
         {
@@ -52,7 +52,7 @@ public class Player : IFlipSevenPlayer<Deck, Card>
 
     public Card Flip(Card card)
     {
-        Draw(card);
+        AddCardToHand(card);
         return card;
     }
 

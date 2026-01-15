@@ -4,16 +4,16 @@ namespace Codespirals.CardGames;
 public interface IDeck<TCard>
     where TCard : ICard
 {
-    public ReadOnlyCollection<TCard> StartingCards { get; }
-    public ReadOnlyCollection<TCard> CardPool { get; }
-    public ReadOnlyCollection<TCard> DiscardPile { get; }
+    ReadOnlyCollection<TCard> StartingCards { get; }
+    ReadOnlyCollection<TCard> CardPool { get; }
+    ReadOnlyCollection<TCard> DiscardPile { get; }
 
-    public TCard Draw();
-    public IEnumerable<TCard> Draw(int numberOfCards);
-    public IEnumerable<TCard> Peek(int numberOfCards);
-    public void PutOnDiscardPile(TCard card);
-    public void ShuffleDiscardPileIntoDeck();
-    public void Shuffle();
-    public void Order();
-    public void Reset();
+    TCard Draw();
+    IEnumerable<TCard> Draw(int numberOfCards);
+    IEnumerable<TCard> Peek(int numberOfCards);
+    void PutOnDiscardPile(TCard card);
+    void ShuffleDiscardPileIntoDeck();
+    void Shuffle();
+    void Order();
+    void Reset();
 }

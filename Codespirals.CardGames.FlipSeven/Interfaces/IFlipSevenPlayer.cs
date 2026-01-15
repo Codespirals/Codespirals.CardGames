@@ -1,15 +1,12 @@
 ﻿namespace Codespirals.CardGames.FlipSeven;
-public interface IFlipSevenPlayer<TDeck, TCard> : IPlayer<TDeck, TCard>
+public interface IFlipSevenPlayer<TDeck, TCard> : IPlayer<TDeck, TCard>, ICanPlayRounds
     where TDeck : IFlipSevenDeck<TCard>
     where TCard : IFlipSevenCard
 {
-    public int BankedPoints { get; }
-    public int HandPoints { get; }
-    public bool IsOutForRound { get; }
-    public PlayerStates State { get; }
-    public TCard Flip(Card card);
-    public void BankPoints();
-    public void Freeze();
-    public void Bust();
-    public void Reactivate();
+    int BankedPoints { get; }
+    int HandPoints { get; }
+    PlayerStates State { get; }
+    TCard Flip(Card card);
+    void BankPoints();
+    void Freeze();
 }

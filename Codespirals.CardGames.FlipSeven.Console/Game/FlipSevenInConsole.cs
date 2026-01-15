@@ -10,35 +10,17 @@ public class FlipSevenInConsole
     {
         Console.ForegroundColor = ConsoleColor.White;
         Console.WriteLine($"Starting a game of Flip7");
-        Console.WriteLine("How many players are playing?");
-        Console.WriteLine("Enter a number between 2 and 8:");
-        var playerCount = ConsoleHelper.ReadUntilInt(2, 8);
-        return new(playerCount);
+        return new(ConsoleHelper.GetPlayerCount(3, 8));
     }
 
     public void Start()
     {
-        NamePlayers();
+        ConsoleHelper.NamePlayers(_game.Players);
         while (!_game.GameOver)
         {
             PlayRound();
         }
         End();
-    }
-    private void NamePlayers()
-    {
-        Console.WriteLine($"Do you want to name the players?");
-        var answer = ConsoleHelper.ReadUntilAccepted(["y", "yes", "n", "no"]);
-        if (answer.StartsWith('n'))
-            return;
-        foreach (var player in _game.Players)
-        {
-            ConsoleHelper.SetColorForPlayer(_game.Players.IndexOf(player));
-            var oldName = player.Name;
-            Console.WriteLine($"Set {oldName}'s new name!");
-            player.Name = ConsoleHelper.ReadUntilAccepted();
-            Console.WriteLine($"{oldName} is now {player.Name}!");
-        }
     }
 
     private void PlayRound()
@@ -72,13 +54,13 @@ public class FlipSevenInConsole
         {
             Console.WriteLine(player.ToString());
         }
-        Console.WriteLine($"What will you do? Flip or bank?");
-        var input = ConsoleHelper.ReadUntilAccepted(["flip", "bank"]);
-        if (input.Equals("flip", StringComparison.InvariantCultureIgnoreCase))
+        Console.WriteLine($"What will you do? {nameof(Flip)} or {nameof(Bank)}?");
+        var input = ConsoleHelper.ReadUntilAccepted([nameof(Flip), nameof(Bank)]);
+        if (input.Equals(nameof(Flip), StringComparison.InvariantCultureIgnoreCase))
         {
             Flip(player);
         }
-        else if (input.Equals("bank", StringComparison.InvariantCultureIgnoreCase))
+        else if (input.Equals(nameof(Bank), StringComparison.InvariantCultureIgnoreCase))
         {
             Bank(player);
         }
