@@ -66,7 +66,7 @@ internal class BlackjackInConsole
             Console.WriteLine($"What will you do? {nameof(Hit)} or {nameof(Stand)}?");
         else
             Console.WriteLine($"What will you do? {nameof(Hit)}, {nameof(DoubleDown)} or {nameof(Stand)}?");
-        var input = ConsoleHelper.ReadUntilAccepted([nameof(Hit), "h", nameof(DoubleDown), "d", nameof(Stand), "s"]);
+        var input = ConsoleHelper.ReadUntilStartsWith('h', 'd', 's');
         if (input.StartsWith('h'))
         {
             Hit(player);
@@ -104,6 +104,7 @@ internal class BlackjackInConsole
     }
     private static void EvaluateHand(Player<BlackJack> player)
     {
+        Console.WriteLine($"{player.Name} currently has {player.HandValue}.");
         if (player.HandValue == 21)
         {
             if (player.HandCount == 2)
@@ -117,14 +118,13 @@ internal class BlackjackInConsole
             player.Stand();
             return;
         }
-        if (player.HandValue > 21)
+        else if (player.HandValue > 21)
         {
             Console.ForegroundColor = ConsoleColor.DarkRed;
             Console.WriteLine($"Oh no... busted");
             player.Bust();
             return;
         }
-        Console.WriteLine($"{player.Name} currently has {player.HandValue}.");
     }
     private void End()
     {

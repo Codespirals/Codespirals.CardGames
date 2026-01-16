@@ -50,6 +50,12 @@ public class Player<TGame> : IPokerPlayer<Deck, Card>
         CurrentBet = Math.Clamp(amount, 0, Points);
         Points -= CurrentBet;
     }
+    public void DoubleDown(Card card)
+    {
+        Bet(CurrentBet);
+        AddCardToHand(card);
+        Stand();
+    }
 
     public void Stand()
         => _isOutForRound = true;

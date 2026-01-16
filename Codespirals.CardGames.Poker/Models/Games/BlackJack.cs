@@ -5,24 +5,25 @@ public class BlackJack : IBlackJackGame<BlackJack, Player<BlackJack>, Deck, Card
 {
     private readonly List<Player<BlackJack>> _players = [];
     private Player<BlackJack> _currentPlayer;
-    private readonly int _currentRound = 0;
+    private int _currentRound = 0;
     public Deck Deck { get; } = PokerDeckBuilder.BasicBlackJackDeck();
     public Player<BlackJack> Dealer { get; }
     public int WinningScore { get; private set; } = 21;
     public int MinBet { get; private set; }
-    public ReadOnlyCollection<Player<BlackJack>> Players => new List<Player<BlackJack>>([Dealer]).Concat(_players).ToList().AsReadOnly();
+    public ReadOnlyCollection<Player<BlackJack>> Players => _players.ToList().AsReadOnly();
     public int CurrentRound => _currentRound + 1;
-    public bool RoundActive { get; private set; }
+    public bool RoundActive => _players.Any(p => !p.IsOutForRound);
     public bool GameOver { get; private set; }
 
     public BlackJack(int players, int minBet, int winningScore = 21)
     {
         Dealer = new Player<BlackJack>(this, "Dealer", 1000000);
+        _players.Add(Dealer);
+        _currentPlayer = Dealer;
         for (var i = 0; i < players; i++)
         {
             _players.Add(new Player<BlackJack>(this, i));
         }
-        _currentPlayer = _players.First();
         MinBet = minBet;
         WinningScore = winningScore;
     }
@@ -34,14 +35,14 @@ public class BlackJack : IBlackJackGame<BlackJack, Player<BlackJack>, Deck, Card
         => _currentPlayer;
     public void StartRound()
     {
-        RoundActive = true;
         foreach (var player in _players)
         {
+            player.Reactivate();
             player.Bet(MinBet);
             player.AddCardToHand(Deck.Draw());
             player.AddCardToHand(Deck.Draw());
         }
-        _currentPlayer = _players[CurrentRound % _players.Count];
+        _currentPlayer = Dealer;
     }
 
     public void MoveToNextPlayer()
@@ -77,10 +78,6 @@ public class BlackJack : IBlackJackGame<BlackJack, Player<BlackJack>, Deck, Card
 
     public void EndRound()
     {
-        RoundActive = false;
-        foreach (var player in _players)
-        {
-            player.Reactivate();
-        }
+        _currentRound++;
     }
 }

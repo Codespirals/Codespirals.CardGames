@@ -13,7 +13,7 @@ public class Game : IFlipSevenGame<Game, Player, Deck, Card>
     public int WinningScore { get; set; } = 200;
     public int NumbersToFlip { get; set; } = 7;
     public int CurrentRound => _currentRound + 1;
-    public bool RoundActive { get; private set; }
+    public bool RoundActive => ActivePlayers.Count > 0;
     public bool GameOver => !RoundActive && _players.Any(p => p.BankedPoints > WinningScore);
 
     private Game(int players, Deck deck, int numbersToFlip = 7, int winningScore = 200)
@@ -41,7 +41,10 @@ public class Game : IFlipSevenGame<Game, Player, Deck, Card>
 
     public void StartRound()
     {
-        RoundActive = true;
+        foreach (var player in _players)
+        {
+            player.Reactivate();
+        }
         var startingPlayer = _currentRound % _players.Count;
         _currentPlayer = Players[startingPlayer];
     }
@@ -74,9 +77,7 @@ public class Game : IFlipSevenGame<Game, Player, Deck, Card>
         {
             if (!player.IsOutForRound)
                 player.BankPoints();
-            player.Reactivate();
         }
-        RoundActive = false;
         _currentRound++;
         _currentPlayer = Players[_currentRound % _players.Count];
     }

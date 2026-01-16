@@ -30,6 +30,18 @@ public static class ConsoleHelper
         }
         return result!;
     }
+    public static string ReadUntilStartsWith(params char[] acceptableValues)
+    {
+        var result = Console.ReadLine();
+        result = result?.Replace(" ", "");
+        while (string.IsNullOrWhiteSpace(result) || acceptableValues.Any(c => result.StartsWith(c)))
+        {
+            Console.WriteLine("Not a valid input. Try again.");
+            result = Console.ReadLine();
+            result = result?.Replace(" ", "");
+        }
+        return result!;
+    }
     public static void SeperatorLine(char lineChar = '-')
         => Console.WriteLine(new string(lineChar, 40));
 
