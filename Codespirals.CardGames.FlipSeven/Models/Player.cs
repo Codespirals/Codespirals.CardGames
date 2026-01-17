@@ -9,7 +9,7 @@ public class Player : IFlipSevenPlayer<Deck, Card>
 
     public string Name { get; set; }
     public ReadOnlyCollection<Card> Hand => _hand.AsReadOnly();
-    public int HandCount => _hand.Count(c => c.CardType == CardType.Number);
+    public int NumberCardsInHand => _hand.Count(c => c.CardType == CardType.Number);
     public int HandPoints => CalculateHandValue();
     public int BankedPoints { get; private set; } = 0;
     public bool IsOutForRound => State != PlayerStates.Playing;
@@ -58,7 +58,7 @@ public class Player : IFlipSevenPlayer<Deck, Card>
 
     public void BankPoints()
     {
-        var roundPoints = HandCount >= _game.NumbersToFlip ? 15 : 0;
+        var roundPoints = NumberCardsInHand >= _game.NumbersToFlip ? 15 : 0;
         roundPoints += HandPoints;
         DiscardAll();
         BankedPoints += roundPoints;

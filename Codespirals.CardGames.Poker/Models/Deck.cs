@@ -15,15 +15,16 @@ public class Deck : IPokerDeck<Card>
     {
 
     }
+
     internal void AddStartingCard(Card card) => _startingCards.Add(card);
     internal void OrderStartingCards() => _startingCards = [.. _startingCards.OrderBy(c => c.Suit).ThenBy(c => c.Value)];
 
     public Card Draw()
     {
         if (CardPool.Count is 0)
-            return CardHelper.NoCard();
-        var card = CardPool.First();
-        _discardPile.Add(card);
+            return new Card(ExtraCards.Fool, 0);
+        var card = _cardPool.First();
+        _cardPool.RemoveAt(0);
         return card;
     }
     public IEnumerable<Card> Draw(int numberOfCards)

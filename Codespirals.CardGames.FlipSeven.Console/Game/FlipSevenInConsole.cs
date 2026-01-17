@@ -15,7 +15,7 @@ public class FlipSevenInConsole
 
     public void Start()
     {
-        ConsoleHelper.NamePlayers(_game.Players);
+        ConsoleHelper.AskToNamePlayers(_game.Players);
         while (!_game.GameOver)
         {
             PlayRound();

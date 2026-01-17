@@ -1,35 +1,34 @@
-﻿using System.Collections.ObjectModel;
+﻿using Codespirals.CardGames.Poker.BlackJack;
+using System.Collections.ObjectModel;
 
 namespace Codespirals.CardGames.Poker;
-public class Player<TGame> : IPokerPlayer<Deck, Card>
-    where TGame : IGame<TGame, Deck, Card>
+public class BlackJackPlayer : IBlackJackPlayer<Deck, Card>
 {
-    private readonly TGame _game;
-    private readonly List<Card> _hand = [];
-    private bool _isOutForRound;
+    internal readonly BlackJackGame _game;
+    internal readonly List<Card> _hand = [];
+    internal bool _isOutForRound;
 
     public string Name { get; set; }
     public ReadOnlyCollection<Card> Hand => _hand.AsReadOnly();
-    public int HandCount => _hand.Count;
-    public int HandValue => CalculateHandValue();
-    public int Points { get; private set; }
+    public int Cash { get; private set; }
     public int CurrentBet { get; private set; }
     public bool IsOutForRound => _isOutForRound || TappedOut;
-    public bool TappedOut => Points == 0 && CurrentBet == 0;
+    public bool TappedOut => Cash == 0 && CurrentBet == 0;
+    public int HandValue => CalculateHandValue();
 
-    public Player(TGame game, int id, int startingPoints = 100)
+    public BlackJackPlayer(BlackJackGame game, int id, int startingCash)
     {
         _game = game;
         Name = $"Player {id + 1}";
-        Points = startingPoints;
+        Cash = startingCash;
     }
-    public Player(TGame game, string name, int startingPoints = 100)
+    public BlackJackPlayer(BlackJackGame game, string name, int startingCash)
     {
         _game = game;
         Name = name;
-        Points = startingPoints;
+        Cash = startingCash;
     }
-
+    public void AddCardToHand(Card card) => _hand.Add(card);
     public void Discard(Card card)
     {
         _hand.Remove(card);
@@ -43,13 +42,12 @@ public class Player<TGame> : IPokerPlayer<Deck, Card>
         _hand.Clear();
     }
 
-    public void AddCardToHand(Card card) => _hand.Add(card);
-
     public void Bet(int amount)
     {
-        CurrentBet = Math.Clamp(amount, 0, Points);
-        Points -= CurrentBet;
+        CurrentBet = Math.Clamp(amount, 0, Cash);
+        Cash -= CurrentBet;
     }
+
     public void DoubleDown(Card card)
     {
         Bet(CurrentBet);
@@ -62,39 +60,39 @@ public class Player<TGame> : IPokerPlayer<Deck, Card>
 
     public void AddWinnings(int amount)
     {
-        DiscardAll();
-        Points += amount;
+        Cash += amount;
         CurrentBet = 0;
     }
 
     public void Bust()
     {
-        DiscardAll();
         CurrentBet = 0;
         _isOutForRound = true;
     }
+
     public void Reactivate()
     {
         DiscardAll();
+        CurrentBet = 0;
         _isOutForRound = false;
     }
 
-    internal int CalculateHandValue()
+    private int CalculateHandValue()
     {
         var value = _hand.Sum(c => c.Value);
         foreach (var ace in _hand.Where(c => c.Value == 11))
         {
-            if (value <= 21)
+            if (value <= _game.WinningScore)
                 break;
             value -= 10;
         }
-        if (value > 21)
+        if (value > _game.WinningScore)
         {
             Bust();
         }
         return value;
     }
-    public override string ToString()
-        => $"{Name} {(Hand.Count != 0 ? "Hand: " : "")}{string.Join('|', Hand.OrderBy(c => c.Suit).Select(c => c.Name))} Hand total: {HandValue} Cash:{Points} Current Bet:{CurrentBet}";
 
+    public override string ToString()
+        => $"{Name} {(Hand.Count != 0 ? "Hand: " : "")}{string.Join('|', Hand.OrderByDescending(c => c.IsFaceDown).Select(c => c.Name))} Hand total: {HandValue} Cash:{Cash} Current Bet:{CurrentBet}";
 }

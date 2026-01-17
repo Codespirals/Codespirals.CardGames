@@ -34,7 +34,7 @@ public static class ConsoleHelper
     {
         var result = Console.ReadLine();
         result = result?.Replace(" ", "");
-        while (string.IsNullOrWhiteSpace(result) || acceptableValues.Any(c => result.StartsWith(c)))
+        while (string.IsNullOrWhiteSpace(result) || !acceptableValues.Any(c => result.StartsWith(c.ToString(), StringComparison.OrdinalIgnoreCase)))
         {
             Console.WriteLine("Not a valid input. Try again.");
             result = Console.ReadLine();
@@ -64,16 +64,16 @@ public static class ConsoleHelper
     public static int GetPlayerCount(int min, int max)
     {
         Console.WriteLine("How many players are playing?");
-        Console.WriteLine("Enter a number between 2 and 8:");
+        Console.WriteLine($"Enter a number between {min} and {max}:");
         return ConsoleHelper.ReadUntilInt(min, max);
     }
 
-    public static void NamePlayers<TPlayer>(IEnumerable<TPlayer> players)
+    public static void AskToNamePlayers<TPlayer>(IEnumerable<TPlayer> players)
         where TPlayer : IPlayer
 
     {
         Console.WriteLine($"Do you want to name the players?");
-        var answer = ConsoleHelper.ReadUntilAccepted(["y", "yes", "n", "no"]);
+        var answer = ConsoleHelper.ReadUntilStartsWith('y', 'n');
         if (answer.StartsWith('n'))
             return;
         var playerList = players.ToList();

@@ -6,7 +6,7 @@ public class Card : IPokerCard
     private readonly int _value = 0;
     private readonly Suit _suit = Suit.Unknown;
     private readonly string _name = "";
-    public int Value => IsFaceDown ? 0 : Value;
+    public int Value => IsFaceDown ? 0 : _value;
     public string Name => GetName();
     public Suit Suit => IsFaceDown ? Suit.Unknown : _suit;
     public string? Emoji => IsFaceDown ? Constants.CARDBACKEMOJI : _emoji;

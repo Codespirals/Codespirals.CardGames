@@ -10,4 +10,8 @@
     <ProjectReference Include="..\Codespirals.CardGames.Shared\Codespirals.CardGames.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Helpers\" />
+  </ItemGroup>
+
 </Project>

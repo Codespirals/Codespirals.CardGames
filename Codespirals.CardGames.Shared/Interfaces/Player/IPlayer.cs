@@ -5,7 +5,6 @@ namespace Codespirals.CardGames;
 public interface IPlayer
 {
     string Name { get; set; }
-    int HandCount { get; }
 }
 public interface IPlayer<TDeck, TCard> : IPlayer
     where TDeck : IDeck<TCard>
