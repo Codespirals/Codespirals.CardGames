@@ -19,12 +19,14 @@ public class Card : IPokerCard
         _value = value;
 
         // if the card is of traditinal suits, there's an emoji for it
-        if (_suit is >= Suit.Diamonds and <= Suit.Spades)
-            _emoji = char.ConvertFromUtf32(Convert.ToInt32("01F0A0", 16) + _value + (((int)_suit - 1) * 16));
+        if (_suit is >= Suit.Spades and <= Suit.Clubs)
+            _emoji = char.ConvertFromUtf32(Convert.ToInt32("01F0A0", 16) + (((int)_suit - 1) * 16) + _value);
     }
     public Card(NamedCards cardType, int value, Suit suit) : this(cardType.ToString(), value, suit)
     {
-
+        // if the card is of traditinal suits, there's an emoji for it
+        if (_suit is >= Suit.Spades and <= Suit.Clubs)
+            _emoji = char.ConvertFromUtf32(Convert.ToInt32("01F0A0", 16) + (((int)_suit - 1) * 16) + 10 + (int)cardType);
     }
 
     public Card(ExtraCards cardType, int value, Suit suit = Suit.Unknown)

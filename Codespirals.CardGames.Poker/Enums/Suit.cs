@@ -11,10 +11,10 @@
 public enum Suit
 {
     Unknown,
+    Spades,
+    Hearts,
     Diamonds,
     Clubs,
-    Hearts,
-    Spades,
     Bells,
     Acorns,
     Flowers,
