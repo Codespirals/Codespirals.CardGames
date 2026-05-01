@@ -22,7 +22,7 @@ public class Deck : IPokerDeck<Card>
     public Card Draw()
     {
         if (CardPool.Count is 0)
-            return new Card(ExtraCards.Fool, 0);
+            return Card.GenerateExtraCard(ExtraCards.Fool, 0, Suit.Unknown);
         var card = _cardPool.First();
         _cardPool.RemoveAt(0);
         return card;

@@ -12,7 +12,7 @@ public class Card : IPokerCard
     public string? Emoji => IsFaceDown ? Constants.CARDBACKEMOJI : _emoji;
     public bool IsFaceDown { get; internal set; }
 
-    public Card(string name, int value, Suit suit)
+    private Card(string name, int value, Suit suit)
     {
         _suit = suit;
         _name = name;
@@ -22,14 +22,19 @@ public class Card : IPokerCard
         if (_suit is >= Suit.Spades and <= Suit.Clubs)
             _emoji = char.ConvertFromUtf32(Convert.ToInt32("01F0A0", 16) + (((int)_suit - 1) * 16) + _value);
     }
-    public Card(NamedCards cardType, int value, Suit suit) : this(cardType.ToString(), value, suit)
+
+    private Card(NamedCards cardType, int value, Suit suit)
     {
+        _suit = suit;
+        _name = cardType.ToString();
+        _value = value;
+
         // if the card is of traditinal suits, there's an emoji for it
         if (_suit is >= Suit.Spades and <= Suit.Clubs)
-            _emoji = char.ConvertFromUtf32(Convert.ToInt32("01F0A0", 16) + (((int)_suit - 1) * 16) + 10 + (int)cardType);
+            _emoji = char.ConvertFromUtf32(Convert.ToInt32("01F0A0", 16) + (((int)_suit - 1) * 16) + (int)cardType);
     }
 
-    public Card(ExtraCards cardType, int value, Suit suit = Suit.Unknown)
+    private Card(ExtraCards cardType, int value, Suit suit = Suit.Unknown)
     {
         _suit = suit;
         _value = value;
@@ -50,6 +55,13 @@ public class Card : IPokerCard
             _name = "";
         }
     }
+
+    public static Card GenerateNumberCard(string name, int value, Suit suit)
+        => new(name, value, suit);
+    public static Card GenerateNamedCard(NamedCards cardType, int value, Suit suit)
+        => new(cardType, value, suit);
+    public static Card GenerateExtraCard(ExtraCards cardType, int value, Suit suit)
+        => new(cardType, value, suit);
 
     public override string ToString()
         => GetName();

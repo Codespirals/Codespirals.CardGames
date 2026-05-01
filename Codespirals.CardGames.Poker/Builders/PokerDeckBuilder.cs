@@ -17,7 +17,7 @@ public class PokerDeckBuilder
         {
             for (var i = min; i < max; i++)
             {
-                _deck.AddStartingCard(new Card(i.ToString(), i, suit));
+                _deck.AddStartingCard(Card.GenerateNumberCard(i.ToString(), i, suit));
             }
         }
         return this;
@@ -26,7 +26,7 @@ public class PokerDeckBuilder
     {
         foreach (var suit in suits)
         {
-            _deck.AddStartingCard(new Card(cardType, value, suit));
+            _deck.AddStartingCard(Card.GenerateNamedCard(cardType, value, suit));
         }
         return this;
     }
@@ -35,7 +35,7 @@ public class PokerDeckBuilder
     {
         for (var i = 0; i < number; i++)
         {
-            _deck.AddStartingCard(new Card(cardType, value, suit));
+            _deck.AddStartingCard(Card.GenerateExtraCard(cardType, value, suit));
         }
         return this;
     }
