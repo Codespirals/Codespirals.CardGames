@@ -17,12 +17,12 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Deck
 
     public BlackJackGame(int players, int minBet, int winningScore = 21, int startingCash = 100)
     {
-        Dealer = new BlackJackPlayer(this, "Dealer", 0);
+        Dealer = BlackJackPlayer.GeneratePlayer(this, "Dealer", Int32.MaxValue);
         _players.Add(Dealer);
         _currentPlayer = Dealer;
         for (var i = 0; i < players; i++)
         {
-            _players.Add(new BlackJackPlayer(this, i, startingCash));
+            _players.Add(BlackJackPlayer.GeneratePlayer(this, i, startingCash));
         }
         BuyIn = minBet;
         WinningScore = winningScore;

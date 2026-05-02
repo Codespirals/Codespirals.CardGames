@@ -9,25 +9,27 @@ public class BlackJackPlayer : IBlackJackPlayer<Deck, Card>
     internal bool _isOutForRound;
 
     public string Name { get; set; }
-    public ReadOnlyCollection<Card> Hand => _hand.AsReadOnly();
-    public int Cash { get; private set; }
+    public int Cash { get; private set; } = 1;
     public int CurrentBet { get; private set; }
     public bool IsOutForRound => _isOutForRound || TappedOut;
-    public bool TappedOut => Cash == 0 && CurrentBet == 0;
+    public bool TappedOut => Cash <= 0 && CurrentBet <= 0;
     public int HandValue => CalculateHandValue();
+    public ReadOnlyCollection<Card> Hand => _hand.AsReadOnly();
 
-    public BlackJackPlayer(BlackJackGame game, int id, int startingCash)
-    {
-        _game = game;
-        Name = $"Player {id + 1}";
-        Cash = startingCash;
-    }
-    public BlackJackPlayer(BlackJackGame game, string name, int startingCash)
+    private BlackJackPlayer(BlackJackGame game, string name, int startingCash)
     {
         _game = game;
         Name = name;
         Cash = startingCash;
     }
+    private BlackJackPlayer(BlackJackGame game, int number, int startingCash) : this(game, $"Player {number + 1}", startingCash)
+    {
+
+    }
+    public static BlackJackPlayer GeneratePlayer(BlackJackGame game, string name, int startingCash)
+        => new BlackJackPlayer(game, name, startingCash);
+    public static BlackJackPlayer GeneratePlayer(BlackJackGame game, int number, int startingCash)
+        => new BlackJackPlayer(game, number, startingCash);
     public void AddCardToHand(Card card) => _hand.Add(card);
     public void Discard(Card card)
     {
@@ -58,16 +60,16 @@ public class BlackJackPlayer : IBlackJackPlayer<Deck, Card>
     public void Stand()
         => _isOutForRound = true;
 
-    public void AddWinnings(int amount)
-    {
-        Cash += amount;
-        CurrentBet = 0;
-    }
-
     public void Bust()
     {
         CurrentBet = 0;
         _isOutForRound = true;
+    }
+
+    public void AddWinnings(int amount)
+    {
+        Cash += amount;
+        CurrentBet = 0;
     }
 
     public void Reactivate()
