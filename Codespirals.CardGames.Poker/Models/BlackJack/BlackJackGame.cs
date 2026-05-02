@@ -37,6 +37,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Deck
         => _currentPlayer;
     public void StartRound()
     {
+        Dealer.Reactivate();
         Dealer.DiscardAll();
         Dealer.AddCardToHand(Deck.Draw());
         Dealer.AddCardToHand(Deck.Draw());
