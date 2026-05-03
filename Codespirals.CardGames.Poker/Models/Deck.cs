@@ -7,10 +7,10 @@ public class Deck : IPokerDeck<Card>
     private List<Card> _cardPool = [];
     private List<Card> _discardPile = [];
 
-    public bool RefreshOnEmpty { get; set; }
     public ReadOnlyCollection<Card> StartingCards => _startingCards.AsReadOnly();
     public ReadOnlyCollection<Card> CardPool => _cardPool.AsReadOnly();
     public ReadOnlyCollection<Card> DiscardPile => _discardPile.AsReadOnly();
+    public bool RefreshOnEmpty { get; set; }
 
     internal Deck()
     {
@@ -26,8 +26,8 @@ public class Deck : IPokerDeck<Card>
         {
             if (RefreshOnEmpty)
             {
-                _cardPool = _discardPile;
-                _discardPile.Shuffle();
+                ReturnDiscardPileToCardPool();
+                _cardPool.Shuffle();
             }
             else
                 return Card.GenerateExtraCard(ExtraCards.Fool, 0, Suit.Unknown);
@@ -44,7 +44,8 @@ public class Deck : IPokerDeck<Card>
     }
     public IEnumerable<Card> Peek(int numberOfCards) => CardPool.Take(numberOfCards);
     public void PutOnDiscardPile(Card card) => _discardPile.Add(card);
-    public void ShuffleDiscardPileIntoDeck()
+    public void PutOnDiscardPile(Card[] cards) => _discardPile.AddRange(cards);
+    public void ReturnDiscardPileToCardPool()
     {
         _cardPool.AddRange(_discardPile);
         _discardPile.Clear();

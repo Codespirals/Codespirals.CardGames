@@ -6,6 +6,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Deck
     private readonly List<BlackJackPlayer> _players = [];
     private BlackJackPlayer _currentPlayer;
     private int _currentRound = 0;
+    private int _automaticallyIncreaseStakeAfterRound = 0;
     public Deck Deck { get; }
     public BlackJackPlayer Dealer { get; }
     public int WinningScore { get; private set; } = 21;
@@ -15,11 +16,12 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Deck
     public bool RoundActive => _players.Any(p => !p.IsOutForRound);
     public bool GameOver { get; private set; }
 
-    public BlackJackGame(int players, int minBet, int winningScore = 21, int startingCash = 100)
+    public BlackJackGame(int players, int minBet = 1, int winningScore = 21, int startingCash = 100, int automaticallyIncreaseStakeAfterRound = 1)
     {
         Dealer = BlackJackPlayer.GeneratePlayer(this, "Dealer", Int32.MaxValue);
         _players.Add(Dealer);
         _currentPlayer = Dealer;
+        _automaticallyIncreaseStakeAfterRound = automaticallyIncreaseStakeAfterRound;
         for (var i = 0; i < players; i++)
         {
             _players.Add(BlackJackPlayer.GeneratePlayer(this, i, startingCash));
@@ -30,8 +32,8 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Deck
         Deck.Shuffle();
     }
 
-    public static BlackJackGame SetUp(int players) => new(players, 1, 21, 100);
-    public static BlackJackGame SetUp(int players, int minBet, int winningScore, int startingCash) => new(players, minBet, winningScore, startingCash);
+    public static BlackJackGame SetUp(int players) => new(players, 1, 21, 100, 1);
+    public static BlackJackGame SetUp(int players, int minBet, int winningScore, int startingCash, int automaticallyIncreaseStakeAfterRound) => new(players, minBet, winningScore, startingCash, automaticallyIncreaseStakeAfterRound);
 
     public BlackJackPlayer GetCurrentPlayer()
         => _currentPlayer;
@@ -88,6 +90,10 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Deck
     public void EndRound()
     {
         _currentRound++;
+        if (_automaticallyIncreaseStakeAfterRound > 0)
+        {
+            RaiseTheStakes(_automaticallyIncreaseStakeAfterRound);
+        }
     }
     public void RaiseTheStakes(int amount)
     {

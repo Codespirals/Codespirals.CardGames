@@ -21,7 +21,7 @@ public class Deck : IFlipSevenDeck<Card>
     public Card Draw()
     {
         if (CardPool.Count is 0)
-            ShuffleDiscardPileIntoDeck();
+            ReturnDiscardPileToCardPool();
         var card = _cardPool.First();
         _cardPool.Remove(card);
         return card;
@@ -37,7 +37,7 @@ public class Deck : IFlipSevenDeck<Card>
 
     public IEnumerable<Card> Peek(int numberOfCards) => _cardPool.Take(Math.Clamp(numberOfCards, 0, _cardPool.Count));
     public void PutOnDiscardPile(Card card) => _discardPile.Add(card);
-    public void ShuffleDiscardPileIntoDeck()
+    public void ReturnDiscardPileToCardPool()
     {
         _cardPool.AddRange(_discardPile);
         _discardPile = [];

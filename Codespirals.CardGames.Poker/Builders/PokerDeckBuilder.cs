@@ -1,7 +1,7 @@
 ﻿namespace Codespirals.CardGames.Poker;
 public class PokerDeckBuilder
 {
-    private readonly Deck _deck;
+    private Deck _deck;
 
     private PokerDeckBuilder()
     {
@@ -10,6 +10,12 @@ public class PokerDeckBuilder
 
     public static PokerDeckBuilder BeginBuilding()
         => new();
+
+    public PokerDeckBuilder RefreshOnEmpty()
+    {
+        _deck.RefreshOnEmpty = true;
+        return this;
+    }
 
     public PokerDeckBuilder WithNumberCards(Suit[] suits, int min = 2, int max = 10)
     {
@@ -49,13 +55,10 @@ public class PokerDeckBuilder
 
     public Deck BuildMultiple(int number)
     {
-        var temp = _deck;
-        foreach (var card in temp.StartingCards)
+        var temp = _deck.StartingCards.ToList().AsReadOnly();
+        for (var i = 0; i > number; i++)
         {
-            for (var i = 0; i > number; i++)
-            {
-                _deck.AddStartingCard(card);
-            }
+            _deck.StartingCards.Concat(temp);
         }
         _deck.OrderStartingCards();
         _deck.Reset();
@@ -78,6 +81,7 @@ public class PokerDeckBuilder
         .WithNamedCards([Suit.Diamonds, Suit.Clubs, Suit.Hearts, Suit.Spades], NamedCards.Jack, 10)
         .WithNamedCards([Suit.Diamonds, Suit.Clubs, Suit.Hearts, Suit.Spades], NamedCards.Queen, 10)
         .WithNamedCards([Suit.Diamonds, Suit.Clubs, Suit.Hearts, Suit.Spades], NamedCards.King, 10)
+        .RefreshOnEmpty()
         .Build();
 
     public static Deck BasicPokerDeckWithJokers(int jokers)
