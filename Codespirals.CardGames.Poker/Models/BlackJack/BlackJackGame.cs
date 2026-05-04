@@ -11,12 +11,13 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Deck
     public BlackJackPlayer Dealer { get; }
     public int WinningScore { get; private set; } = 21;
     public int BuyIn { get; private set; }
+    public int DrawAtStartOfRound { get; private set; } = 2;
     public ReadOnlyCollection<BlackJackPlayer> Players => _players.ToList().AsReadOnly();
     public int CurrentRound => _currentRound + 1;
-    public bool RoundActive => _players.Any(p => !p.IsOutForRound);
+    public bool RoundActive => _players.All(p => p.IsOutForRound);
     public bool GameOver => Players.Except([Dealer]).All(p => p.TappedOut);
 
-    public BlackJackGame(int players, int minBet = 1, int winningScore = 21, int startingCash = 100, int automaticallyIncreaseStakeAfterRound = 1)
+    public BlackJackGame(int players, int minBet = 1, int winningScore = 21, int startingCash = 100, int automaticallyIncreaseStakeAfterRound = 1, int drawAtStartOfRound = 2)
     {
         Dealer = BlackJackPlayer.GeneratePlayer(this, "Dealer", Int32.MaxValue);
         _players.Add(Dealer);
@@ -28,29 +29,35 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Deck
         }
         BuyIn = minBet;
         WinningScore = winningScore;
+        DrawAtStartOfRound = drawAtStartOfRound;
         Deck = PokerDeckBuilder.BasicBlackJackDeck();
         Deck.Shuffle();
     }
 
     public static BlackJackGame SetUp(int players) => new(players, 1, 21, 100, 1);
-    public static BlackJackGame SetUp(int players, int minBet, int winningScore, int startingCash, int automaticallyIncreaseStakeAfterRound) => new(players, minBet, winningScore, startingCash, automaticallyIncreaseStakeAfterRound);
+    public static BlackJackGame SetUp(int players, int minBet, int winningScore, int startingCash, int automaticallyIncreaseStakeAfterRound, int drawAtStartOfRound) => new(players, minBet, winningScore, startingCash, automaticallyIncreaseStakeAfterRound, drawAtStartOfRound);
 
     public BlackJackPlayer GetCurrentPlayer()
         => _currentPlayer;
+
     public void StartRound()
     {
         Dealer.Reactivate();
         Dealer.DiscardAll();
-        Dealer.AddCardToHand(Deck.Draw());
-        Dealer.AddCardToHand(Deck.Draw());
+        for (int i = 0; i < DrawAtStartOfRound; i++)
+        {
+            Dealer.AddCardToHand(Deck.Draw());
+        }
         foreach (var player in _players.Except([Dealer]))
         {
             if (player.TappedOut)
                 continue;
             player.Reactivate();
             player.Bet(BuyIn);
-            player.AddCardToHand(Deck.Draw());
-            player.AddCardToHand(Deck.Draw());
+            for (int i = 0; i < DrawAtStartOfRound; i++)
+            {
+                player.AddCardToHand(Deck.Draw());
+            }
         }
         _currentPlayer = Dealer;
     }
@@ -74,6 +81,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Deck
         player.AddCardToHand(card);
         return card;
     }
+
     public Card DoubleDown(BlackJackPlayer player)
     {
         var card = Deck.Draw();
@@ -81,6 +89,19 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Deck
         return card;
     }
     public void Stand(BlackJackPlayer player) => player.Stand();
+
+    private bool EvaluateHand(BlackJackPlayer player)
+    {
+        var busted = player.HandValue > WinningScore;
+        if (busted)
+            player.Bust();
+
+        if (RoundActive)
+            MoveToNextPlayer();
+        else
+            EndRound();
+        return busted;
+    }
 
     public void EndRound()
     {
@@ -90,6 +111,23 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Deck
             RaiseTheStakes(_automaticallyIncreaseStakeAfterRound);
         }
     }
+
+    public void PlayDealer()
+    {
+        if (Dealer.HandValue <= 17)
+        {
+            Hit(Dealer);
+            if (Dealer.HandValue > WinningScore)
+            {
+                EndRound();
+            }
+        }
+        else if (!Dealer.IsOutForRound)
+        {
+            Stand(Dealer);
+        }
+    }
+
     public void RaiseTheStakes(int amount)
     {
         BuyIn += amount;

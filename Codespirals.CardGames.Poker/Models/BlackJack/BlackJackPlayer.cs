@@ -52,7 +52,10 @@ public class BlackJackPlayer : IBlackJackPlayer<Deck, Card>
 
     public void DoubleDown(Card card)
     {
-        Bet(CurrentBet);
+        if (Cash >= CurrentBet)
+        {
+            Bet(CurrentBet);
+        }
         AddCardToHand(card);
         Stand();
     }
@@ -66,10 +69,17 @@ public class BlackJackPlayer : IBlackJackPlayer<Deck, Card>
         _isOutForRound = true;
     }
 
-    public void AddWinnings(int amount)
+    public void AddWinnings(int multiplier = 1)
     {
-        Cash += amount;
+        Cash += CurrentBet * multiplier;
         CurrentBet = 0;
+    }
+
+    public void DeactivateForRound()
+    {
+        DiscardAll();
+        CurrentBet = 0;
+        _isOutForRound = true;
     }
 
     public void Reactivate()
