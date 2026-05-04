@@ -14,7 +14,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Deck
     public ReadOnlyCollection<BlackJackPlayer> Players => _players.ToList().AsReadOnly();
     public int CurrentRound => _currentRound + 1;
     public bool RoundActive => _players.Any(p => !p.IsOutForRound);
-    public bool GameOver { get; private set; }
+    public bool GameOver => Players.Except([Dealer]).All(p => p.TappedOut);
 
     public BlackJackGame(int players, int minBet = 1, int winningScore = 21, int startingCash = 100, int automaticallyIncreaseStakeAfterRound = 1)
     {
@@ -57,12 +57,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Deck
 
     public void MoveToNextPlayer()
     {
-        if (Players.Except([Dealer]).All(p => p.TappedOut))
-        {
-            GameOver = true;
-            return;
-        }
-        if (Players.All(p => p.IsOutForRound))
+        if (Players.All(p => p.IsOutForRound) || GameOver)
         {
             EndRound();
             return;
