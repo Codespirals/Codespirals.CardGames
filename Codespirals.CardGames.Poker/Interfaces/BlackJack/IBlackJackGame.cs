@@ -55,5 +55,5 @@ public interface IBlackJackGame<TSelf, TPlayer, TDeck, TCard> : IGame<TSelf, TDe
     /// End the round and return information about the winnings of the round
     /// </summary>
     /// <returns></returns>
-    (BlackJackPlayer Player, int Winnings)[] CalculateWinningsOfRound();
+    (BlackJackPlayer Player, int WinningMultiplier)[] CalculateWinningsOfRound();
 }

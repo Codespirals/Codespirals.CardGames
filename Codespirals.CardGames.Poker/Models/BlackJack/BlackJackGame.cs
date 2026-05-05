@@ -117,9 +117,9 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Deck
             RaiseTheStakes(_automaticallyIncreaseStakeAfterRound);
     }
 
-    public (BlackJackPlayer Player, int Winnings)[] CalculateWinningsOfRound()
+    public (BlackJackPlayer Player, int WinningMultiplier)[] CalculateWinningsOfRound()
     {
-        (BlackJackPlayer Player, int Winnings)[] results = [];
+        (BlackJackPlayer, int)[] results = [];
         foreach (var player in _players.Except([Dealer]))
         {
             if (player.IsBusted)
@@ -128,21 +128,24 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Deck
                 continue;
             }
 
-            var winnings = 0;
+            var winningMultiplier = 0;
             if (player.HandValue == WinningScore && player.Hand.Count == 2)
             {
-                winnings = player.CurrentBet * 3;
+                // blackjack
+                winningMultiplier = 3;
             }
             if ((Dealer.IsBusted && !player.IsBusted)
                 || (!Dealer.IsBusted && !player.IsBusted && player.HandValue > Dealer.HandValue))
             {
-                winnings = player.CurrentBet * 2;
+                // win
+                winningMultiplier = 2;
             }
             else if (!Dealer.IsBusted && player.HandValue == Dealer.HandValue)
             {
-                winnings = player.CurrentBet;
+                // draw
+                winningMultiplier = 1;
             }
-            results.Append((player, winnings));
+            results.Append((player, winningMultiplier));
         }
 
         return results;
@@ -152,7 +155,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Deck
     {
         foreach (var item in CalculateWinningsOfRound())
         {
-            item.Player.AddWinnings(item.Winnings);
+            item.Player.AddWinnings(item.WinningMultiplier);
         }
     }
 
