@@ -41,12 +41,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Deck
     public void StartRound()
     {
         _currentRound++;
-        Dealer.Reactivate();
-        for (int i = 0; i < DrawAtStartOfRound; i++)
-        {
-            Dealer.AddCardToHand(Deck.Draw());
-        }
-        foreach (var player in _players.Except([Dealer]))
+        foreach (var player in _players)
         {
             if (player.TappedOut)
                 continue;
@@ -93,31 +88,22 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Deck
             MoveToNextPlayer();
     }
 
-    /// <summary>
-    /// Make the dealer play his round.
-    /// </summary>
-    /// <remarks>The dealer counts cards. The house has an advantage.</remarks>
     public Card? PlayDealer()
     {
         if (!Dealer.IsOutForRound)
-        {
             return null;
-        }
 
-        var averageValueOfCardPool = Math.Ceiling(Deck.CardPool.Average(c => c.Value) / 2);
-        if (Dealer.HandValue <= WinningScore - averageValueOfCardPool)
+        var averageValueOfCardPool = Deck.CardPool.Average(c => c.Value);
+        if (Dealer.HandValue <= WinningScore - Math.Ceiling(averageValueOfCardPool / 2))
         {
             var newCard = Hit(Dealer);
-            if (Dealer.IsBusted)
-                EndRound();
             return newCard;
         }
         else
         {
             Dealer.Stand();
+            return null;
         }
-
-        return null;
     }
 
     public void EndRound()
@@ -128,9 +114,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Deck
         }
 
         if (_automaticallyIncreaseStakeAfterRound > 0)
-        {
             RaiseTheStakes(_automaticallyIncreaseStakeAfterRound);
-        }
     }
 
     public (BlackJackPlayer Player, int Winnings)[] CalculateWinningsOfRound()

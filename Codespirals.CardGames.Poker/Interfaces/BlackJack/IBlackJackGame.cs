@@ -47,6 +47,11 @@ public interface IBlackJackGame<TSelf, TPlayer, TDeck, TCard> : IGame<TSelf, TDe
     /// <param name="player"></param>
     void Stand(TPlayer player);
     /// <summary>
+    /// Make the dealer play his round.
+    /// </summary>
+    /// <remarks>The dealer counts cards. The house has an advantage.</remarks>
+    public TCard? PlayDealer();
+    /// <summary>
     /// End the round and return information about the winnings of the round
     /// </summary>
     /// <returns></returns>
