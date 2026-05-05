@@ -2,5 +2,6 @@
 public interface ICanPlayRounds
 {
     bool IsOutForRound { get; }
+    void DeactivateForRound();
     void Reactivate();
 }

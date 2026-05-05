@@ -4,4 +4,5 @@ public interface IHasBets
 {
     int BuyIn { get; }
     public void RaiseTheStakes(int amount);
+    public void PayOut();
 }

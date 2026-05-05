@@ -2,9 +2,9 @@
 
 public interface ICanBet
 {
-    public int Cash { get; }
-    public int CurrentBet { get; }
+    int Cash { get; }
+    int CurrentBet { get; }
     bool TappedOut { get; }
-    public void Bet(int amount);
-    public void AddWinnings(int amount);
+    void Bet(int amount);
+    void AddWinnings(int amount);
 }

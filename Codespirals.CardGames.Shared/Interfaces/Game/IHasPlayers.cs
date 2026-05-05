@@ -7,6 +7,6 @@ public interface IHasPlayers<TPlayer, TDeck, TCard>
     where TCard : ICard
 {
     ReadOnlyCollection<TPlayer> Players { get; }
-    TPlayer GetCurrentPlayer();
+    TPlayer CurrentPlayer { get; }
     void MoveToNextPlayer();
 }

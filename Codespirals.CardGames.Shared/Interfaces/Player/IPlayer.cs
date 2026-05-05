@@ -15,5 +15,4 @@ public interface IPlayer<TDeck, TCard> : IPlayer
     void AddCardToHand(TCard card);
     void Discard(TCard card);
     void DiscardAll();
-    void Bust();
 }

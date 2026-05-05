@@ -33,7 +33,7 @@ internal class BlackjackInConsole
         _game.StartRound();
         while (_game.RoundActive)
         {
-            var currentPlayer = _game.GetCurrentPlayer();
+            var currentPlayer = _game.CurrentPlayer;
             if (currentPlayer == _game.Dealer)
             {
                 DealerTurn(currentPlayer);

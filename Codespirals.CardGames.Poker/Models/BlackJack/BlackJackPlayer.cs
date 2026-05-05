@@ -7,11 +7,13 @@ public class BlackJackPlayer : IBlackJackPlayer<Deck, Card>
     internal readonly BlackJackGame _game;
     internal readonly List<Card> _hand = [];
     internal bool _isOutForRound;
+    internal bool _isBusted;
 
     public string Name { get; set; }
     public int Cash { get; private set; } = 1;
     public int CurrentBet { get; private set; }
-    public bool IsOutForRound => _isOutForRound || TappedOut;
+    public bool IsOutForRound => _isOutForRound || _isBusted || TappedOut;
+    public bool IsBusted => _isBusted || CheckIfIsBusted();
     public bool TappedOut => Cash <= 0 && CurrentBet <= 0;
     public int HandValue => CalculateHandValue();
     public ReadOnlyCollection<Card> Hand => _hand.AsReadOnly();
@@ -52,21 +54,18 @@ public class BlackJackPlayer : IBlackJackPlayer<Deck, Card>
 
     public void DoubleDown(Card card)
     {
-        if (Cash >= CurrentBet)
-        {
-            Bet(CurrentBet);
-        }
+        Bet(Math.Clamp(CurrentBet, 0, Cash));
         AddCardToHand(card);
         Stand();
     }
 
     public void Stand()
-        => _isOutForRound = true;
+        => DeactivateForRound();
 
     public void Bust()
     {
         CurrentBet = 0;
-        _isOutForRound = true;
+        _isBusted = true;
     }
 
     public void AddWinnings(int multiplier = 1)
@@ -76,17 +75,23 @@ public class BlackJackPlayer : IBlackJackPlayer<Deck, Card>
     }
 
     public void DeactivateForRound()
-    {
-        DiscardAll();
-        CurrentBet = 0;
-        _isOutForRound = true;
-    }
+        => _isOutForRound = true;
 
     public void Reactivate()
     {
         DiscardAll();
         CurrentBet = 0;
         _isOutForRound = false;
+        _isBusted = false;
+    }
+
+    private bool CheckIfIsBusted()
+    {
+        _isBusted = HandValue > _game.WinningScore;
+        if (_isBusted)
+            Bust();
+
+        return _isBusted;
     }
 
     private int CalculateHandValue()
