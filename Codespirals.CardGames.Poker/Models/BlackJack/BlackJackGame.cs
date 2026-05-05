@@ -112,17 +112,23 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Deck
         }
     }
 
+    /// <summary>
+    /// Make the dealer play his round.
+    /// </summary>
+    /// <remarks>The dealer counts cards. The house has an advantage.</remarks>
     public void PlayDealer()
     {
-        if (Dealer.HandValue <= 17)
+        if (!Dealer.IsOutForRound)
+            return;
+
+        var averageValueOfCardPool = Deck.CardPool.Average(c => c.Value);
+        if (Dealer.HandValue <= WinningScore - averageValueOfCardPool - 1)
         {
             Hit(Dealer);
             if (Dealer.HandValue > WinningScore)
-            {
                 EndRound();
-            }
         }
-        else if (!Dealer.IsOutForRound)
+        else
         {
             Stand(Dealer);
         }
