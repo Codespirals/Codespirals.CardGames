@@ -18,7 +18,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Deck
     public bool RoundActive => !_players.All(p => p.IsOutForRound);
     public bool GameOver => Players.Except([Dealer]).All(p => p.TappedOut);
 
-    public BlackJackGame(int players, int minBet = 1, int winningScore = 21, int startingCash = 100, int automaticallyIncreaseStakeAfterRound = 1, int drawAtStartOfRound = 2)
+    public BlackJackGame(int players, int minBet = 1, int winningScore = 21, int startingCash = 100, int automaticallyIncreaseStakeAfterRound = 1, int drawAtStartOfRound = 2, Deck? deck = null)
     {
         Dealer = BlackJackPlayer.GeneratePlayer(this, "Dealer", Int32.MaxValue);
         _players.Add(Dealer);
@@ -31,12 +31,14 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Deck
         BuyIn = minBet;
         WinningScore = winningScore;
         DrawAtStartOfRound = drawAtStartOfRound;
-        Deck = PokerDeckBuilder.BasicBlackJackDeck();
+        Deck = deck ?? PokerDeckBuilder.BasicBlackJackDeck();
         Deck.Shuffle();
     }
 
     public static BlackJackGame SetUp(int players) => new(players, 1, 21, 100, 1, 2);
     public static BlackJackGame SetUp(int players, int minBet, int winningScore, int startingCash, int automaticallyIncreaseStakeAfterRound, int drawAtStartOfRound) => new(players, minBet, winningScore, startingCash, automaticallyIncreaseStakeAfterRound, drawAtStartOfRound);
+    public static BlackJackGame SetUp(int players, int minBet, int winningScore, int startingCash, int automaticallyIncreaseStakeAfterRound, int drawAtStartOfRound, Deck? deck)
+        => new(players, minBet, winningScore, startingCash, automaticallyIncreaseStakeAfterRound, drawAtStartOfRound, deck);
 
     public void StartRound()
     {
@@ -90,7 +92,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Deck
 
     public Card? PlayDealer()
     {
-        if (!Dealer.IsOutForRound)
+        if (Dealer.IsOutForRound)
             return null;
 
         var averageValueOfCardPool = Deck.CardPool.Average(c => c.Value);
@@ -119,33 +121,32 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Deck
 
     public (BlackJackPlayer Player, int WinningMultiplier)[] CalculateWinningsOfRound()
     {
-        (BlackJackPlayer, int)[] results = [];
+        (BlackJackPlayer Player, int WinningMultiplier)[] results = [];
         foreach (var player in _players.Except([Dealer]))
         {
+            var winningMultiplier = 0;
+
             if (player.IsBusted)
             {
-                results.Append((player, 0));
-                continue;
+                results = results.Append((player, winningMultiplier)).ToArray();
             }
-
-            var winningMultiplier = 0;
-            if (player.HandValue == WinningScore && player.Hand.Count == 2)
+            else if (player.HandValue == WinningScore && player.Hand.Count == 2)
             {
                 // blackjack
                 winningMultiplier = 3;
             }
-            if ((Dealer.IsBusted && !player.IsBusted)
+            else if ((Dealer.IsBusted && !player.IsBusted)
                 || (!Dealer.IsBusted && !player.IsBusted && player.HandValue > Dealer.HandValue))
             {
                 // win
                 winningMultiplier = 2;
             }
-            else if (!Dealer.IsBusted && player.HandValue == Dealer.HandValue)
+            else if (!player.IsBusted && player.HandValue == Dealer.HandValue)
             {
                 // draw
                 winningMultiplier = 1;
             }
-            results.Append((player, winningMultiplier));
+            results = results.Append((player, winningMultiplier)).ToArray();
         }
 
         return results;

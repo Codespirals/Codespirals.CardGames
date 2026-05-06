@@ -30,6 +30,18 @@ public interface IBlackJackGame<TSelf, TPlayer, TDeck, TCard> : IGame<TSelf, TDe
     /// <returns></returns>
     static abstract TSelf SetUp(int players, int minBet, int winningScore, int startingCash, int automaticallyIncreaseStakeAfterRound, int drawAtStartOfRound);
     /// <summary>
+    /// Set up a new game with extended parameters
+    /// </summary>
+    /// <param name="deck"></param>
+    /// <param name="players"></param>
+    /// <param name="minBet"></param>
+    /// <param name="winningScore"></param>
+    /// <param name="startingCash"></param>
+    /// <param name="automaticallyIncreaseStakeAfterRound"></param>
+    /// <param name="drawAtStartOfRound"></param>
+    /// <returns></returns>
+    static abstract TSelf SetUp(int players, int minBet, int winningScore, int startingCash, int automaticallyIncreaseStakeAfterRound, int drawAtStartOfRound, TDeck? deck);
+    /// <summary>
     /// Make the player draw a card
     /// </summary>
     /// <param name="player"></param>
