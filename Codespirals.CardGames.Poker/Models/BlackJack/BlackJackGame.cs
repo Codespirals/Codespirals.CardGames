@@ -128,7 +128,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Deck
 
             if (player.IsBusted)
             {
-                results = results.Append((player, winningMultiplier)).ToArray();
+
             }
             else if (player.HandValue == WinningScore && player.Hand.Count == 2)
             {
