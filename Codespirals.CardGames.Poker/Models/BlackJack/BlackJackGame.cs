@@ -7,6 +7,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Deck
     private BlackJackPlayer _currentPlayer;
     private int _currentRound = 0;
     private int _automaticallyIncreaseStakeAfterRound = 0;
+    private bool _dealerCanCountCards;
     public Deck Deck { get; }
     public BlackJackPlayer Dealer { get; }
     public int WinningScore { get; private set; } = 21;
@@ -18,7 +19,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Deck
     public bool RoundActive => !_players.All(p => p.IsOutForRound);
     public bool GameOver => Players.Except([Dealer]).All(p => p.TappedOut);
 
-    public BlackJackGame(int players, int minBet = 1, int winningScore = 21, int startingCash = 100, int automaticallyIncreaseStakeAfterRound = 1, int drawAtStartOfRound = 2, Deck? deck = null)
+    public BlackJackGame(int players, int minBet = 1, int winningScore = 21, int startingCash = 100, int automaticallyIncreaseStakeAfterRound = 1, int drawAtStartOfRound = 2, Deck? deck = null, bool dealerCanCountCards = false)
     {
         Dealer = BlackJackPlayer.GeneratePlayer(this, "Dealer", Int32.MaxValue);
         _players.Add(Dealer);
@@ -33,6 +34,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Deck
         DrawAtStartOfRound = drawAtStartOfRound;
         Deck = deck ?? PokerDeckBuilder.BasicBlackJackDeck();
         Deck.Shuffle();
+        _dealerCanCountCards = dealerCanCountCards;
     }
 
     public static BlackJackGame SetUp(int players) => new(players, 1, 21, 100, 1, 2);
@@ -95,7 +97,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Deck
         if (Dealer.IsOutForRound)
             return null;
 
-        var averageValueOfCardPool = Deck.CardPool.Average(c => c.Value);
+        var averageValueOfCardPool = _dealerCanCountCards ? Deck.CardPool.Average(c => c.Value) : 7.3;
         if (Dealer.HandValue <= WinningScore - Math.Ceiling(averageValueOfCardPool / 2))
         {
             var newCard = Hit(Dealer);

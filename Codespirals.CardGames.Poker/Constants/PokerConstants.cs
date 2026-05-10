@@ -1,5 +1,5 @@
 ﻿namespace Codespirals.CardGames.Poker;
-public static class Constants
+public static class PokerConstants
 {
     public const string CARDBACKEMOJI = "🂠";
     public const string JOKEREMOJI = "🂿";

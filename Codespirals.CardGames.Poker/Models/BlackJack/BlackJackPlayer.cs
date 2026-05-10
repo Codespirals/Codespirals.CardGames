@@ -64,7 +64,7 @@ public class BlackJackPlayer : IBlackJackPlayer<Deck, Card>
     public void Bust()
     {
         CurrentBet = 0;
-        _isOutForRound = false;
+        _isOutForRound = true;
     }
 
     public void AddWinnings(int multiplier = 1)
@@ -100,5 +100,5 @@ public class BlackJackPlayer : IBlackJackPlayer<Deck, Card>
     }
 
     public override string ToString()
-        => $"{Name} {(Hand.Count != 0 ? "Hand: " : "")}{string.Join('|', Hand.OrderByDescending(c => c.IsFaceDown).Select(c => c.Name))} Hand total: {HandValue} Cash:{Cash} Current Bet:{CurrentBet}";
+        => $"{Name} {Hand.Select(c => c.Emoji)}";
 }

@@ -2,14 +2,14 @@
 
 public class Card : IPokerCard
 {
-    private readonly string _emoji = "?";
+    private readonly string? _emoji;
     private readonly int _value = 0;
     private readonly Suit _suit = Suit.Unknown;
     private readonly string _name = "";
-    public int Value => IsFaceDown ? 0 : _value;
+    public int Value => _value;
     public string Name => GetName();
     public Suit Suit => IsFaceDown ? Suit.Unknown : _suit;
-    public string? Emoji => IsFaceDown ? Constants.CARDBACKEMOJI : _emoji;
+    public string? Emoji => GetSymbol();
     public bool IsFaceDown { get; internal set; }
 
     private Card(string name, int value, Suit suit)
@@ -42,13 +42,13 @@ public class Card : IPokerCard
         if (cardType is ExtraCards.Joker)
         {
             _name = ExtraCards.Joker.ToString();
-            _emoji = Constants.JOKEREMOJI;
+            _emoji = PokerConstants.JOKEREMOJI;
         }
         // fool
         else if (cardType is ExtraCards.Fool)
         {
             _name = ExtraCards.Fool.ToString();
-            _emoji = Constants.FOOLEMOJI;
+            _emoji = PokerConstants.FOOLEMOJI;
         }
         else
         {
@@ -65,6 +65,12 @@ public class Card : IPokerCard
 
     public override string ToString()
         => GetName();
+    private string GetSymbol()
+    {
+        if (IsFaceDown)
+            return PokerConstants.CARDBACKEMOJI;
+        return _emoji ?? _value.ToString();
+    }
     private string GetName()
     {
         if (IsFaceDown)
