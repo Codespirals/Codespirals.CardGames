@@ -1,27 +1,34 @@
 ﻿using System.Collections.ObjectModel;
 
 namespace Codespirals.CardGames.FlipSeven;
-public class Player : IFlipSevenPlayer<Deck, Card>
+public class FlipSevenPlayer : IFlipSevenPlayer<FlipSevenDeck, FlipSevenCard>
 {
-    private readonly Game _game;
-    private readonly List<Card> _hand = [];
-    private readonly int _playerNumber = 0;
+    private readonly FlipSevenGame _game;
+    private readonly List<FlipSevenCard> _hand = [];
 
     public string Name { get; set; }
-    public ReadOnlyCollection<Card> Hand => _hand.AsReadOnly();
+    public ReadOnlyCollection<FlipSevenCard> Hand => _hand.AsReadOnly();
     public int NumberCardsInHand => _hand.Count(c => c.CardType == CardType.Number);
     public int HandPoints => CalculateHandValue();
     public int BankedPoints { get; private set; } = 0;
+    public bool IsBusted => State == PlayerStates.Busted;
     public bool IsOutForRound => State != PlayerStates.Playing;
     public PlayerStates State { get; private set; }
-    public Player(Game game, int id)
+    private FlipSevenPlayer(FlipSevenGame game, string name)
     {
         _game = game;
-        _playerNumber = id;
-        Name = $"Player {_playerNumber + 1}";
+        Name = name;
     }
+    private FlipSevenPlayer(FlipSevenGame game, int number) : this(game, $"Player {number}")
+    {
 
-    public void AddCardToHand(Card card)
+    }
+    public static FlipSevenPlayer GeneratePlayer(FlipSevenGame game, string name)
+        => new FlipSevenPlayer(game, name);
+    public static FlipSevenPlayer GeneratePlayer(FlipSevenGame game, int number)
+        => new FlipSevenPlayer(game, number);
+
+    public void AddCardToHand(FlipSevenCard card)
     {
         if (card.CardType is CardType.Flip or CardType.Freeze)
         {
@@ -37,7 +44,7 @@ public class Player : IFlipSevenPlayer<Deck, Card>
         _hand.Add(card);
     }
 
-    public void Discard(Card card)
+    public void Discard(FlipSevenCard card)
     {
         _game.Deck.PutOnDiscardPile(card);
         _hand.Remove(card);
@@ -48,12 +55,6 @@ public class Player : IFlipSevenPlayer<Deck, Card>
         foreach (var card in _hand)
             _game.Deck.PutOnDiscardPile(card);
         _hand.Clear();
-    }
-
-    public Card Flip(Card card)
-    {
-        AddCardToHand(card);
-        return card;
     }
 
     public void BankPoints()
@@ -80,6 +81,8 @@ public class Player : IFlipSevenPlayer<Deck, Card>
         DiscardAll();
         State = PlayerStates.Busted;
     }
+    public void DeactivateForRound()
+        => BankPoints();
     public void Reactivate()
     {
         DiscardAll();

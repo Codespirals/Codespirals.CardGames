@@ -1,31 +1,37 @@
 ﻿namespace Codespirals.CardGames.FlipSeven;
 public class FlipSevenDeckBuilder
 {
-    private readonly Deck _deck;
+    private readonly FlipSevenDeck _deck;
     private FlipSevenDeckBuilder()
     {
-        _deck = new Deck();
+        _deck = new FlipSevenDeck();
     }
     public static FlipSevenDeckBuilder Begin()
         => new();
 
+    public FlipSevenDeckBuilder RefreshOnEmpty(bool refresh = true)
+    {
+        _deck.RefreshOnEmpty = true;
+        return this;
+    }
+
     public FlipSevenDeckBuilder WithNumberCards(int highestNumber = 12)
     {
-        _deck.AddStartingCard(new Card(CardType.Number, 0));
+        _deck.AddStartingCard(FlipSevenCard.GenerateNumberCard(0));
         for (var v = highestNumber; v > 0; v--)
         {
             for (var i = 0; i < v; i++)
             {
-                _deck.AddStartingCard(new Card(CardType.Number, v));
+                _deck.AddStartingCard(FlipSevenCard.GenerateNumberCard(v));
             }
         }
         return this;
     }
-    public FlipSevenDeckBuilder WithBonusCards(int number = 5, int step = 2)
+    public FlipSevenDeckBuilder WithBonusCards(int[] values)
     {
-        for (var i = 1; i <= number; i++)
+        foreach (var value in values)
         {
-            _deck.AddStartingCard(new Card(CardType.BonusAdd, i * step));
+            _deck.AddStartingCard(FlipSevenCard.GenerateBonusAddCard(value));
         }
         return this;
     }
@@ -33,44 +39,45 @@ public class FlipSevenDeckBuilder
     {
         for (var i = 1; i <= number; i++)
         {
-            _deck.AddStartingCard(new Card(CardType.Multiplier, multiplier));
+            _deck.AddStartingCard(FlipSevenCard.GenerateMultiplierCard(multiplier));
         }
         return this;
     }
-    public FlipSevenDeckBuilder WithFlipCards(int number = 4, int flip = 3)
+    public FlipSevenDeckBuilder WithFlipCards(int number = 3, int flip = 3)
     {
         for (var i = 1; i <= number; i++)
         {
-            _deck.AddStartingCard(new Card(CardType.Flip, flip));
+            _deck.AddStartingCard(FlipSevenCard.GenerateFlipCard(flip));
         }
         return this;
     }
-    public FlipSevenDeckBuilder WithFreezes(int number = 4)
+    public FlipSevenDeckBuilder WithFreezes(int number = 3)
     {
         for (var i = 1; i <= number; i++)
         {
-            _deck.AddStartingCard(new Card(CardType.Freeze, 0));
+            _deck.AddStartingCard(FlipSevenCard.GenerateFreezeCard());
         }
         return this;
     }
-    public FlipSevenDeckBuilder WithSecondChances(int number = 5)
+    public FlipSevenDeckBuilder WithSecondChances(int number = 3)
     {
         for (var i = 1; i <= number; i++)
         {
-            _deck.AddStartingCard(new Card(CardType.SecondChance, 0));
+            _deck.AddStartingCard(FlipSevenCard.GenerateSecondChanceCard());
         }
         return this;
     }
-    public Deck Build()
+    public FlipSevenDeck Build()
     {
-        _deck.OrderStartingCards();
         _deck.Reset();
         return _deck;
     }
-    public static Deck CreateStandardDeck()
+
+    public static FlipSevenDeck CreateStandardDeck()
         => Begin()
+        .RefreshOnEmpty()
         .WithNumberCards()
-        .WithBonusCards()
+        .WithBonusCards([2,4,6,8,10])
         .WithFlipCards()
         .WithMultipliers()
         .WithFreezes()

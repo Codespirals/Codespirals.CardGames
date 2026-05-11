@@ -1,14 +1,14 @@
 ﻿using System.Collections.ObjectModel;
 
 namespace Codespirals.CardGames.Poker.BlackJack;
-public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Deck, Card>
+public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, PokerDeck, PokerCard>
 {
     private readonly List<BlackJackPlayer> _players = [];
     private BlackJackPlayer _currentPlayer;
     private int _currentRound = 0;
     private int _automaticallyIncreaseStakeAfterRound = 0;
     private bool _dealerCanCountCards;
-    public Deck Deck { get; }
+    public PokerDeck Deck { get; }
     public BlackJackPlayer Dealer { get; }
     public int WinningScore { get; private set; } = 21;
     public int BuyIn { get; private set; }
@@ -19,7 +19,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Deck
     public bool RoundActive => !_players.All(p => p.IsOutForRound);
     public bool GameOver => Players.Except([Dealer]).All(p => p.TappedOut);
 
-    public BlackJackGame(int players, int minBet = 1, int winningScore = 21, int startingCash = 100, int automaticallyIncreaseStakeAfterRound = 1, int drawAtStartOfRound = 2, Deck? deck = null, bool dealerCanCountCards = false)
+    public BlackJackGame(int players, int minBet = 1, int winningScore = 21, int startingCash = 100, int automaticallyIncreaseStakeAfterRound = 1, int drawAtStartOfRound = 2, PokerDeck? deck = null, bool dealerCanCountCards = false)
     {
         Dealer = BlackJackPlayer.GeneratePlayer(this, "Dealer", Int32.MaxValue);
         _players.Add(Dealer);
@@ -39,7 +39,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Deck
 
     public static BlackJackGame SetUp(int players) => new(players, 1, 21, 100, 1, 2);
     public static BlackJackGame SetUp(int players, int minBet, int winningScore, int startingCash, int automaticallyIncreaseStakeAfterRound, int drawAtStartOfRound) => new(players, minBet, winningScore, startingCash, automaticallyIncreaseStakeAfterRound, drawAtStartOfRound);
-    public static BlackJackGame SetUp(int players, int minBet, int winningScore, int startingCash, int automaticallyIncreaseStakeAfterRound, int drawAtStartOfRound, Deck? deck)
+    public static BlackJackGame SetUp(int players, int minBet, int winningScore, int startingCash, int automaticallyIncreaseStakeAfterRound, int drawAtStartOfRound, PokerDeck? deck)
         => new(players, minBet, winningScore, startingCash, automaticallyIncreaseStakeAfterRound, drawAtStartOfRound, deck);
 
     public void StartRound()
@@ -60,14 +60,14 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Deck
     }
 
     #region Choices
-    public Card Hit(BlackJackPlayer player)
+    public PokerCard Hit(BlackJackPlayer player)
     {
         var card = Deck.Draw();
         player.AddCardToHand(card);
         return card;
     }
 
-    public Card DoubleDown(BlackJackPlayer player)
+    public PokerCard DoubleDown(BlackJackPlayer player)
     {
         var card = Deck.Draw();
         player.DoubleDown(card);
@@ -92,7 +92,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Deck
             MoveToNextPlayer();
     }
 
-    public Card? PlayDealer()
+    public PokerCard? PlayDealer()
     {
         if (Dealer.IsOutForRound)
             return null;

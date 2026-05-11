@@ -2,10 +2,10 @@
 using System.Collections.ObjectModel;
 
 namespace Codespirals.CardGames.Poker;
-public class BlackJackPlayer : IBlackJackPlayer<Deck, Card>
+public class BlackJackPlayer : IBlackJackPlayer<PokerDeck, PokerCard>
 {
     internal readonly BlackJackGame _game;
-    internal readonly List<Card> _hand = [];
+    internal readonly List<PokerCard> _hand = [];
     internal bool _isOutForRound;
 
     public string Name { get; set; }
@@ -15,7 +15,7 @@ public class BlackJackPlayer : IBlackJackPlayer<Deck, Card>
     public bool IsBusted => HandValue > _game.WinningScore;
     public bool TappedOut => Cash <= 0 && CurrentBet <= 0;
     public int HandValue => CalculateHandValue();
-    public ReadOnlyCollection<Card> Hand => _hand.AsReadOnly();
+    public ReadOnlyCollection<PokerCard> Hand => _hand.AsReadOnly();
 
     private BlackJackPlayer(BlackJackGame game, string name, int startingCash)
     {
@@ -31,8 +31,8 @@ public class BlackJackPlayer : IBlackJackPlayer<Deck, Card>
         => new BlackJackPlayer(game, name, startingCash);
     public static BlackJackPlayer GeneratePlayer(BlackJackGame game, int number, int startingCash)
         => new BlackJackPlayer(game, number, startingCash);
-    public void AddCardToHand(Card card) => _hand.Add(card);
-    public void Discard(Card card)
+    public void AddCardToHand(PokerCard card) => _hand.Add(card);
+    public void Discard(PokerCard card)
     {
         _hand.Remove(card);
         _game.Deck.PutOnDiscardPile(card);
@@ -51,7 +51,7 @@ public class BlackJackPlayer : IBlackJackPlayer<Deck, Card>
         Cash -= CurrentBet;
     }
 
-    public void DoubleDown(Card card)
+    public void DoubleDown(PokerCard card)
     {
         Bet(Math.Clamp(CurrentBet, 0, Cash));
         AddCardToHand(card);

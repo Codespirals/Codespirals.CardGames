@@ -1,19 +1,19 @@
 ﻿namespace Codespirals.CardGames.Poker;
 public class PokerDeckBuilder
 {
-    private Deck _deck;
+    private PokerDeck _deck;
 
     private PokerDeckBuilder()
     {
-        _deck = new Deck();
+        _deck = new PokerDeck();
     }
 
     public static PokerDeckBuilder BeginBuilding()
         => new();
 
-    public PokerDeckBuilder RefreshOnEmpty()
+    public PokerDeckBuilder RefreshOnEmpty(bool refresh)
     {
-        _deck.RefreshOnEmpty = true;
+        _deck.RefreshOnEmpty = refresh;
         return this;
     }
 
@@ -23,7 +23,7 @@ public class PokerDeckBuilder
         {
             for (var i = min; i < max; i++)
             {
-                _deck.AddStartingCard(Card.GenerateNumberCard(i.ToString(), i, suit));
+                _deck.AddStartingCard(PokerCard.GenerateNumberCard(i.ToString(), i, suit));
             }
         }
         return this;
@@ -32,7 +32,7 @@ public class PokerDeckBuilder
     {
         foreach (var suit in suits)
         {
-            _deck.AddStartingCard(Card.GenerateNamedCard(cardType, value, suit));
+            _deck.AddStartingCard(PokerCard.GenerateNamedCard(cardType, value, suit));
         }
         return this;
     }
@@ -41,50 +41,49 @@ public class PokerDeckBuilder
     {
         for (var i = 0; i < number; i++)
         {
-            _deck.AddStartingCard(Card.GenerateExtraCard(cardType, value, suit));
+            _deck.AddStartingCard(PokerCard.GenerateExtraCard(cardType, value, suit));
         }
         return this;
     }
 
-    public Deck Build()
+    public PokerDeck Build()
     {
-        _deck.OrderStartingCards();
         _deck.Reset();
         return _deck;
     }
 
-    public Deck BuildMultiple(int number)
+    public PokerDeck BuildMultiple(int number)
     {
         var temp = _deck.StartingCards.ToList().AsReadOnly();
         for (var i = 0; i > number; i++)
         {
             _deck.StartingCards.Concat(temp);
         }
-        _deck.OrderStartingCards();
         _deck.Reset();
         return _deck;
     }
 
-    public static Deck BasicPokerDeck()
+    public static PokerDeck BasicPokerDeck()
         => BeginBuilding()
         .WithNumberCards([Suit.Diamonds, Suit.Clubs, Suit.Hearts, Suit.Spades])
         .WithNamedCards([Suit.Diamonds, Suit.Clubs, Suit.Hearts, Suit.Spades], NamedCards.Ace, 1)
         .WithNamedCards([Suit.Diamonds, Suit.Clubs, Suit.Hearts, Suit.Spades], NamedCards.Jack, 11)
         .WithNamedCards([Suit.Diamonds, Suit.Clubs, Suit.Hearts, Suit.Spades], NamedCards.Queen, 12)
         .WithNamedCards([Suit.Diamonds, Suit.Clubs, Suit.Hearts, Suit.Spades], NamedCards.King, 13)
+        .RefreshOnEmpty(true)
         .Build();
 
-    public static Deck BasicBlackJackDeck()
+    public static PokerDeck BasicBlackJackDeck()
         => BeginBuilding()
         .WithNumberCards([Suit.Diamonds, Suit.Clubs, Suit.Hearts, Suit.Spades])
         .WithNamedCards([Suit.Diamonds, Suit.Clubs, Suit.Hearts, Suit.Spades], NamedCards.Ace, 11)
         .WithNamedCards([Suit.Diamonds, Suit.Clubs, Suit.Hearts, Suit.Spades], NamedCards.Jack, 10)
         .WithNamedCards([Suit.Diamonds, Suit.Clubs, Suit.Hearts, Suit.Spades], NamedCards.Queen, 10)
         .WithNamedCards([Suit.Diamonds, Suit.Clubs, Suit.Hearts, Suit.Spades], NamedCards.King, 10)
-        .RefreshOnEmpty()
+        .RefreshOnEmpty(true)
         .Build();
 
-    public static Deck BasicPokerDeckWithJokers(int jokers)
+    public static PokerDeck BasicPokerDeckWithJokers(int jokers)
         => BeginBuilding()
         .WithNumberCards([Suit.Diamonds, Suit.Clubs, Suit.Hearts, Suit.Spades])
         .WithNamedCards([Suit.Diamonds, Suit.Clubs, Suit.Hearts, Suit.Spades], NamedCards.Ace, 1)
@@ -92,14 +91,16 @@ public class PokerDeckBuilder
         .WithNamedCards([Suit.Diamonds, Suit.Clubs, Suit.Hearts, Suit.Spades], NamedCards.Queen, 12)
         .WithNamedCards([Suit.Diamonds, Suit.Clubs, Suit.Hearts, Suit.Spades], NamedCards.King, 13)
         .WithExtraCards(ExtraCards.Joker, 0, jokers)
+        .RefreshOnEmpty(true)
         .Build();
 
-    public static Deck JassDeck()
+    public static PokerDeck JassDeck()
         => BeginBuilding()
         .WithNumberCards([Suit.Bells, Suit.Acorns, Suit.Flowers, Suit.Shields], 6, 10)
         .WithNamedCards([Suit.Bells, Suit.Acorns, Suit.Flowers, Suit.Shields], NamedCards.Ace, 1)
         .WithNamedCards([Suit.Bells, Suit.Acorns, Suit.Flowers, Suit.Shields], NamedCards.Jack, 11)
         .WithNamedCards([Suit.Bells, Suit.Acorns, Suit.Flowers, Suit.Shields], NamedCards.Queen, 12)
         .WithNamedCards([Suit.Bells, Suit.Acorns, Suit.Flowers, Suit.Shields], NamedCards.Ace, 13)
+        .RefreshOnEmpty(true)
         .Build();
 }

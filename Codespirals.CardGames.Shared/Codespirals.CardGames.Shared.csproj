@@ -16,7 +16,7 @@
     <PackageProjectUrl>https://www.codespirals.dev/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Codespirals/Codespirals.CardGames/tree/master/Codespirals.CardGames.Poker</RepositoryUrl>
     <PackageTags>codespirals;games;</PackageTags>
-    <Version>1.0.8.26127</Version>
+    <Version>1.0.14.26132</Version>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>

@@ -1,26 +1,27 @@
 ﻿using System.Collections.ObjectModel;
 
 namespace Codespirals.CardGames.FlipSeven;
-public class Game : IFlipSevenGame<Game, Player, Deck, Card>
+public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, FlipSevenDeck, FlipSevenCard>
 {
-    private readonly List<Player> _players = [];
-    private Player _currentPlayer;
+    private readonly List<FlipSevenPlayer> _players = [];
+    private FlipSevenPlayer _currentPlayer;
     private int _currentRound = 0;
 
-    public Deck Deck { get; } = FlipSevenDeckBuilder.CreateStandardDeck();
-    public ReadOnlyCollection<Player> Players => _players.AsReadOnly();
-    public ReadOnlyCollection<Player> ActivePlayers => _players.Where(p => !p.IsOutForRound).ToList().AsReadOnly();
+    public FlipSevenDeck Deck { get; } = FlipSevenDeckBuilder.CreateStandardDeck();
+    public ReadOnlyCollection<FlipSevenPlayer> Players => _players.AsReadOnly();
+    public ReadOnlyCollection<FlipSevenPlayer> ActivePlayers => _players.Where(p => !p.IsOutForRound).ToList().AsReadOnly();
     public int WinningScore { get; set; } = 200;
     public int NumbersToFlip { get; set; } = 7;
+    public FlipSevenPlayer CurrentPlayer => _currentPlayer;
     public int CurrentRound => _currentRound + 1;
     public bool RoundActive => ActivePlayers.Count > 0;
     public bool GameOver => !RoundActive && _players.Any(p => p.BankedPoints > WinningScore);
 
-    private Game(int players, Deck deck, int numbersToFlip = 7, int winningScore = 200)
+    private FlipSevenGame(int players, FlipSevenDeck deck, int numbersToFlip = 7, int winningScore = 200)
     {
         for (var i = 0; i < players; i++)
         {
-            _players.Add(new Player(this, i));
+            _players.Add(FlipSevenPlayer.GeneratePlayer(this, i));
         }
         Deck = deck;
         NumbersToFlip = numbersToFlip;
@@ -32,12 +33,12 @@ public class Game : IFlipSevenGame<Game, Player, Deck, Card>
     public static FlipSevenDeckBuilder StartBuildingCustomDeck()
         => FlipSevenDeckBuilder.Begin();
 
-    public static Game SetUp(int players)
+    public static FlipSevenGame SetUp(int players)
         => new(players, FlipSevenDeckBuilder.CreateStandardDeck());
-    public static Game SetUp(int players, Deck deck, int numbersToFlip = 7, int winningScore = 200)
+    public static FlipSevenGame SetUp(int players, FlipSevenDeck deck, int numbersToFlip = 7, int winningScore = 200)
         => new(players, deck, numbersToFlip, winningScore);
 
-    public Player GetCurrentPlayer() => _currentPlayer;
+    public FlipSevenPlayer GetCurrentPlayer() => _currentPlayer;
 
     public void StartRound()
     {
@@ -62,13 +63,14 @@ public class Game : IFlipSevenGame<Game, Player, Deck, Card>
             MoveToNextPlayer();
     }
 
-    public Card Flip(Player player)
+    public FlipSevenCard Flip(FlipSevenPlayer player)
     {
         var card = Deck.Draw();
-        return player.Flip(card);
+        player.AddCardToHand(card);
+        return card;
     }
 
-    public void Freeze(Player player)
+    public void Freeze(FlipSevenPlayer player)
         => player.Freeze();
 
     public void EndRound()
@@ -82,7 +84,7 @@ public class Game : IFlipSevenGame<Game, Player, Deck, Card>
         _currentPlayer = Players[_currentRound % _players.Count];
     }
 
-    public Player? GetWinner()
+    public FlipSevenPlayer? GetWinner()
     {
         if (!GameOver)
             return null;

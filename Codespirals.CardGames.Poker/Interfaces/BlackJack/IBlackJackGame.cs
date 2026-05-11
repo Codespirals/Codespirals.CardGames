@@ -2,7 +2,7 @@
 public interface IBlackJackGame<TSelf, TPlayer, TDeck, TCard> : IGame<TSelf, TDeck, TCard>, IRoundBased, IHasPlayers<TPlayer, TDeck, TCard>, IHasBets
     where TSelf : IBlackJackGame<TSelf, TPlayer, TDeck, TCard>
     where TPlayer : IBlackJackPlayer<TDeck, TCard>
-    where TDeck : IPokerDeck<TCard>
+    where TDeck : IDeck<TCard>
     where TCard : IPokerCard
 {
     /// <summary>

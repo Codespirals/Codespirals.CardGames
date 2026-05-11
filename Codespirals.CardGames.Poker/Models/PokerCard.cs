@@ -1,6 +1,6 @@
 ﻿namespace Codespirals.CardGames.Poker;
 
-public class Card : IPokerCard
+public class PokerCard : IPokerCard
 {
     private readonly string? _emoji;
     private readonly int _value = 0;
@@ -12,7 +12,7 @@ public class Card : IPokerCard
     public string? Emoji => GetSymbol();
     public bool IsFaceDown { get; internal set; }
 
-    private Card(string name, int value, Suit suit)
+    private PokerCard(string name, int value, Suit suit)
     {
         _suit = suit;
         _name = name;
@@ -23,7 +23,7 @@ public class Card : IPokerCard
             _emoji = char.ConvertFromUtf32(Convert.ToInt32("01F0A0", 16) + (((int)_suit - 1) * 16) + _value);
     }
 
-    private Card(NamedCards cardType, int value, Suit suit)
+    private PokerCard(NamedCards cardType, int value, Suit suit)
     {
         _suit = suit;
         _name = cardType.ToString();
@@ -34,7 +34,7 @@ public class Card : IPokerCard
             _emoji = char.ConvertFromUtf32(Convert.ToInt32("01F0A0", 16) + (((int)_suit - 1) * 16) + (int)cardType);
     }
 
-    private Card(ExtraCards cardType, int value, Suit suit = Suit.Unknown)
+    private PokerCard(ExtraCards cardType, int value, Suit suit = Suit.Unknown)
     {
         _suit = suit;
         _value = value;
@@ -56,11 +56,11 @@ public class Card : IPokerCard
         }
     }
 
-    public static Card GenerateNumberCard(string name, int value, Suit suit)
+    public static PokerCard GenerateNumberCard(string name, int value, Suit suit)
         => new(name, value, suit);
-    public static Card GenerateNamedCard(NamedCards cardType, int value, Suit suit)
+    public static PokerCard GenerateNamedCard(NamedCards cardType, int value, Suit suit)
         => new(cardType, value, suit);
-    public static Card GenerateExtraCard(ExtraCards cardType, int value, Suit suit)
+    public static PokerCard GenerateExtraCard(ExtraCards cardType, int value, Suit suit)
         => new(cardType, value, suit);
 
     public override string ToString()

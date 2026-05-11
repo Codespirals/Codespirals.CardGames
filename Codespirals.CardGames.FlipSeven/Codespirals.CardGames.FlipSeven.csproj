@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Codespirals.CardGames.Shared\Codespirals.CardGames.Shared.csproj" />
+    <PackageReference Include="Codespirals.CardGames.Shared" Version="1.0.13.26132" />
   </ItemGroup>
 
 </Project>

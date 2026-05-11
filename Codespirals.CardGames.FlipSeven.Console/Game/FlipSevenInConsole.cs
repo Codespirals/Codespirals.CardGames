@@ -1,10 +1,10 @@
 ﻿namespace Codespirals.CardGames.FlipSeven;
 public class FlipSevenInConsole
 {
-    private readonly Game _game;
+    private readonly FlipSevenGame _game;
     private FlipSevenInConsole(int playerCount)
     {
-        _game = Game.SetUp(playerCount);
+        _game = FlipSevenGame.SetUp(playerCount);
     }
     public static FlipSevenInConsole SetUp()
     {
@@ -45,7 +45,7 @@ public class FlipSevenInConsole
         Console.WriteLine();
     }
 
-    private void PlayerTurn(Player player)
+    private void PlayerTurn(FlipSevenPlayer player)
     {
         ConsoleHelper.SeperatorLine();
         ConsoleHelper.SetColorForPlayer(_game.Players.IndexOf(player));
@@ -66,7 +66,7 @@ public class FlipSevenInConsole
         }
         Console.WriteLine();
     }
-    private void Flip(Player player)
+    private void Flip(FlipSevenPlayer player)
     {
         ConsoleHelper.SetColorForPlayer(_game.Players.IndexOf(player));
         var drawnCard = _game.Flip(player);
@@ -81,14 +81,14 @@ public class FlipSevenInConsole
             Console.WriteLine($"Oh no... busted");
         }
     }
-    private void Freeze(Player user, Player target)
+    private void Freeze(FlipSevenPlayer user, FlipSevenPlayer target)
     {
         ConsoleHelper.SetColorForPlayer(_game.Players.IndexOf(target));
         target.Freeze();
         Console.WriteLine($"{target.Name} was frozen by {user.Name}");
     }
 
-    private void Bank(Player player)
+    private void Bank(FlipSevenPlayer player)
     {
         ConsoleHelper.SetColorForPlayer(_game.Players.IndexOf(player));
         if (player.HandPoints == 0)
@@ -98,7 +98,7 @@ public class FlipSevenInConsole
         player.BankPoints();
         Console.WriteLine($"{player.Name} now has {player.BankedPoints} Points!");
     }
-    private void UseTargetedCard(Player user, Card card)
+    private void UseTargetedCard(FlipSevenPlayer user, FlipSevenCard card)
     {
         Console.WriteLine($"{user.Name} input the number to the right of the player you want to use this {card.Name} on!");
         Console.WriteLine($"Your targets are:");
