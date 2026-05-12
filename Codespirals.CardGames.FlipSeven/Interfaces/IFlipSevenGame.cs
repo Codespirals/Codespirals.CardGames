@@ -13,6 +13,7 @@ public interface IFlipSevenGame<TSelf, TPlayer, TDeck, TCard> : IGame<TSelf, TDe
 
     TCard? Flip(TPlayer player);
     IEnumerable<TCard> Flip(TPlayer player, int number);
-    void Freeze(TPlayer player);
+    int Bank(TPlayer player);
+    int Freeze(TPlayer player);
     TPlayer? GetWinner();
 }

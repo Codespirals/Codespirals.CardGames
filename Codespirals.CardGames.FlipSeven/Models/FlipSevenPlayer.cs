@@ -57,18 +57,19 @@ public class FlipSevenPlayer : IFlipSevenPlayer<FlipSevenDeck, FlipSevenCard>
         _hand.Clear();
     }
 
-    public void BankPoints()
+    public int BankPoints()
     {
         var roundPoints = NumberCardsInHand >= _game.NumbersToFlip ? 15 : 0;
         roundPoints += HandPoints;
         DiscardAll();
         BankedPoints += roundPoints;
         State = PlayerStates.Banked;
+        return roundPoints;
     }
-    public void Freeze()
+    public int Freeze()
     {
-        BankPoints();
         State = PlayerStates.Frozen;
+        return BankPoints();
     }
     public void Bust()
     {

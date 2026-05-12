@@ -68,7 +68,10 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         }
     }
 
-    public void Freeze(FlipSevenPlayer player)
+    public int Bank(FlipSevenPlayer player)
+        => player.BankPoints();
+
+    public int Freeze(FlipSevenPlayer player)
         => player.Freeze();
 
     public void MoveToNextPlayer()

@@ -7,6 +7,6 @@ public interface IFlipSevenPlayer<TDeck, TCard> : IPlayer<TDeck, TCard>, ICanPla
     int HandPoints { get; }
     int NumberCardsInHand { get; }
     PlayerStates State { get; }
-    void BankPoints();
-    void Freeze();
+    int BankPoints();
+    int Freeze();
 }
