@@ -13,22 +13,11 @@ public interface IBlackJackGame<TSelf, TPlayer, TDeck, TCard> : IGame<TSelf, TDe
     /// What the winning score is
     /// </summary>
     /// <remarks>For Blackjack the default should be 21</remarks>
-    int WinningScore { get; }
+    int BlackJackScore { get; }
     /// <summary>
     /// How many cards every player draws automatically at the beginning of the round
     /// </summary>
     int DrawAtStartOfRound { get; }
-    /// <summary>
-    /// Set up a new game with extended parameters
-    /// </summary>
-    /// <param name="players"></param>
-    /// <param name="minBet"></param>
-    /// <param name="winningScore"></param>
-    /// <param name="startingCash"></param>
-    /// <param name="automaticallyIncreaseStakeAfterRound"></param>
-    /// <param name="drawAtStartOfRound"></param>
-    /// <returns></returns>
-    static abstract TSelf SetUp(int players, int minBet, int winningScore, int startingCash, int automaticallyIncreaseStakeAfterRound, int drawAtStartOfRound);
     /// <summary>
     /// Set up a new game with extended parameters
     /// </summary>
@@ -46,13 +35,13 @@ public interface IBlackJackGame<TSelf, TPlayer, TDeck, TCard> : IGame<TSelf, TDe
     /// </summary>
     /// <param name="player"></param>
     /// <returns></returns>
-    TCard Hit(TPlayer player);
+    TCard? Hit(TPlayer player);
     /// <summary>
     /// Make the player double down on their bet
     /// </summary>
     /// <param name="player"></param>
     /// <returns></returns>
-    TCard DoubleDown(TPlayer player);
+    TCard? DoubleDown(TPlayer player);
     /// <summary>
     /// Make the player stick to their current hand
     /// </summary>

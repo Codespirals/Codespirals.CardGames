@@ -9,17 +9,17 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
     private int _automaticallyIncreaseStakeAfterRound = 0;
     private bool _dealerCanCountCards;
     public PokerDeck Deck { get; }
-    public BlackJackPlayer Dealer { get; }
-    public int WinningScore { get; private set; } = 21;
-    public int BuyIn { get; private set; }
-    public int DrawAtStartOfRound { get; private set; } = 2;
     public ReadOnlyCollection<BlackJackPlayer> Players => _players.ToList().AsReadOnly();
     public BlackJackPlayer CurrentPlayer => _currentPlayer;
     public int CurrentRound => _currentRound;
+    public BlackJackPlayer Dealer { get; }
+    public int BlackJackScore { get; private set; } = 21;
+    public int BuyIn { get; private set; }
+    public int DrawAtStartOfRound { get; private set; } = 2;
     public bool RoundActive => !_players.All(p => p.IsOutForRound);
     public bool GameOver => Players.Except([Dealer]).All(p => p.TappedOut);
 
-    public BlackJackGame(int players, int minBet = 1, int winningScore = 21, int startingCash = 100, int automaticallyIncreaseStakeAfterRound = 1, int drawAtStartOfRound = 2, PokerDeck? deck = null, bool dealerCanCountCards = false)
+    public BlackJackGame(int players, int minBet = 1, int blackJackScore = 21, int startingCash = 100, int automaticallyIncreaseStakeAfterRound = 1, int drawAtStartOfRound = 2, PokerDeck? deck = null, bool dealerCanCountCards = false)
     {
         Dealer = BlackJackPlayer.GeneratePlayer(this, "Dealer", Int32.MaxValue);
         _players.Add(Dealer);
@@ -30,7 +30,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
             _players.Add(BlackJackPlayer.GeneratePlayer(this, i, startingCash));
         }
         BuyIn = minBet;
-        WinningScore = winningScore;
+        BlackJackScore = blackJackScore;
         DrawAtStartOfRound = drawAtStartOfRound;
         Deck = deck ?? PokerDeckBuilder.BasicBlackJackDeck();
         Deck.Shuffle();
@@ -38,7 +38,6 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
     }
 
     public static BlackJackGame SetUp(int players) => new(players, 1, 21, 100, 1, 2);
-    public static BlackJackGame SetUp(int players, int minBet, int winningScore, int startingCash, int automaticallyIncreaseStakeAfterRound, int drawAtStartOfRound) => new(players, minBet, winningScore, startingCash, automaticallyIncreaseStakeAfterRound, drawAtStartOfRound);
     public static BlackJackGame SetUp(int players, int minBet, int winningScore, int startingCash, int automaticallyIncreaseStakeAfterRound, int drawAtStartOfRound, PokerDeck? deck)
         => new(players, minBet, winningScore, startingCash, automaticallyIncreaseStakeAfterRound, drawAtStartOfRound, deck);
 
@@ -60,17 +59,19 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
     }
 
     #region Choices
-    public PokerCard Hit(BlackJackPlayer player)
+    public PokerCard? Hit(BlackJackPlayer player)
     {
         var card = Deck.Draw();
-        player.AddCardToHand(card);
+        if (card is not null)
+            player.AddCardToHand(card);
         return card;
     }
 
-    public PokerCard DoubleDown(BlackJackPlayer player)
+    public PokerCard? DoubleDown(BlackJackPlayer player)
     {
         var card = Deck.Draw();
-        player.DoubleDown(card);
+        if (card is not null)
+            player.DoubleDown(card);
         return card;
     }
 
@@ -98,7 +99,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
             return null;
 
         var averageValueOfCardPool = _dealerCanCountCards ? Deck.CardPool.Average(c => c.Value) : 7.3;
-        if (Dealer.HandValue <= WinningScore - Math.Ceiling(averageValueOfCardPool / 2))
+        if (Dealer.HandValue <= BlackJackScore - Math.Ceiling(averageValueOfCardPool / 2))
         {
             var newCard = Hit(Dealer);
             return newCard;
@@ -132,7 +133,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
             {
 
             }
-            else if (player.HandValue == WinningScore && player.Hand.Count == 2)
+            else if (player.HandValue == BlackJackScore && player.Hand.Count == 2)
             {
                 // blackjack
                 winningMultiplier = 3;

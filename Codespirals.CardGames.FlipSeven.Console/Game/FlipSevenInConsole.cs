@@ -81,6 +81,24 @@ public class FlipSevenInConsole
             Console.WriteLine($"Oh no... busted");
         }
     }
+    private void Flip(FlipSevenPlayer player, int number)
+    {
+        ConsoleHelper.SetColorForPlayer(_game.Players.IndexOf(player));
+        var drawnCards = _game.Flip(player, number);
+        foreach (var card in drawnCards)
+        {
+            Console.WriteLine($"{player.Name} flipped a {card.Name}!");
+            if (card.CardType is CardType.Freeze or CardType.Flip)
+            {
+                UseTargetedCard(player, card);
+            }
+        }
+        if (player.State == PlayerStates.Busted)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine($"Oh no... busted");
+        }
+    }
     private void Freeze(FlipSevenPlayer user, FlipSevenPlayer target)
     {
         ConsoleHelper.SetColorForPlayer(_game.Players.IndexOf(target));
@@ -118,10 +136,7 @@ public class FlipSevenInConsole
             else
                 Console.WriteLine($"{user.Name} is flipping out!");
 
-            for (var j = 0; j < card.Value; j++)
-            {
-                Flip(target);
-            }
+            Flip(target, card.Value);
         }
         else if (card.CardType == CardType.Freeze)
         {

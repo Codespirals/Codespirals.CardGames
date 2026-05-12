@@ -1,13 +1,49 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+    <PackageOutputPath>$(OneDrive)\NuGet</PackageOutputPath>
+    <PackageLicenseExpression>CC0-1.0</PackageLicenseExpression>
+    <Title>$(AssemblyName)</Title>
+    <Authors>codespirals, Eliterate</Authors>
+    <Company>codespirals</Company>
+    <NeutralLanguage>en</NeutralLanguage>
+    <PackageIcon>logo.png</PackageIcon>
+    <Copyright>codespirals</Copyright>
+    <PackageProjectUrl>https://www.codespirals.dev/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Codespirals/Codespirals.CardGames/tree/master/Codespirals.CardGames.FlipSeven</RepositoryUrl>
+    <PackageTags>codespirals;flipseven;games;</PackageTags>
+    <Version>1.0.3.26132</Version>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
-
+  <ItemGroup>
+    <None Remove="README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\..\Codespirals.Base\Codespirals.Base.Shared\Resources\Images\logo.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </Resource>
+    <Resource Include="README.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </Resource>
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Codespirals.CardGames.Shared" Version="1.0.13.26132" />
   </ItemGroup>
-
+  <ItemGroup>
+    <None Update="AutoUpdateVersionNumber.ps1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="PowerShell -ExecutionPolicy Bypass -NoProfile -File AutoUpdateVersionNumber.ps1" />
+  </Target>
 </Project>

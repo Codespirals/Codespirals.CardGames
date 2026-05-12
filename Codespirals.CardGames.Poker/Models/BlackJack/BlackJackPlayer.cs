@@ -12,7 +12,7 @@ public class BlackJackPlayer : IBlackJackPlayer<PokerDeck, PokerCard>
     public int Cash { get; private set; } = 1;
     public int CurrentBet { get; private set; }
     public bool IsOutForRound => _isOutForRound || IsBusted || TappedOut;
-    public bool IsBusted => HandValue > _game.WinningScore;
+    public bool IsBusted => HandValue > _game.BlackJackScore;
     public bool TappedOut => Cash <= 0 && CurrentBet <= 0;
     public int HandValue => CalculateHandValue();
     public ReadOnlyCollection<PokerCard> Hand => _hand.AsReadOnly();
@@ -88,11 +88,11 @@ public class BlackJackPlayer : IBlackJackPlayer<PokerDeck, PokerCard>
         var value = _hand.Sum(c => c.Value);
         foreach (var ace in _hand.Where(c => c.Value == 11))
         {
-            if (value <= _game.WinningScore)
+            if (value <= _game.BlackJackScore)
                 break;
             value -= 10;
         }
-        if (value > _game.WinningScore)
+        if (value > _game.BlackJackScore)
         {
             Bust();
         }

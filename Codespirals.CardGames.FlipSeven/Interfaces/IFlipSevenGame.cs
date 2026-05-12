@@ -7,11 +7,12 @@ public interface IFlipSevenGame<TSelf, TPlayer, TDeck, TCard> : IGame<TSelf, TDe
     where TDeck : IDeck<TCard>
     where TCard : IFlipSevenCard
 {
-    ReadOnlyCollection<FlipSevenPlayer> ActivePlayers { get; }
+    abstract static FlipSevenGame SetUp(int players, int numbersToFlip = 7, int winningScore = 200, FlipSevenDeck? deck = null);
     int WinningScore { get; }
     int NumbersToFlip { get; }
 
-    TCard Flip(TPlayer player);
+    TCard? Flip(TPlayer player);
+    IEnumerable<TCard> Flip(TPlayer player, int number);
     void Freeze(TPlayer player);
-    FlipSevenPlayer? GetWinner();
+    TPlayer? GetWinner();
 }

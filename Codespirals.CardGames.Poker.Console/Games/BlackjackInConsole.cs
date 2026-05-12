@@ -49,7 +49,7 @@ internal class BlackjackInConsole
         {
             ConsoleHelper.SetColorForPlayer(_game.Players.IndexOf(player));
             Console.WriteLine($"{player.Name} had {string.Join('|', player.Hand.Select(c => c.Name))}");
-            if (player.HandValue < _game.WinningScore && (_game.Dealer.HandValue > _game.WinningScore || _game.Dealer.HandValue < player.HandValue))
+            if (player.HandValue < _game.BlackJackScore && (_game.Dealer.HandValue > _game.BlackJackScore || _game.Dealer.HandValue < player.HandValue))
             {
                 Console.WriteLine($"{player.Name} wins {player.CurrentBet * 2}");
                 player.AddWinnings(player.CurrentBet * 2);
