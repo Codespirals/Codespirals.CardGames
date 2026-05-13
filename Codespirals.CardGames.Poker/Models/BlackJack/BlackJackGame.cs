@@ -117,21 +117,18 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
         {
             player.DeactivateForRound();
         }
-
-        if (_automaticallyIncreaseStakeAfterRound > 0)
-            RaiseTheStakes(_automaticallyIncreaseStakeAfterRound);
     }
 
-    public (BlackJackPlayer Player, int WinningMultiplier)[] CalculateWinningsOfRound()
+    public (BlackJackPlayer Player, int Winnings)[] CalculateCurrentPotentialPointGain()
     {
-        (BlackJackPlayer Player, int WinningMultiplier)[] results = [];
+        (BlackJackPlayer Player, int Winnings)[] results = [];
         foreach (var player in _players.Except([Dealer]))
         {
-            var winningMultiplier = 0;
+            var winningMultiplier = -1;
 
             if (player.IsBusted)
             {
-
+                winningMultiplier = 0;
             }
             else if (player.HandValue == BlackJackScore && player.Hand.Count == 2)
             {
@@ -149,7 +146,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
                 // draw
                 winningMultiplier = 1;
             }
-            results = results.Append((player, winningMultiplier)).ToArray();
+            results = results.Append((player, winningMultiplier * player.CurrentBet)).ToArray();
         }
 
         return results;
@@ -157,10 +154,17 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
 
     public void PayOut()
     {
-        foreach (var item in CalculateWinningsOfRound())
+        if (Players.Any(p => !p.IsOutForRound))
         {
-            item.Player.AddWinnings(item.WinningMultiplier);
+            return;
         }
+        foreach (var item in CalculateCurrentPotentialPointGain())
+        {
+            item.Player.AddWinnings(item.Winnings);
+        }
+
+        if (_automaticallyIncreaseStakeAfterRound > 0)
+            RaiseTheStakes(_automaticallyIncreaseStakeAfterRound);
     }
 
     public void RaiseTheStakes(int amount)

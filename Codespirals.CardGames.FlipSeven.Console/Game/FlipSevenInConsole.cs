@@ -38,9 +38,9 @@ public class FlipSevenInConsole
         Console.ForegroundColor = ConsoleColor.White;
         Console.WriteLine("The round is over!");
         Console.WriteLine("Here are the current scores:");
-        foreach (var player in _game.Players.OrderBy(p => p.BankedPoints))
+        foreach (var player in _game.Players.OrderBy(p => p.TotalPoints))
         {
-            Console.WriteLine($"{player.Name} has {player.BankedPoints}!");
+            Console.WriteLine($"{player.Name} has {player.TotalPoints}!");
         }
         Console.WriteLine();
     }
@@ -113,8 +113,8 @@ public class FlipSevenInConsole
             Console.WriteLine($"You have no points to bank... But ok.");
         else
             Console.WriteLine($"{player.Name} chose to bank their points. That's probably sensible.");
-        player.BankPoints();
-        Console.WriteLine($"{player.Name} now has {player.BankedPoints} Points!");
+        player.Bank();
+        Console.WriteLine($"{player.Name} now has {player.TotalPoints} Points!");
     }
     private void UseTargetedCard(FlipSevenPlayer user, FlipSevenCard card)
     {

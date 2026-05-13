@@ -1,5 +1,5 @@
 ﻿namespace Codespirals.CardGames.Poker.BlackJack;
-public interface IBlackJackGame<TSelf, TPlayer, TDeck, TCard> : IGame<TSelf, TDeck, TCard>, IRoundBased, IHasPlayers<TPlayer, TDeck, TCard>, IHasBets
+public interface IBlackJackGame<TSelf, TPlayer, TDeck, TCard> : IGame<TSelf, TDeck, TCard>, IRoundBased, IHasPlayers<TPlayer, TDeck, TCard>, IHasBets<TPlayer>
     where TSelf : IBlackJackGame<TSelf, TPlayer, TDeck, TCard>
     where TPlayer : IBlackJackPlayer<TDeck, TCard>
     where TDeck : IDeck<TCard>
@@ -52,9 +52,4 @@ public interface IBlackJackGame<TSelf, TPlayer, TDeck, TCard> : IGame<TSelf, TDe
     /// </summary>
     /// <remarks>The dealer counts cards. The house has an advantage.</remarks>
     public TCard? PlayDealer();
-    /// <summary>
-    /// End the round and return information about the winnings of the round
-    /// </summary>
-    /// <returns></returns>
-    (BlackJackPlayer Player, int WinningMultiplier)[] CalculateWinningsOfRound();
 }

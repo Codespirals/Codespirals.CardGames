@@ -9,11 +9,11 @@ public class BlackJackPlayer : IBlackJackPlayer<PokerDeck, PokerCard>
     internal bool _isOutForRound;
 
     public string Name { get; set; }
-    public int Cash { get; private set; } = 1;
+    public int TotalPoints { get; private set; } = 1;
     public int CurrentBet { get; private set; }
     public bool IsOutForRound => _isOutForRound || IsBusted || TappedOut;
     public bool IsBusted => HandValue > _game.BlackJackScore;
-    public bool TappedOut => Cash <= 0 && CurrentBet <= 0;
+    public bool TappedOut => TotalPoints <= 0 && CurrentBet <= 0;
     public int HandValue => CalculateHandValue();
     public ReadOnlyCollection<PokerCard> Hand => _hand.AsReadOnly();
 
@@ -21,7 +21,7 @@ public class BlackJackPlayer : IBlackJackPlayer<PokerDeck, PokerCard>
     {
         _game = game;
         Name = name;
-        Cash = startingCash;
+        TotalPoints = startingCash;
     }
     private BlackJackPlayer(BlackJackGame game, int number, int startingCash) : this(game, $"Player {number + 1}", startingCash)
     {
@@ -47,13 +47,13 @@ public class BlackJackPlayer : IBlackJackPlayer<PokerDeck, PokerCard>
 
     public void Bet(int amount)
     {
-        CurrentBet = Math.Clamp(amount, 0, Cash);
-        Cash -= CurrentBet;
+        CurrentBet = Math.Clamp(amount, 0, TotalPoints);
+        TotalPoints -= CurrentBet;
     }
 
     public void DoubleDown(PokerCard card)
     {
-        Bet(Math.Clamp(CurrentBet, 0, Cash));
+        Bet(Math.Clamp(CurrentBet, 0, TotalPoints));
         AddCardToHand(card);
         Stand();
     }
@@ -67,9 +67,9 @@ public class BlackJackPlayer : IBlackJackPlayer<PokerDeck, PokerCard>
         _isOutForRound = true;
     }
 
-    public void AddWinnings(int multiplier = 1)
+    public void AddWinnings(int winnings = 0)
     {
-        Cash += CurrentBet * multiplier;
+        TotalPoints += winnings;
         CurrentBet = 0;
     }
 

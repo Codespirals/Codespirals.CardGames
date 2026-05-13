@@ -10,8 +10,7 @@ public class FlipSevenPlayer : IFlipSevenPlayer<FlipSevenDeck, FlipSevenCard>
     public ReadOnlyCollection<FlipSevenCard> Hand => _hand.AsReadOnly();
     public int NumberCardsInHand => _hand.Count(c => c.CardType == CardType.Number);
     public int HandPoints => CalculateHandValue();
-    public int BankedPoints { get; private set; } = 0;
-    public bool IsBusted => State == PlayerStates.Busted;
+    public int TotalPoints { get; private set; } = 0;
     public bool IsOutForRound => State != PlayerStates.Playing;
     public PlayerStates State { get; private set; }
     private FlipSevenPlayer(FlipSevenGame game, string name)
@@ -29,20 +28,7 @@ public class FlipSevenPlayer : IFlipSevenPlayer<FlipSevenDeck, FlipSevenCard>
         => new FlipSevenPlayer(game, number);
 
     public void AddCardToHand(FlipSevenCard card)
-    {
-        if (card.CardType is CardType.Flip or CardType.Freeze)
-        {
-            Discard(card);
-            return;
-        }
-        if (card.CardType == CardType.Number && Hand.Any(c => c.CardType == CardType.Number && c.Value == card.Value))
-        {
-            Discard(card);
-            Bust();
-            return;
-        }
-        _hand.Add(card);
-    }
+        => _hand.Add(card);
 
     public void Discard(FlipSevenCard card)
     {
@@ -57,41 +43,33 @@ public class FlipSevenPlayer : IFlipSevenPlayer<FlipSevenDeck, FlipSevenCard>
         _hand.Clear();
     }
 
-    public int BankPoints()
+    public int Bank()
     {
-        var roundPoints = NumberCardsInHand >= _game.NumbersToFlip ? 15 : 0;
-        roundPoints += HandPoints;
-        DiscardAll();
-        BankedPoints += roundPoints;
         State = PlayerStates.Banked;
-        return roundPoints;
+        return HandPoints;
     }
+
     public int Freeze()
     {
         State = PlayerStates.Frozen;
-        return BankPoints();
+        return HandPoints;
     }
-    public void Bust()
-    {
-        var secondChance = Hand.FirstOrDefault(c => c.CardType == CardType.SecondChance);
-        if (secondChance is not null)
-        {
-            Discard(secondChance);
-            return;
-        }
-        DiscardAll();
-        State = PlayerStates.Busted;
-    }
+
     public void DeactivateForRound()
-        => BankPoints();
+        => State = PlayerStates.Busted;
+
     public void Reactivate()
     {
         DiscardAll();
         State = PlayerStates.Playing;
     }
+
+    public void AddWinnings(int points)
+        => TotalPoints += points;
+
     private int CalculateHandValue()
     {
-        var points = 0;
+        var points = NumberCardsInHand == _game.NumbersToFlip ? _game.FlipNumberBonus : 0;
         foreach (var card in _hand.OrderBy(c => c.CardType))
         {
             switch (card.CardType)
@@ -112,5 +90,5 @@ public class FlipSevenPlayer : IFlipSevenPlayer<FlipSevenDeck, FlipSevenCard>
         return points;
     }
     public override string ToString()
-        => $"{Name} {(Hand.Count != 0 ? "Hand: " : "")}{string.Join('|', Hand.OrderBy(c => c.CardType).Select(c => c.Name))} Hand total: {HandPoints} Banked:{BankedPoints}";
+        => $"{Name} {(Hand.Count != 0 ? "Hand: " : "")}{string.Join('|', Hand.OrderBy(c => c.CardType).Select(c => c.Name))} Hand total: {HandPoints} Banked:{TotalPoints}";
 }

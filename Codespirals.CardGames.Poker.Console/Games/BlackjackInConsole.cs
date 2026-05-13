@@ -60,9 +60,9 @@ internal class BlackjackInConsole
             }
         }
         Console.WriteLine("Here are the current scores:");
-        foreach (var player in _game.Players.Except([_game.Dealer]).OrderBy(p => p.Cash))
+        foreach (var player in _game.Players.Except([_game.Dealer]).OrderBy(p => p.TotalPoints))
         {
-            Console.WriteLine($"{player.Name} has ${player.Cash}!");
+            Console.WriteLine($"{player.Name} has ${player.TotalPoints}!");
         }
         Console.WriteLine();
     }
