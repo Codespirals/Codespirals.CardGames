@@ -5,8 +5,8 @@
 /// <typeparam name="TSelf"></typeparam>
 /// <typeparam name="TDeck"></typeparam>
 /// <typeparam name="TCard"></typeparam>
-public interface IGame<TSelf, TDeck, TCard>
-    where TSelf : IGame<TSelf, TDeck, TCard>
+public interface ICardGame<TSelf, TDeck, TCard>
+    where TSelf : ICardGame<TSelf, TDeck, TCard>
     where TDeck : IDeck<TCard>
     where TCard : ICard
 {

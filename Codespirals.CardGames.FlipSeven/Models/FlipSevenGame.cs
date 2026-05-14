@@ -1,20 +1,31 @@
 ﻿using System.Collections.ObjectModel;
 
 namespace Codespirals.CardGames.FlipSeven;
+
+/// <inheritdoc />
 public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, FlipSevenDeck, FlipSevenCard>
 {
     private readonly List<FlipSevenPlayer> _players = [];
     private FlipSevenPlayer _currentPlayer;
     private int _currentRound = 0;
 
+    /// <inheritdoc />
     public FlipSevenDeck Deck { get; } = FlipSevenDeckBuilder.CreateStandardDeck();
+    /// <inheritdoc />
     public ReadOnlyCollection<FlipSevenPlayer> Players => _players.AsReadOnly();
+    /// <inheritdoc />
     public FlipSevenPlayer CurrentPlayer => _currentPlayer;
+    /// <inheritdoc />
     public int CurrentRound => _currentRound;
+    /// <inheritdoc />
     public int WinningScore { get; set; } = 200;
+    /// <inheritdoc />
     public int NumbersToFlip { get; set; } = 7;
+    /// <inheritdoc />
     public int FlipNumberBonus { get; set; } = 15;
+    /// <inheritdoc />
     public bool RoundActive => !_players.All(p => p.IsOutForRound);
+    /// <inheritdoc />
     public bool GameOver => !RoundActive && _players.Any(p => p.TotalPoints > WinningScore);
 
     private FlipSevenGame(int players, int numbersToFlip = 7, int flipNumberBonus = 15, int winningScore = 200, FlipSevenDeck? deck = null)
@@ -30,13 +41,17 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         Deck.Shuffle();
     }
 
+    /// <inheritdoc />
     public static FlipSevenGame SetUp(int players)
         => new(players);
+    /// <inheritdoc />
     public static FlipSevenGame SetUp(int players, int numbersToFlip = 7, int flipNumberBonus = 15, int winningScore = 200, FlipSevenDeck? deck = null)
         => new(players, numbersToFlip, flipNumberBonus, winningScore, deck);
 
+    /// <inheritdoc />
     public FlipSevenPlayer GetCurrentPlayer() => _currentPlayer;
 
+    /// <inheritdoc />
     public void StartRound()
     {
         _currentRound++;
@@ -46,14 +61,14 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         }
         _currentPlayer = Players[_currentRound % _players.Count];
     }
-
+    /// <inheritdoc />
     public int? Bank(FlipSevenPlayer player)
     {
         if (player.IsOutForRound)
             return null;
         return player.Bank();
     }
-
+    /// <inheritdoc />
     public FlipSevenCard? Flip(FlipSevenPlayer player)
     {
         if (player.IsOutForRound)
@@ -87,21 +102,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
 
         return card;
     }
-
-    /// <summary>
-    /// Attempt to give a card to another player.
-    /// This can only be a card of type <see cref="CardType.Flip"/>, <see cref="CardType.Freeze"/> or <see cref="CardType.SecondChance"/>.
-    /// However a player can only have 1 <see cref="CardType.SecondChance"/> at a time.
-    /// </summary>
-    /// <param name="player"></param>
-    /// <param name="card"></param>
-    /// <returns>
-    /// <list type="bullet">
-    /// <item>An list of cards containing the cards the player flipped</item>
-    /// <item>An empty list if the transfer was successful but didn't result in any drawn cards</item>
-    /// <item><see langword="null"/> if the transfer failed</item>
-    /// </list> 
-    /// </returns>
+    /// <inheritdoc />
     public IEnumerable<FlipSevenCard>? TryGivePlayerCard(FlipSevenPlayer player, FlipSevenCard card)
     {
         if (player.IsOutForRound)
@@ -124,7 +125,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
                 return null;
         }
     }
-
+    /// <inheritdoc />
     public IEnumerable<FlipSevenCard> Flip(FlipSevenPlayer player, int number)
     {
         for (int i = 0; i < number; i++)
@@ -135,14 +136,14 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
             yield return card;
         }
     }
-
+    /// <inheritdoc />
     public int? Freeze(FlipSevenPlayer player)
     {
         if (player.IsOutForRound)
             return null;
         return player.Freeze();
     }
-
+    /// <inheritdoc />
     public void MoveToNextPlayer()
     {
         if (_players.All(p => p.IsOutForRound) || GameOver)
@@ -157,7 +158,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         if (_currentPlayer.IsOutForRound)
             MoveToNextPlayer();
     }
-
+    /// <inheritdoc />
     public void EndRound()
     {
         foreach (var player in _players.Where(p => !p.IsOutForRound))
@@ -165,7 +166,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
             player.Bank();
         }
     }
-
+    /// <inheritdoc />
     public (FlipSevenPlayer Player, int Winnings)[] CalculateCurrentPotentialPointGain()
     {
         (FlipSevenPlayer Player, int WinningMultiplier)[] results = [];
@@ -184,7 +185,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         }
         return results;
     }
-
+    /// <inheritdoc />
     public void PayOut()
     {
         if (Players.Any(p => !p.IsOutForRound))
@@ -196,7 +197,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
             item.Player.AddWinnings(item.Winnings);
         }
     }
-
+    /// <inheritdoc />
     public FlipSevenPlayer? GetWinner()
     {
         if (!GameOver)
