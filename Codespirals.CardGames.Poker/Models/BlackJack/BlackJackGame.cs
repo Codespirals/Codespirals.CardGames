@@ -32,7 +32,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
         BuyIn = minBet;
         BlackJackScore = blackJackScore;
         DrawAtStartOfRound = drawAtStartOfRound;
-        Deck = deck ?? PokerDeckBuilder.BasicBlackJackDeck();
+        Deck = deck ?? PokerDeckBuilder.CreateBlackJackDeck();
         Deck.Shuffle();
         _dealerCanCountCards = dealerCanCountCards;
     }

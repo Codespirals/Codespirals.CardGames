@@ -36,7 +36,7 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Codespirals.CardGames.Shared" Version="1.0.15.26134" />
+    <PackageReference Include="Codespirals.CardGames.Shared" Version="1.0.16.26134" />
   </ItemGroup>
   <ItemGroup>
     <None Update="AutoUpdateVersionNumber.ps1">

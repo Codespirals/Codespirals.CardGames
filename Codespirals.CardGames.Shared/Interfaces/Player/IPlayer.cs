@@ -23,7 +23,6 @@ public interface IPlayer<TCard> : IPlayer
     /// The hand of this player
     /// </summary>
     ReadOnlyCollection<TCard> Hand { get; }
-
     /// <summary>
     /// Add a card to <see cref="Hand"/>
     /// </summary>

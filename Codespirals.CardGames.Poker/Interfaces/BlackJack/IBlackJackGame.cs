@@ -1,5 +1,5 @@
 ﻿namespace Codespirals.CardGames.Poker.BlackJack;
-public interface IBlackJackGame<TSelf, TPlayer, TDeck, TCard> : IGame<TSelf, TDeck, TCard>, IRoundBased, IHasPlayers<TPlayer, TDeck, TCard>, IHasBets<TPlayer>
+public interface IBlackJackGame<TSelf, TPlayer, TDeck, TCard> : ICardGame<TSelf, TDeck, TCard>, IRoundBased, IHasPlayers<TPlayer>, IHasBets<TPlayer>
     where TSelf : IBlackJackGame<TSelf, TPlayer, TDeck, TCard>
     where TPlayer : IBlackJackPlayer<TDeck, TCard>
     where TDeck : IDeck<TCard>

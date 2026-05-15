@@ -6,11 +6,22 @@ using System.Threading.Tasks;
 
 namespace Codespirals.CardGames.Poker.BlackJack;
 
-public interface IBlackJackPlayer<TDeck, TCard> : IPlayer<TDeck, TCard>, ICanPlayRounds, ICanBet, ICanBust, IHasPoints
+/// <inheritdoc/>
+public interface IBlackJackPlayer<TDeck, TCard> : IPlayer<TCard>, ICanPlayRounds, ICanBet, ICanBust, IHasPoints
     where TDeck : IDeck<TCard>
     where TCard : IPokerCard
 {
+    /// <summary>
+    /// The value of the player's hand
+    /// </summary>
     public int HandValue { get; }
+    /// <summary>
+    /// The player stands on their current hand
+    /// </summary>
     public void Stand();
+    /// <summary>
+    /// The player double's down
+    /// </summary>
+    /// <param name="card"></param>
     public void DoubleDown(TCard card);
 }

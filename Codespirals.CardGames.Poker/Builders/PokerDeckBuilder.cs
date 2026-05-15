@@ -1,5 +1,5 @@
 ﻿namespace Codespirals.CardGames.Poker;
-public class PokerDeckBuilder
+public class PokerDeckBuilder : IDeckBuilder<PokerDeckBuilder, PokerDeck, PokerCard>
 {
     private PokerDeck _deck;
 
@@ -8,7 +8,7 @@ public class PokerDeckBuilder
         _deck = new PokerDeck();
     }
 
-    public static PokerDeckBuilder BeginBuilding()
+    public static PokerDeckBuilder Begin()
         => new();
 
     public PokerDeckBuilder RefreshOnEmpty(bool refresh)
@@ -63,8 +63,8 @@ public class PokerDeckBuilder
         return _deck;
     }
 
-    public static PokerDeck BasicPokerDeck()
-        => BeginBuilding()
+    public static PokerDeck CreateStandardDeck()
+        => Begin()
         .WithNumberCards([Suit.Diamonds, Suit.Clubs, Suit.Hearts, Suit.Spades])
         .WithNamedCards([Suit.Diamonds, Suit.Clubs, Suit.Hearts, Suit.Spades], NamedCards.Ace, 1)
         .WithNamedCards([Suit.Diamonds, Suit.Clubs, Suit.Hearts, Suit.Spades], NamedCards.Jack, 11)
@@ -73,8 +73,8 @@ public class PokerDeckBuilder
         .RefreshOnEmpty(true)
         .Build();
 
-    public static PokerDeck BasicBlackJackDeck()
-        => BeginBuilding()
+    public static PokerDeck CreateBlackJackDeck()
+        => Begin()
         .WithNumberCards([Suit.Diamonds, Suit.Clubs, Suit.Hearts, Suit.Spades])
         .WithNamedCards([Suit.Diamonds, Suit.Clubs, Suit.Hearts, Suit.Spades], NamedCards.Ace, 11)
         .WithNamedCards([Suit.Diamonds, Suit.Clubs, Suit.Hearts, Suit.Spades], NamedCards.Jack, 10)
@@ -83,8 +83,8 @@ public class PokerDeckBuilder
         .RefreshOnEmpty(true)
         .Build();
 
-    public static PokerDeck BasicPokerDeckWithJokers(int jokers)
-        => BeginBuilding()
+    public static PokerDeck CreatePokerDeckWithJokers(int jokers)
+        => Begin()
         .WithNumberCards([Suit.Diamonds, Suit.Clubs, Suit.Hearts, Suit.Spades])
         .WithNamedCards([Suit.Diamonds, Suit.Clubs, Suit.Hearts, Suit.Spades], NamedCards.Ace, 1)
         .WithNamedCards([Suit.Diamonds, Suit.Clubs, Suit.Hearts, Suit.Spades], NamedCards.Jack, 11)
@@ -94,8 +94,8 @@ public class PokerDeckBuilder
         .RefreshOnEmpty(true)
         .Build();
 
-    public static PokerDeck JassDeck()
-        => BeginBuilding()
+    public static PokerDeck CreateJassDeck()
+        => Begin()
         .WithNumberCards([Suit.Bells, Suit.Acorns, Suit.Flowers, Suit.Shields], 6, 10)
         .WithNamedCards([Suit.Bells, Suit.Acorns, Suit.Flowers, Suit.Shields], NamedCards.Ace, 1)
         .WithNamedCards([Suit.Bells, Suit.Acorns, Suit.Flowers, Suit.Shields], NamedCards.Jack, 11)
