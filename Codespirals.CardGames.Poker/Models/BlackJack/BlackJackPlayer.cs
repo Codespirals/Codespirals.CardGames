@@ -2,7 +2,7 @@
 using System.Collections.ObjectModel;
 
 namespace Codespirals.CardGames.Poker;
-public class BlackJackPlayer : IBlackJackPlayer<PokerDeck, PokerCard>
+public class BlackJackPlayer : IBlackJackPlayer<PokerCard>
 {
     internal readonly BlackJackGame _game;
     internal readonly List<PokerCard> _hand = [];
@@ -67,9 +67,9 @@ public class BlackJackPlayer : IBlackJackPlayer<PokerDeck, PokerCard>
         _isOutForRound = true;
     }
 
-    public void AddWinnings(int winnings = 0)
+    public void AddPoints(int points = 0)
     {
-        TotalPoints += winnings;
+        TotalPoints += points;
         CurrentBet = 0;
     }
 
@@ -98,7 +98,4 @@ public class BlackJackPlayer : IBlackJackPlayer<PokerDeck, PokerCard>
         }
         return value;
     }
-
-    public override string ToString()
-        => $"{Name} {Hand.Select(c => c.Emoji)}";
 }

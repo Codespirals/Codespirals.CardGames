@@ -11,7 +11,6 @@ internal class BlackjackInConsole
     public static BlackjackInConsole SetUp()
     {
         Console.ForegroundColor = ConsoleColor.White;
-        Console.WriteLine($"Starting a game of Blackjack");
         var game = new BlackjackInConsole(ConsoleHelper.GetPlayerCount(1, 8));
         ConsoleHelper.AskToNamePlayers(game._game.Players);
         return game;
@@ -19,6 +18,10 @@ internal class BlackjackInConsole
     
     public void Start()
     {
+        foreach (var item in _game.LogEntries)
+        {
+            Console.WriteLine(item.Text);
+        }
         while (!_game.GameOver)
         {
             PlayRound();
@@ -29,8 +32,12 @@ internal class BlackjackInConsole
     {
         Console.ForegroundColor = ConsoleColor.White;
         ConsoleHelper.SeperatorLine('#');
-        Console.WriteLine($"Starting round {_game.CurrentRound}");
         _game.StartRound();
+        foreach (var item in _game.LogEntries.Where(l => l.Round == _game.CurrentRound))
+        {
+            Console.WriteLine(item.Text);
+        }
+        Console.WriteLine(_game.Prompt);
         while (_game.RoundActive)
         {
             var currentPlayer = _game.CurrentPlayer;
@@ -39,7 +46,9 @@ internal class BlackjackInConsole
                 DealerTurn(currentPlayer);
             }
             else
+            {
                 PlayerTurn(currentPlayer);
+            }
             _game.MoveToNextPlayer();
         }
         Console.ForegroundColor = ConsoleColor.White;
@@ -52,7 +61,7 @@ internal class BlackjackInConsole
             if (player.HandValue < _game.BlackJackScore && (_game.Dealer.HandValue > _game.BlackJackScore || _game.Dealer.HandValue < player.HandValue))
             {
                 Console.WriteLine($"{player.Name} wins {player.CurrentBet * 2}");
-                player.AddWinnings(player.CurrentBet * 2);
+                player.AddPoints(player.CurrentBet * 2);
             }
             else
             {
@@ -71,26 +80,21 @@ internal class BlackjackInConsole
         ConsoleHelper.SeperatorLine();
         ConsoleHelper.SetColorForPlayer(_game.Players.IndexOf(dealer));
         Console.WriteLine($"It's the Dealer's turn!");
-        Console.WriteLine($"The dealer has a hidden card and {string.Join('|', dealer.Hand.Skip(1).Select(c => c.Name))}");
-        if (dealer.HandValue < 17)
-        {
-            Console.WriteLine($"The Dealer is trying their luck at another card!");
-            var drawnCard = _game.Hit(dealer);
-            Console.WriteLine($"{dealer.Name} drew a {drawnCard.Name}!");
-        }
-        else
-            Console.WriteLine($"The Dealer is standing on their cards.");
+        Console.WriteLine($"The dealer has {dealer.Hand.First().Name} and {dealer.Hand.Count -1} hidden cards.");
+        var dealerRound = _game.PlayDealer();
+        if (dealerRound == true)
+            Console.WriteLine($"The dealer drew another card.");
+        else if (dealerRound == false)
+            Console.WriteLine($"The dealer is standing on their cards.");
     }
     private void PlayerTurn(BlackJackPlayer player)
     {
         ConsoleHelper.SeperatorLine();
         ConsoleHelper.SetColorForPlayer(_game.Players.IndexOf(player));
         Console.WriteLine($"It's {player.Name}'s turn!");
-        if (player.Hand.Count != 0)
-        {
-            Console.WriteLine(player.ToString());
-        }
+        Console.WriteLine($"They have {string.Join("", player.Hand.Select(c => c.Emoji))}({player.HandValue})");
         EvaluateHand(player);
+        Console.WriteLine(_game.Prompt);
         if (player.HandValue > 17)
             Console.WriteLine($"What will you do? {nameof(Hit)} or {nameof(Stand)}?");
         else

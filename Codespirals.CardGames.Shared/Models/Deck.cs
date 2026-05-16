@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 
 namespace Codespirals.CardGames;
-/// <inheritdoc/>
+/// <inheritdoc cref="IDeck{TCard}"/>
 public abstract class Deck<TCard> : IDeck<TCard>
     where TCard : ICard
 {

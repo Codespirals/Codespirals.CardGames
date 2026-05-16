@@ -1,6 +1,8 @@
 ﻿using System.Collections.ObjectModel;
 
 namespace Codespirals.CardGames.Poker.BlackJack;
+
+/// <inheritdoc cref="IBlackJackGame{TSelf, TPlayer, TDeck, TCard}"/>
 public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, PokerDeck, PokerCard>
 {
     private readonly List<BlackJackPlayer> _players = [];
@@ -8,17 +10,34 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
     private int _currentRound = 0;
     private int _automaticallyIncreaseStakeAfterRound = 0;
     private bool _dealerCanCountCards;
+
+    /// <inheritdoc/>
     public PokerDeck Deck { get; }
+    /// <inheritdoc/>
     public ReadOnlyCollection<BlackJackPlayer> Players => _players.ToList().AsReadOnly();
+    /// <inheritdoc/>
     public BlackJackPlayer CurrentPlayer => _currentPlayer;
+    /// <inheritdoc/>
     public int CurrentRound => _currentRound;
+    /// <inheritdoc/>
     public BlackJackPlayer Dealer { get; }
+    /// <inheritdoc/>
     public int BlackJackScore { get; private set; } = 21;
+    /// <inheritdoc/>
     public int BuyIn { get; private set; }
+    /// <inheritdoc/>
     public int DrawAtStartOfRound { get; private set; } = 2;
+    /// <inheritdoc/>
     public bool RoundActive => !_players.All(p => p.IsOutForRound);
+    /// <inheritdoc/>
     public bool GameOver => Players.Except([Dealer]).All(p => p.TappedOut);
 
+    /// <inheritdoc/>
+    public IEnumerable<LogEntry> LogEntries { get; } = [];
+    /// <inheritdoc/>
+    public string Prompt { get; private set; } = "";
+
+    /// <inheritdoc/>
     public BlackJackGame(int players, int minBet = 1, int blackJackScore = 21, int startingCash = 100, int automaticallyIncreaseStakeAfterRound = 1, int drawAtStartOfRound = 2, PokerDeck? deck = null, bool dealerCanCountCards = false)
     {
         Dealer = BlackJackPlayer.GeneratePlayer(this, "Dealer", Int32.MaxValue);
@@ -35,15 +54,23 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
         Deck = deck ?? PokerDeckBuilder.CreateBlackJackDeck();
         Deck.Shuffle();
         _dealerCanCountCards = dealerCanCountCards;
+        Log("Starting a new game of Blackjack.");
+        Log($"The starting buyin is {BuyIn}");
+        StartRound();
+        Prompt = "Start playing!";
     }
 
+    /// <inheritdoc/>
     public static BlackJackGame SetUp(int players) => new(players, 1, 21, 100, 1, 2);
+    /// <inheritdoc/>
     public static BlackJackGame SetUp(int players, int minBet, int winningScore, int startingCash, int automaticallyIncreaseStakeAfterRound, int drawAtStartOfRound, PokerDeck? deck)
         => new(players, minBet, winningScore, startingCash, automaticallyIncreaseStakeAfterRound, drawAtStartOfRound, deck);
 
+    /// <inheritdoc/>
     public void StartRound()
     {
         _currentRound++;
+        Log($"Starting round {_currentRound}");
         foreach (var player in _players)
         {
             if (player.TappedOut)
@@ -52,32 +79,49 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
             player.Bet(BuyIn);
             for (int i = 0; i < DrawAtStartOfRound; i++)
             {
-                player.AddCardToHand(Deck.Draw());
+                var card = Deck.Draw();
+                if (card is not null)
+                    player.AddCardToHand(card);
             }
         }
         _currentPlayer = Dealer;
     }
 
     #region Choices
+    /// <inheritdoc/>
     public PokerCard? Hit(BlackJackPlayer player)
     {
         var card = Deck.Draw();
         if (card is not null)
+        {
             player.AddCardToHand(card);
+            Log($"{player.Name} drew a {card.Name}.");
+        }
         return card;
     }
 
+    /// <inheritdoc/>
     public PokerCard? DoubleDown(BlackJackPlayer player)
     {
         var card = Deck.Draw();
         if (card is not null)
+        {
             player.DoubleDown(card);
+            Log($"{player.Name} doubled down! Their bet is now {player.CurrentBet}.");
+            Log($"{player.Name} drew a {card.Name}.");
+        }
         return card;
     }
 
-    public void Stand(BlackJackPlayer player) => player.Stand();
+    /// <inheritdoc/>
+    public void Stand(BlackJackPlayer player)
+    {
+        player.Stand();
+        Log($"{player.Name} is standing on {player.HandValue}.");
+    }
     #endregion
 
+    /// <inheritdoc/>
     public void MoveToNextPlayer()
     {
         if (_players.All(p => p.IsOutForRound) || GameOver)
@@ -90,35 +134,57 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
         _currentPlayer = _players[nextPlayerIndex];
 
         if (_currentPlayer.IsOutForRound)
+        {
             MoveToNextPlayer();
+            return;
+        }
+        if (_currentPlayer == Dealer)
+        {
+            PlayDealer();
+            return;
+        }
+        Log($"It's {_currentPlayer.Name}'s turn.");
+        Prompt = $"{_currentPlayer.Name}: Choose an action!";
     }
 
-    public PokerCard? PlayDealer()
+    /// <inheritdoc/>
+    public bool? PlayDealer()
     {
         if (Dealer.IsOutForRound)
             return null;
 
+        Log($"It's the dealer's turn.");
         var averageValueOfCardPool = _dealerCanCountCards ? Deck.CardPool.Average(c => c.Value) : 7.3;
         if (Dealer.HandValue <= BlackJackScore - Math.Ceiling(averageValueOfCardPool / 2))
         {
-            var newCard = Hit(Dealer);
-            return newCard;
+            var newCard = Deck.Draw();
+            if (newCard is null)
+                return null;
+            Dealer.AddCardToHand(newCard);
+            Log($"The dealer drew a card.");
+            return true;
         }
         else
         {
             Dealer.Stand();
-            return null;
+            Log($"The dealer is standing on their cards.");
+            return false;
         }
     }
 
+    /// <inheritdoc/>
     public void EndRound()
     {
         foreach (var player in _players)
         {
             player.DeactivateForRound();
         }
+        Log($"Round {CurrentRound} has ended.");
+        PayOut();
+        Prompt = $"Start the next round!";
     }
 
+    /// <inheritdoc/>
     public (BlackJackPlayer Player, int Winnings)[] CalculateCurrentPotentialPointGain()
     {
         (BlackJackPlayer Player, int Winnings)[] results = [];
@@ -152,23 +218,33 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
         return results;
     }
 
+    /// <inheritdoc/>
     public void PayOut()
     {
         if (Players.Any(p => !p.IsOutForRound))
-        {
             return;
-        }
+        Log($"Paying out to all players:");
         foreach (var item in CalculateCurrentPotentialPointGain())
         {
-            item.Player.AddWinnings(item.Winnings);
+            item.Player.AddPoints(item.Winnings);
+            if (item.Winnings < 1)
+                Log($"\n{item.Player.Name} lost...");
+            else
+                Log($"\n{item.Player.Name} Won! +{item.Winnings}");
         }
 
         if (_automaticallyIncreaseStakeAfterRound > 0)
             RaiseTheStakes(_automaticallyIncreaseStakeAfterRound);
     }
 
+    /// <inheritdoc/>
     public void RaiseTheStakes(int amount)
     {
         BuyIn += amount;
+        Log($"The stakes have risen to {BuyIn}!");
     }
+
+    /// <inheritdoc/>
+    public void Log(string text)
+        => LogEntries.Append(new LogEntry(text, CurrentRound));
 }

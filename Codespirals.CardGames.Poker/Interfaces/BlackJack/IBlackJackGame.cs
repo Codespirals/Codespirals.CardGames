@@ -1,7 +1,14 @@
 ﻿namespace Codespirals.CardGames.Poker.BlackJack;
-public interface IBlackJackGame<TSelf, TPlayer, TDeck, TCard> : ICardGame<TSelf, TDeck, TCard>, IRoundBased, IHasPlayers<TPlayer>, IHasBets<TPlayer>
+/// <summary>
+/// A game of blackjack
+/// </summary>
+/// <typeparam name="TSelf"></typeparam>
+/// <typeparam name="TPlayer"></typeparam>
+/// <typeparam name="TDeck"></typeparam>
+/// <typeparam name="TCard"></typeparam>
+public interface IBlackJackGame<TSelf, TPlayer, TDeck, TCard> : ICardGame<TSelf, TDeck, TCard>, IRoundBased, IHasPlayers<TPlayer>, IHasBets<TPlayer>, IHasActivityLog<LogEntry>, IHasPrompt
     where TSelf : IBlackJackGame<TSelf, TPlayer, TDeck, TCard>
-    where TPlayer : IBlackJackPlayer<TDeck, TCard>
+    where TPlayer : IBlackJackPlayer<TCard>
     where TDeck : IDeck<TCard>
     where TCard : IPokerCard
 {
@@ -51,5 +58,6 @@ public interface IBlackJackGame<TSelf, TPlayer, TDeck, TCard> : ICardGame<TSelf,
     /// Make the dealer play his round.
     /// </summary>
     /// <remarks>The dealer counts cards. The house has an advantage.</remarks>
-    public TCard? PlayDealer();
+    /// <returns>If the dealer drew a card or null if it's the dealer is already out.</returns>
+    public bool? PlayDealer();
 }
