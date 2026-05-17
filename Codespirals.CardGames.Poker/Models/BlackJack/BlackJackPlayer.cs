@@ -2,19 +2,29 @@
 using System.Collections.ObjectModel;
 
 namespace Codespirals.CardGames.Poker;
+
+/// <inheritdoc cref="IBlackJackPlayer{TCard}"/>
 public class BlackJackPlayer : IBlackJackPlayer<PokerCard>
 {
     internal readonly BlackJackGame _game;
     internal readonly List<PokerCard> _hand = [];
     internal bool _isOutForRound;
 
+    /// <inheritdoc/>
     public string Name { get; set; }
+    /// <inheritdoc/>
     public int TotalPoints { get; private set; } = 1;
+    /// <inheritdoc/>
     public int CurrentBet { get; private set; }
+    /// <inheritdoc/>
     public bool IsOutForRound => _isOutForRound || IsBusted || TappedOut;
+    /// <inheritdoc/>
     public bool IsBusted => HandValue > _game.BlackJackScore;
+    /// <inheritdoc/>
     public bool TappedOut => TotalPoints <= 0 && CurrentBet <= 0;
+    /// <inheritdoc/>
     public int HandValue => CalculateHandValue();
+    /// <inheritdoc/>
     public ReadOnlyCollection<PokerCard> Hand => _hand.AsReadOnly();
 
     private BlackJackPlayer(BlackJackGame game, string name, int startingCash)
@@ -27,17 +37,22 @@ public class BlackJackPlayer : IBlackJackPlayer<PokerCard>
     {
 
     }
+    /// <inheritdoc/>
     public static BlackJackPlayer GeneratePlayer(BlackJackGame game, string name, int startingCash)
         => new BlackJackPlayer(game, name, startingCash);
+    /// <inheritdoc/>
     public static BlackJackPlayer GeneratePlayer(BlackJackGame game, int number, int startingCash)
         => new BlackJackPlayer(game, number, startingCash);
+    /// <inheritdoc/>
     public void AddCardToHand(PokerCard card) => _hand.Add(card);
+    /// <inheritdoc/>
     public void Discard(PokerCard card)
     {
         _hand.Remove(card);
         _game.Deck.PutOnDiscardPile(card);
     }
 
+    /// <inheritdoc/>
     public void DiscardAll()
     {
         foreach (var card in _hand)
@@ -45,12 +60,14 @@ public class BlackJackPlayer : IBlackJackPlayer<PokerCard>
         _hand.Clear();
     }
 
+    /// <inheritdoc/>
     public void Bet(int amount)
     {
         CurrentBet = Math.Clamp(amount, 0, TotalPoints);
         TotalPoints -= CurrentBet;
     }
 
+    /// <inheritdoc/>
     public void DoubleDown(PokerCard card)
     {
         Bet(Math.Clamp(CurrentBet, 0, TotalPoints));
@@ -58,24 +75,29 @@ public class BlackJackPlayer : IBlackJackPlayer<PokerCard>
         Stand();
     }
 
+    /// <inheritdoc/>
     public void Stand()
         => DeactivateForRound();
 
+    /// <inheritdoc/>
     public void Bust()
     {
         CurrentBet = 0;
         _isOutForRound = true;
     }
 
+    /// <inheritdoc/>
     public void AddPoints(int points = 0)
     {
         TotalPoints += points;
         CurrentBet = 0;
     }
 
+    /// <inheritdoc/>
     public void DeactivateForRound()
         => _isOutForRound = true;
-
+    
+    /// <inheritdoc/>
     public void Reactivate()
     {
         DiscardAll();
