@@ -12,7 +12,9 @@ public class BlackJackPlayer : IBlackJackPlayer<PokerCard>
 
     /// <inheritdoc/>
     public string Name { get; set; }
-    /// <inheritdoc/>
+    /// <summary>
+    /// How much cash this player still has to bet with
+    /// </summary>
     public int TotalPoints { get; private set; } = 1;
     /// <inheritdoc/>
     public int CurrentBet { get; private set; }
@@ -65,14 +67,6 @@ public class BlackJackPlayer : IBlackJackPlayer<PokerCard>
     {
         CurrentBet = Math.Clamp(amount, 0, TotalPoints);
         TotalPoints -= CurrentBet;
-    }
-
-    /// <inheritdoc/>
-    public void DoubleDown(PokerCard card)
-    {
-        Bet(Math.Clamp(CurrentBet, 0, TotalPoints));
-        AddCardToHand(card);
-        Stand();
     }
 
     /// <inheritdoc/>

@@ -18,9 +18,4 @@ public interface IBlackJackPlayer<TCard> : IPlayer<TCard>, ICanPlayRounds, ICanB
     /// The player stands on their current hand
     /// </summary>
     public void Stand();
-    /// <summary>
-    /// The player double's down
-    /// </summary>
-    /// <param name="card"></param>
-    public void DoubleDown(TCard card);
 }

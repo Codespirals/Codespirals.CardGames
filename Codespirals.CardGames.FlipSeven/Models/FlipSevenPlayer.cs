@@ -1,17 +1,28 @@
 ﻿using System.Collections.ObjectModel;
 
 namespace Codespirals.CardGames.FlipSeven;
+
+/// <inheritdoc />
 public class FlipSevenPlayer : IFlipSevenPlayer<FlipSevenDeck, FlipSevenCard>
 {
     private readonly FlipSevenGame _game;
     private readonly List<FlipSevenCard> _hand = [];
 
+    /// <inheritdoc />
     public string Name { get; set; }
+    /// <inheritdoc />
     public ReadOnlyCollection<FlipSevenCard> Hand => _hand.AsReadOnly();
+    /// <inheritdoc />
     public int NumberCardsInHand => _hand.Count(c => c.CardType == CardType.Number);
+    /// <inheritdoc />
     public int HandPoints => CalculateHandValue();
+    /// <inheritdoc />
     public int TotalPoints { get; private set; } = 0;
+    /// <inheritdoc />
+    public bool IsBusted => State == PlayerStates.Busted;
+    /// <inheritdoc />
     public bool IsOutForRound => State != PlayerStates.Playing;
+    /// <inheritdoc />
     public PlayerStates State { get; private set; }
     private FlipSevenPlayer(FlipSevenGame game, string name)
     {
@@ -22,20 +33,25 @@ public class FlipSevenPlayer : IFlipSevenPlayer<FlipSevenDeck, FlipSevenCard>
     {
 
     }
+    /// <inheritdoc />
     public static FlipSevenPlayer GeneratePlayer(FlipSevenGame game, string name)
         => new FlipSevenPlayer(game, name);
+    /// <inheritdoc />
     public static FlipSevenPlayer GeneratePlayer(FlipSevenGame game, int number)
         => new FlipSevenPlayer(game, number);
 
+    /// <inheritdoc />
     public void AddCardToHand(FlipSevenCard card)
         => _hand.Add(card);
 
+    /// <inheritdoc />
     public void Discard(FlipSevenCard card)
     {
         _game.Deck.PutOnDiscardPile(card);
         _hand.Remove(card);
     }
 
+    /// <inheritdoc />
     public void DiscardAll()
     {
         foreach (var card in _hand)
@@ -43,28 +59,37 @@ public class FlipSevenPlayer : IFlipSevenPlayer<FlipSevenDeck, FlipSevenCard>
         _hand.Clear();
     }
 
+    /// <inheritdoc />
     public int Bank()
     {
         State = PlayerStates.Banked;
         return HandPoints;
     }
 
+    /// <inheritdoc />
     public int Freeze()
     {
         State = PlayerStates.Frozen;
         return HandPoints;
     }
 
+    /// <inheritdoc />
+    public void Bust()
+        => DeactivateForRound();
+
+    /// <inheritdoc />
     public void DeactivateForRound()
         => State = PlayerStates.Busted;
 
+    /// <inheritdoc />
     public void Reactivate()
     {
         DiscardAll();
         State = PlayerStates.Playing;
     }
 
-    public void AddWinnings(int points)
+    /// <inheritdoc />
+    public void AddPoints(int points)
         => TotalPoints += points;
 
     private int CalculateHandValue()
@@ -89,6 +114,7 @@ public class FlipSevenPlayer : IFlipSevenPlayer<FlipSevenDeck, FlipSevenCard>
         }
         return points;
     }
+    /// <inheritdoc />
     public override string ToString()
         => $"{Name} {(Hand.Count != 0 ? "Hand: " : "")}{string.Join('|', Hand.OrderBy(c => c.CardType).Select(c => c.Name))} Hand total: {HandPoints} Banked:{TotalPoints}";
 }

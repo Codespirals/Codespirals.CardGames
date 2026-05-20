@@ -34,9 +34,9 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
     public bool GameOver => Players.Except([Dealer]).All(p => p.TappedOut);
 
     /// <inheritdoc/>
-    public IEnumerable<LogEntry> LogEntries => _logEntries;
-    /// <inheritdoc/>
     public string Prompt { get; private set; } = "";
+    /// <inheritdoc/>
+    public IEnumerable<LogEntry> LogEntries => _logEntries;
 
     /// <inheritdoc/>
     public BlackJackGame(int players, int minBet = 1, int blackJackScore = 21, int startingCash = 100, int automaticallyIncreaseStakeAfterRound = 1, int drawAtStartOfRound = 2, bool dealerCanCountCards = false, PokerDeck? deck = null)
@@ -69,6 +69,8 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
     /// <inheritdoc/>
     public void StartRound()
     {
+        if (GameOver)
+            return;
         _currentRound++;
         Log($"Starting round {_currentRound}");
         foreach (var player in _players)
@@ -93,11 +95,11 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
     public PokerCard? Hit(BlackJackPlayer player)
     {
         var card = Deck.Draw();
-        if (card is not null)
-        {
-            player.AddCardToHand(card);
-            Log($"{player.Name} drew a {card.Name}.");
-        }
+        if (card is null)
+            return null;
+
+        player.AddCardToHand(card);
+        Log($"{player.Name} drew a {card.Name}.");
         MoveToNextPlayer();
         return card;
     }
@@ -106,12 +108,15 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
     public PokerCard? DoubleDown(BlackJackPlayer player)
     {
         var card = Deck.Draw();
-        if (card is not null)
-        {
-            player.DoubleDown(card);
-            Log($"{player.Name} doubled down! Their bet is now {player.CurrentBet}.");
-            Log($"{player.Name} drew a {card.Name}.");
-        }
+        if (card is null)
+            return null;
+
+        player.Bet(Math.Clamp(player.CurrentBet, 0, player.TotalPoints));
+        player.AddCardToHand(card);
+        player.Stand();
+
+        Log($"{player.Name} doubled down! Their bet is now {player.CurrentBet}.");
+        Log($"{player.Name} drew a {card.Name}.");
         MoveToNextPlayer();
         return card;
     }
@@ -225,6 +230,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
     {
         if (Players.Any(p => !p.IsOutForRound))
             return;
+
         Log($"Paying out to all players:");
         Log($"The dealer ended the round with {Dealer.HandValue}");
         foreach (var item in CalculateCurrentPotentialPointGain())

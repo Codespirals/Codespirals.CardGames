@@ -8,7 +8,7 @@ namespace Codespirals.CardGames.FlipSeven;
 /// <typeparam name="TPlayer"></typeparam>
 /// <typeparam name="TDeck"></typeparam>
 /// <typeparam name="TCard"></typeparam>
-public interface IFlipSevenGame<TSelf, TPlayer, TDeck, TCard> : IGame<TSelf, TDeck, TCard>, IRoundBased, IHasPlayers<TPlayer, TDeck, TCard>, IPlayersHavePoints<TPlayer>
+public interface IFlipSevenGame<TSelf, TPlayer, TDeck, TCard> : ICardGame<TSelf, TDeck, TCard>, IRoundBased, IHasPlayers<TPlayer>, IPlayersHavePoints<TPlayer>, IHasPrompt, IHasActivityLog<LogEntry>
     where TSelf : IFlipSevenGame<TSelf, TPlayer, TDeck, TCard>
     where TPlayer : IFlipSevenPlayer<TDeck, TCard>
     where TDeck : IDeck<TCard>
@@ -23,7 +23,7 @@ public interface IFlipSevenGame<TSelf, TPlayer, TDeck, TCard> : IGame<TSelf, TDe
     /// <param name="winningScore"></param>
     /// <param name="deck"></param>
     /// <returns></returns>
-    abstract static FlipSevenGame SetUp(int players, int numbersToFlip = 7, int flipNumberBonus = 15, int winningScore = 200, FlipSevenDeck? deck = null);
+    abstract static TSelf SetUp(int players, int numbersToFlip = 7, int flipNumberBonus = 15, int winningScore = 200, FlipSevenDeck? deck = null);
     /// <summary>
     /// The score needed to win the game. Default should be 200
     /// </summary>
@@ -48,7 +48,11 @@ public interface IFlipSevenGame<TSelf, TPlayer, TDeck, TCard> : IGame<TSelf, TDe
     /// <param name="player"></param>
     /// <returns></returns>
     TCard? Flip(TPlayer player);
-
+    /// <summary>
+    /// Get the players you can target with <see cref="TryGivePlayerCard(TPlayer, TCard)"/>
+    /// </summary>
+    /// <returns></returns>
+    IEnumerable<TPlayer> GetValidTargets();
     /// <summary>
     /// Attempt to give a card to another player.
     /// This can only be a card of type <see cref="CardType.Flip"/>, <see cref="CardType.Freeze"/> or <see cref="CardType.SecondChance"/>.
@@ -63,7 +67,7 @@ public interface IFlipSevenGame<TSelf, TPlayer, TDeck, TCard> : IGame<TSelf, TDe
     /// <item><see langword="null"/> if the transfer failed</item>
     /// </list> 
     /// </returns>
-    IEnumerable<FlipSevenCard>? TryGivePlayerCard(FlipSevenPlayer player, FlipSevenCard card);
+    IEnumerable<TCard>? TryGivePlayerCard(TPlayer player, TCard card);
     /// <summary>
     /// Flip multiple cards for a the player.
     /// </summary>
