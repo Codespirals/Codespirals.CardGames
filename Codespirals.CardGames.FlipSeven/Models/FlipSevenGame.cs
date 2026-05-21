@@ -39,7 +39,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     {
         for (var i = 0; i < players; i++)
         {
-            _players.Add(FlipSevenPlayer.GeneratePlayer(this, i));
+            _players.Add(FlipSevenPlayer.GeneratePlayer(this, i+1));
         }
         Deck = deck ?? FlipSevenDeckBuilder.CreateStandardDeck();
         NumbersToFlip = numbersToFlip;

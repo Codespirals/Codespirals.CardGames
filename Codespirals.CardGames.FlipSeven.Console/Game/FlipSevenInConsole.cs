@@ -102,7 +102,7 @@ public class FlipSevenInConsole
     private void Freeze(FlipSevenPlayer user, FlipSevenPlayer target)
     {
         ConsoleHelper.SetColorForPlayer(_game.Players.IndexOf(target));
-        target.Freeze();
+        _game.Freeze(target);
         Console.WriteLine($"{target.Name} was frozen by {user.Name}");
     }
 
@@ -121,13 +121,14 @@ public class FlipSevenInConsole
         Console.WriteLine($"{user.Name} input the number to the right of the player you want to use this {card.Name} on!");
         Console.WriteLine($"Your targets are:");
         var i = 1;
-        foreach (var option in _game.ActivePlayers)
+        var targets = _game.GetValidTargets().ToList();
+        foreach (var option in targets)
         {
-            Console.WriteLine($"For {option.Name} (Saved:{option.BankedPoints} | Hand:{option.HandPoints}) - Type: {i}");
+            Console.WriteLine($"For {option.Name} (Saved:{option.TotalPoints} | Hand:{option.HandPoints}) - Type: {i}");
             i++;
         }
-        var selectedPlayerIndex = ConsoleHelper.ReadUntilInt(1, _game.ActivePlayers.Count);
-        var target = _game.ActivePlayers[selectedPlayerIndex - 1];
+        var selectedPlayerIndex = ConsoleHelper.ReadUntilInt(1, targets.Count);
+        var target = targets[selectedPlayerIndex - 1];
 
         if (card.CardType == CardType.Flip)
         {

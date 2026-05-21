@@ -16,7 +16,7 @@
     <PackageProjectUrl>https://www.codespirals.dev/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Codespirals/Codespirals.CardGames/tree/master/Codespirals.CardGames.FlipSeven</RepositoryUrl>
     <PackageTags>codespirals;flipseven;games;</PackageTags>
-    <Version>1.0.6.26141</Version>
+    <Version>1.0.7.26141</Version>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
