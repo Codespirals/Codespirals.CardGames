@@ -41,10 +41,10 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         {
             _players.Add(FlipSevenPlayer.GeneratePlayer(this, i+1));
         }
+        _currentPlayer = _players.First();
         Deck = deck ?? FlipSevenDeckBuilder.CreateStandardDeck();
         NumbersToFlip = numbersToFlip;
         WinningScore = winningScore;
-        _currentPlayer = _players.First();
         Deck.Shuffle();
         Log("Starting a new game of Flip Seven.");
         Prompt = "Start playing!";
@@ -71,7 +71,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         {
             player.Reactivate();
         }
-        _currentPlayer = Players[_currentRound % _players.Count];
+        _currentPlayer = Players[_currentRound - 1 % _players.Count];
         Log($"It's {_currentPlayer.Name}'s turn.");
         Prompt = $"{_currentPlayer.Name}: Choose an action!";
     }
@@ -125,7 +125,6 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
             Log($"Wow, {player.Name} managed to get {NumbersToFlip} Number cards!");
             EndRound();
         }
-
         return card;
     }
     /// <inheritdoc />

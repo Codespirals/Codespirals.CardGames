@@ -19,7 +19,7 @@ public class FlipSevenCard : IFlipSevenCard
     public static FlipSevenCard GenerateBonusAddCard(int value)
         => new FlipSevenCard(CardType.BonusAdd, value);
     public static FlipSevenCard GenerateSecondChanceCard()
-        => new FlipSevenCard(CardType.BonusAdd);
+        => new FlipSevenCard(CardType.SecondChance);
     public static FlipSevenCard GenerateFlipCard(int value)
         => new FlipSevenCard(CardType.Flip, value);
     public static FlipSevenCard GenerateFreezeCard()
