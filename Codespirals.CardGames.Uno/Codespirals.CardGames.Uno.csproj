@@ -8,11 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Codespirals.CardGames.Shared" Version="1.1.0.26137" />
+    <PackageReference Include="Codespirals.CardGames.Shared" Version="1.1.1.26141" />
   </ItemGroup>
 
 </Project>

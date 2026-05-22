@@ -6,4 +6,6 @@ namespace Codespirals.CardGames.Uno;
 
 public interface IUnoCard : ICard
 {
+    public CardType CardType { get; }
+    public Color Color { get; }
 }

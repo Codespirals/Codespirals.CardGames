@@ -2,7 +2,6 @@
 
 public class FlipSevenCard : IFlipSevenCard
 {
-    public bool IsFaceDown => false;
     public int Value { get; init; }
     public string Name => GetName();
     public CardType CardType { get; init; }
@@ -31,9 +30,9 @@ public class FlipSevenCard : IFlipSevenCard
     private string GetName()
         => CardType switch
         {
-            CardType.Freeze => Constants.FreezeName,
-            CardType.Flip => $"{Constants.FlipXName} {Value}",
-            CardType.SecondChance => Constants.SecondChanceName,
+            CardType.Freeze => FlipSevenConstants.FREEZENAME,
+            CardType.Flip => $"{FlipSevenConstants.FLIPNAME} {Value}",
+            CardType.SecondChance => FlipSevenConstants.SECONDCHANCENAME,
             CardType.BonusAdd => $"+{Value}",
             CardType.Multiplier => $"x{Value}",
             CardType.Number => $"{Value}",

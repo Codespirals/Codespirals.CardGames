@@ -1,6 +1,6 @@
 ﻿namespace Codespirals.CardGames.Uno;
 
-public enum Colors
+public enum Color
 {
     None,
     Red,

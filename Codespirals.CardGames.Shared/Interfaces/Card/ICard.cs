@@ -5,10 +5,6 @@
 public interface ICard
 {
     /// <summary>
-    /// If this card is face down
-    /// </summary>
-    bool IsFaceDown { get; }
-    /// <summary>
     /// The value of this card
     /// </summary>
     int Value { get; }
