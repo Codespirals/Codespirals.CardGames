@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 
 namespace Codespirals.CardGames;
@@ -14,7 +15,7 @@ public interface IHasActivityLog<TEntry>
     /// <summary>
     /// The entries
     /// </summary>
-    IEnumerable<TEntry> LogEntries { get; }
+    ReadOnlyCollection<TEntry> LogEntries { get; }
     /// <summary>
     /// Create a log entry
     /// </summary>

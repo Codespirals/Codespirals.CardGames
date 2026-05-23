@@ -36,7 +36,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
     /// <inheritdoc/>
     public string Prompt { get; private set; } = "";
     /// <inheritdoc/>
-    public IEnumerable<LogEntry> LogEntries => _logEntries;
+    public ReadOnlyCollection<LogEntry> LogEntries => _logEntries.AsReadOnly();
 
     /// <inheritdoc/>
     public BlackJackGame(int players, int minBet = 1, int blackJackScore = 21, int startingCash = 100, int automaticallyIncreaseStakeAfterRound = 1, int drawAtStartOfRound = 2, bool dealerCanCountCards = false, PokerDeck? deck = null)

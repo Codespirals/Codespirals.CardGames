@@ -25,6 +25,8 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     /// <inheritdoc />
     public int FlipNumberBonus { get; set; } = 15;
     /// <inheritdoc />
+    public ReadOnlyCollection<(FlipSevenPlayer, FlipSevenCard)> ActionCardQueue { get; }
+    /// <inheritdoc />
     public bool RoundActive => !_players.All(p => p.IsOutForRound);
     /// <inheritdoc />
     public bool GameOver => !RoundActive && _players.Any(p => p.TotalPoints > WinningScore);
@@ -32,7 +34,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     /// <inheritdoc />
     public string Prompt { get; private set; } = "";
     /// <inheritdoc />
-    public IEnumerable<LogEntry> LogEntries => _logEntries;
+    public ReadOnlyCollection<LogEntry> LogEntries => _logEntries.AsReadOnly();
 
     /// <inheritdoc />
     private FlipSevenGame(int players, int numbersToFlip = 7, int flipNumberBonus = 15, int winningScore = 200, FlipSevenDeck? deck = null)
@@ -131,24 +133,31 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     public IEnumerable<FlipSevenPlayer> GetValidTargets()
         => _players.Where(p => !p.IsOutForRound);
     /// <inheritdoc />
-    public IEnumerable<FlipSevenCard>? TryGivePlayerCard(FlipSevenPlayer player, FlipSevenCard card)
+    public IEnumerable<FlipSevenCard>? TryGivePlayerCard(FlipSevenPlayer target, FlipSevenCard card)
     {
-        if (player.IsOutForRound)
+        if (target.IsOutForRound || !card.IsActionCard)
             return null;
+
+        if (_currentPlayer == target)
+            Log($"{_currentPlayer.Name} is taking {card.Name} for themselves!");
+        else
+            Log($"{_currentPlayer.Name} is giving {card.Name} to {target.Name}!");
 
         switch (card.CardType)
         {
-            case CardType.Number or CardType.Multiplier or CardType.BonusAdd:
-                return null;
             case CardType.SecondChance:
-                if (player.Hand.Any(c => c.CardType == CardType.SecondChance))
+                if (target.Hand.Any(c => c.CardType == CardType.SecondChance))
+                {
+                    Log($"{target.Name} already has a {card.Name}! It's not called \"third chance\"...");
+                    Prompt = $"{_currentPlayer.Name} choose another player.";
                     return null;
-                player.AddCardToHand(card);
+                }
+                target.AddCardToHand(card);
                 return [];
             case CardType.Flip:
-                return Flip(player, card.Value);
+                return Flip(target, card.Value);
             case CardType.Freeze:
-                player.Freeze();
+                target.Freeze();
                 return [];
             default:
                 return null;
