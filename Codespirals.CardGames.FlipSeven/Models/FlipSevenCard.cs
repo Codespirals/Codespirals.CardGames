@@ -1,9 +1,13 @@
 ﻿namespace Codespirals.CardGames.FlipSeven;
 
+/// <inheritdoc cref="IFlipSevenCard"/>
 public class FlipSevenCard : IFlipSevenCard
 {
+    /// <inheritdoc/>
     public int Value { get; init; }
+    /// <inheritdoc/>
     public string Name => GetName();
+    /// <inheritdoc/>
     public CardType CardType { get; init; }
 
     private FlipSevenCard(CardType cardType, int value = 0)
@@ -24,6 +28,7 @@ public class FlipSevenCard : IFlipSevenCard
     public static FlipSevenCard GenerateFreezeCard()
         => new FlipSevenCard(CardType.Freeze);
 
+    /// <inheritdoc/>
     public override string ToString()
         => Name;
 

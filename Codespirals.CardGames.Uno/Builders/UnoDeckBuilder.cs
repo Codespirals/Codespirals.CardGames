@@ -123,6 +123,6 @@ public class UnoDeckBuilder : IDeckBuilder<UnoDeckBuilder, UnoDeck, UnoCard>
         .WithReverseCardsInAllColors()
         .WithDrawCardsAllColors()
         .WithChooseCards()
-        .WithChooseCards()
+        .WithChooseAndDrawCards() 
         .Build();
 }
