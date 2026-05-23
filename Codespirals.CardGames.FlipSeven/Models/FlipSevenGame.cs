@@ -9,6 +9,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     private FlipSevenPlayer _currentPlayer;
     private int _currentRound = 0;
     private List<LogEntry> _logEntries = [];
+    private List<(FlipSevenPlayer, FlipSevenCard)> _actionCardQueue = [];
 
     /// <inheritdoc />
     public FlipSevenDeck Deck { get; } = FlipSevenDeckBuilder.CreateStandardDeck();
@@ -25,7 +26,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     /// <inheritdoc />
     public int FlipNumberBonus { get; set; } = 15;
     /// <inheritdoc />
-    public ReadOnlyCollection<(FlipSevenPlayer, FlipSevenCard)> ActionCardQueue { get; }
+    public ReadOnlyCollection<(FlipSevenPlayer Player, FlipSevenCard ActionCard)> ActionCardQueue => _actionCardQueue.AsReadOnly();
     /// <inheritdoc />
     public bool RoundActive => !_players.All(p => p.IsOutForRound);
     /// <inheritdoc />
@@ -97,9 +98,10 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
 
         Log($"{player.Name} flipped a {card.Name}.");
         // action cards need to be played immediately
-        if (card.CardType is CardType.Flip or CardType.Freeze or CardType.SecondChance)
+        if (card.IsActionCard)
         {
             Prompt = $"{_currentPlayer.Name} Choose a player to give the card to!";
+            _actionCardQueue.Add((player, card));
             return card;
         }
 
@@ -142,7 +144,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
             Log($"{_currentPlayer.Name} is taking {card.Name} for themselves!");
         else
             Log($"{_currentPlayer.Name} is giving {card.Name} to {target.Name}!");
-
+         
         switch (card.CardType)
         {
             case CardType.SecondChance:
@@ -153,35 +155,41 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
                     return null;
                 }
                 target.AddCardToHand(card);
+                _actionCardQueue.RemoveAt(0);
                 return [];
             case CardType.Flip:
-                return Flip(target, card.Value);
+                var newCards = Flip(target, card.Value);
+                _actionCardQueue.RemoveAt(0);
+                return newCards;
             case CardType.Freeze:
-                target.Freeze();
+                var gainedPoints = Freeze(target);
+                if (gainedPoints is null)
+                    return null;
+                _actionCardQueue.RemoveAt(0);
                 return [];
             default:
                 return null;
         }
     }
     /// <inheritdoc />
-    public IEnumerable<FlipSevenCard> Flip(FlipSevenPlayer player, int number)
+    public IEnumerable<FlipSevenCard> Flip(FlipSevenPlayer target, int number)
     {
-        Log($"{player.Name} has to flip {number}!");
+        Log($"{target.Name} has to flip {number}!");
         for (int i = 0; i < number; i++)
         {
-            var card = Flip(player);
+            var card = Flip(target);
             if (card is null)
                 yield break;
             yield return card;
         }
     }
     /// <inheritdoc />
-    public int? Freeze(FlipSevenPlayer player)
+    public int? Freeze(FlipSevenPlayer target)
     {
-        if (player.IsOutForRound)
+        if (target.IsOutForRound)
             return null;
-        Log($"{player.Name} got frozen on {player.HandPoints}.");
-        return player.Freeze();
+        Log($"{target.Name} got frozen on {target.HandPoints}.");
+        return target.Freeze();
     }
     /// <inheritdoc />
     public void MoveToNextPlayer()

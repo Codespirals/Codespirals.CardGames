@@ -39,7 +39,7 @@ public interface IFlipSevenGame<TSelf, TPlayer, TDeck, TCard> : ICardGame<TSelf,
     /// <summary>
     /// Active action cards get added to this queue to be used
     /// </summary>
-    ReadOnlyCollection<(FlipSevenPlayer, FlipSevenCard)> ActionCardQueue { get; } 
+    ReadOnlyCollection<(FlipSevenPlayer Player, FlipSevenCard ActionCard)> ActionCardQueue { get; } 
     /// <summary>
     /// Remove the player from the round and bank the points
     /// </summary>
