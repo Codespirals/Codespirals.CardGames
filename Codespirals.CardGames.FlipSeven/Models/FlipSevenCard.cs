@@ -9,6 +9,8 @@ public class FlipSevenCard : IFlipSevenCard
     public string Name => GetName();
     /// <inheritdoc/>
     public CardType CardType { get; init; }
+    /// <inheritdoc/>
+    public bool IsActionCard => CardType is CardType.Flip or CardType.Freeze or CardType.SecondChance;
 
     private FlipSevenCard(CardType cardType, int value = 0)
     {
