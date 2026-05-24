@@ -192,7 +192,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
     }
 
     /// <inheritdoc/>
-    public (BlackJackPlayer Player, int Winnings)[] CalculateCurrentPotentialPointGain()
+    public IEnumerable<(BlackJackPlayer Player, int Winnings)> CalculateCurrentPotentialPointGain()
     {
         (BlackJackPlayer Player, int Winnings)[] results = [];
         foreach (var player in _players.Except([Dealer]))

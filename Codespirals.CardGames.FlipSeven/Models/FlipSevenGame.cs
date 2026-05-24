@@ -9,7 +9,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     private FlipSevenPlayer _currentPlayer;
     private int _currentRound = 0;
     private List<LogEntry> _logEntries = [];
-    private List<(FlipSevenPlayer, FlipSevenCard)> _actionCardQueue = [];
+    private List<(FlipSevenPlayer Player, FlipSevenCard ActionCard)> _actionCardQueue = [];
 
     /// <inheritdoc />
     public FlipSevenDeck Deck { get; } = FlipSevenDeckBuilder.CreateStandardDeck();
@@ -25,6 +25,8 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     public int NumbersToFlip { get; set; } = 7;
     /// <inheritdoc />
     public int FlipNumberBonus { get; set; } = 15;
+    /// <inheritdoc />
+    public bool PlayersCanHaveMultipleSecondChances { get; set; }
     /// <inheritdoc />
     public ReadOnlyCollection<(FlipSevenPlayer Player, FlipSevenCard ActionCard)> ActionCardQueue => _actionCardQueue.AsReadOnly();
     /// <inheritdoc />
@@ -78,64 +80,27 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         Log($"It's {_currentPlayer.Name}'s turn.");
         Prompt = $"{_currentPlayer.Name}: Choose an action!";
     }
+
+    #region player actions
     /// <inheritdoc />
-    public int? Bank(FlipSevenPlayer player)
+    public void Bank()
     {
-        if (player.IsOutForRound)
-            return null;
-        Log($"{player.Name} is banking their {player.HandPoints} points.");
-        return player.Bank();
+        if (_currentPlayer.IsOutForRound)
+            return;
+        Log($"{_currentPlayer.Name} is banking their {_currentPlayer.HandPoints} points.");
+        MoveToNextPlayer();
+        return;
     }
     /// <inheritdoc />
-    public FlipSevenCard? Flip(FlipSevenPlayer player)
+    public FlipSevenCard? Flip()
     {
-        if (player.IsOutForRound)
-            return null;
-
-        var card = Deck.Draw();
-        if (card is null)
-            return null;
-
-        Log($"{player.Name} flipped a {card.Name}.");
-        // action cards need to be played immediately
-        if (card.IsActionCard)
-        {
-            Prompt = $"{_currentPlayer.Name} Choose a player to give the card to!";
-            _actionCardQueue.Add((player, card));
-            return card;
-        }
-
-        player.AddCardToHand(card);
-
-        // is number and player already has number
-        if (card.CardType == CardType.Number && player.Hand.Any(c => c.CardType == CardType.Number && c.Value == card.Value))
-        {
-            Log($"Oh no, {player.Name} already has a {card.Name}.");
-            var hasSecondChance = player.Hand.FirstOrDefault(c => c.CardType == CardType.SecondChance);
-            if (hasSecondChance is not null)
-            {
-                Log($"Phew, {player.Name} had a {hasSecondChance.Name} to save them!");
-                player.Discard(card);
-                player.Discard(hasSecondChance);
-            }
-            else
-            {
-                Log($"{player.Name} got busted...");
-                player.Bust();
-            }
-        }
-        else if (player.NumberCardsInHand == NumbersToFlip)
-        {
-            Log($"Wow, {player.Name} managed to get {NumbersToFlip} Number cards!");
-            EndRound();
-        }
-        return card;
+        var flippedCard = Flip(_currentPlayer);
+        MoveToNextPlayer();
+        return flippedCard;
     }
+
     /// <inheritdoc />
-    public IEnumerable<FlipSevenPlayer> GetValidTargets()
-        => _players.Where(p => !p.IsOutForRound);
-    /// <inheritdoc />
-    public IEnumerable<FlipSevenCard>? TryGivePlayerCard(FlipSevenPlayer target, FlipSevenCard card)
+    public IEnumerable<FlipSevenCard>? UseActionCard(FlipSevenPlayer target, FlipSevenCard card)
     {
         if (target.IsOutForRound || !card.IsActionCard)
             return null;
@@ -144,7 +109,8 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
             Log($"{_currentPlayer.Name} is taking {card.Name} for themselves!");
         else
             Log($"{_currentPlayer.Name} is giving {card.Name} to {target.Name}!");
-         
+
+        IEnumerable<FlipSevenCard>? result = null;
         switch (card.CardType)
         {
             case CardType.SecondChance:
@@ -155,24 +121,31 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
                     return null;
                 }
                 target.AddCardToHand(card);
-                _actionCardQueue.RemoveAt(0);
-                return [];
+                result = [];
+                break;
             case CardType.Flip:
-                var newCards = Flip(target, card.Value);
-                _actionCardQueue.RemoveAt(0);
-                return newCards;
+                var newCards = ForceFlip(target, card.Value);
+                result = newCards;
+                break;
             case CardType.Freeze:
                 var gainedPoints = Freeze(target);
                 if (gainedPoints is null)
                     return null;
-                _actionCardQueue.RemoveAt(0);
-                return [];
+                result = [];
+                break;
             default:
                 return null;
         }
+
+        _actionCardQueue.RemoveAt(0);
+        MoveToNextPlayer();
+        return result;
     }
+    #endregion
+
+    #region Action cards
     /// <inheritdoc />
-    public IEnumerable<FlipSevenCard> Flip(FlipSevenPlayer target, int number)
+    public IEnumerable<FlipSevenCard> ForceFlip(FlipSevenPlayer target, int number)
     {
         Log($"{target.Name} has to flip {number}!");
         for (int i = 0; i < number; i++)
@@ -191,12 +164,29 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         Log($"{target.Name} got frozen on {target.HandPoints}.");
         return target.Freeze();
     }
+    #endregion
+
+    /// <inheritdoc />
+    public IEnumerable<FlipSevenPlayer>? GetValidTargets(FlipSevenCard card)
+    {
+        if (!card.IsActionCard)
+            return null;
+        if (!PlayersCanHaveMultipleSecondChances && card.CardType is CardType.SecondChance)
+            return _players.Where(p => !p.IsOutForRound && !p.Hand.Any(c => c.CardType == CardType.SecondChance));
+        return _players.Where(p => !p.IsOutForRound);
+    }
+
     /// <inheritdoc />
     public void MoveToNextPlayer()
     {
         if (_players.All(p => p.IsOutForRound) || GameOver)
         {
             EndRound();
+            return;
+        }
+        if (_actionCardQueue.Any())
+        {
+            Prompt = $"There are active action cards that have to be played!";
             return;
         }
 
@@ -209,16 +199,21 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         Log($"It's {_currentPlayer.Name}'s turn.");
         Prompt = $"{_currentPlayer.Name}: Choose an action!";
     }
+
     /// <inheritdoc />
     public void EndRound()
     {
         foreach (var player in _players.Where(p => !p.IsOutForRound))
             player.Bank();
+        foreach (var queueItem in _actionCardQueue)
+            Deck.PutOnDiscardPile(queueItem.ActionCard);
+        _actionCardQueue = [];
         Log($"Round {CurrentRound} has ended.");
-        Prompt = $"Pay the players their winnings.";
+        PayOut();
     }
+
     /// <inheritdoc />
-    public (FlipSevenPlayer Player, int Winnings)[] CalculateCurrentPotentialPointGain()
+    public IEnumerable<(FlipSevenPlayer Player, int Winnings)> CalculateCurrentPotentialPointGain()
     {
         (FlipSevenPlayer Player, int WinningMultiplier)[] results = [];
         foreach (var player in Players)
@@ -236,6 +231,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         }
         return results;
     }
+
     /// <inheritdoc />
     public void PayOut()
     {
@@ -269,4 +265,56 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     /// <inheritdoc/>
     public void Log(string text)
         => _logEntries.Add(new LogEntry(text, CurrentRound));
+
+    private FlipSevenCard? Flip(FlipSevenPlayer player)
+    {
+        if (player.IsOutForRound)
+            return null;
+
+        var card = Deck.Draw();
+        if (card is null)
+            return null;
+
+        Log($"{player.Name} flipped a {card.Name}.");
+        // action cards need to be played immediately
+        if (card.IsActionCard)
+        {
+            var targets = GetValidTargets(card);
+            if (targets is null || !targets.Any())
+            {
+                Log($"There are no valid players to give a {card.Name} to, so it has to be discarded.");
+                Deck.PutOnDiscardPile(card);
+                return card;
+            }
+            Prompt = $"{player.Name} Choose a player to give the card to!";
+            _actionCardQueue.Add((player, card));
+            return card;
+        }
+
+        player.AddCardToHand(card);
+
+        // is number and player already has number
+        if (card.CardType == CardType.Number && player.Hand.Any(c => c.CardType == CardType.Number && c.Value == card.Value))
+        {
+            Log($"Oh no, {player.Name} already has a {card.Name}.");
+            var hasSecondChance = player.Hand.FirstOrDefault(c => c.CardType == CardType.SecondChance);
+            if (hasSecondChance is not null)
+            {
+                Log($"Phew, {player.Name} had a {hasSecondChance.Name} to save them!");
+                player.Discard(card);
+                player.Discard(hasSecondChance);
+            }
+            else
+            {
+                Log($"{player.Name} got busted...");
+                player.Bust();
+            }
+        }
+        else if (player.NumberCardsInHand == NumbersToFlip)
+        {
+            Log($"Wow, {player.Name} managed to get {NumbersToFlip} Number cards!");
+            EndRound();
+        }
+        return card;
+    }
 }

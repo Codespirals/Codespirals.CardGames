@@ -84,7 +84,7 @@ public class FlipSevenInConsole
     private void Flip(FlipSevenPlayer player, int number)
     {
         ConsoleHelper.SetColorForPlayer(_game.Players.IndexOf(player));
-        var drawnCards = _game.Flip(player, number);
+        var drawnCards = _game.ForceFlip(player, number);
         foreach (var card in drawnCards)
         {
             Console.WriteLine($"{player.Name} flipped a {card.Name}!");

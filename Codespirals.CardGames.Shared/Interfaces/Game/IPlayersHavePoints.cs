@@ -14,7 +14,7 @@ public interface IPlayersHavePoints<TPlayer>
     /// End the round and return information about the winnings of the round
     /// </summary>
     /// <returns></returns>
-    (TPlayer Player, int Winnings)[] CalculateCurrentPotentialPointGain();
+    IEnumerable<(TPlayer Player, int Winnings)> CalculateCurrentPotentialPointGain();
     /// <summary>
     /// Increase the points of each player by how much they won this round
     /// </summary>

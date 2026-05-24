@@ -37,26 +37,29 @@ public interface IFlipSevenGame<TSelf, TPlayer, TDeck, TCard> : ICardGame<TSelf,
     /// </summary>
     int FlipNumberBonus { get; }
     /// <summary>
+    /// Dictates wether a player can have more than one second chance
+    /// </summary>
+    bool PlayersCanHaveMultipleSecondChances { get; }
+    /// <summary>
     /// Active action cards get added to this queue to be used
     /// </summary>
     ReadOnlyCollection<(FlipSevenPlayer Player, FlipSevenCard ActionCard)> ActionCardQueue { get; } 
     /// <summary>
-    /// Remove the player from the round and bank the points
+    /// Remove the current player from the round and bank the points
     /// </summary>
-    /// <param name="player"></param>
     /// <returns></returns>
-    int? Bank(TPlayer player);
+    void Bank();
     /// <summary>
-    /// Flip a card for that player
+    /// Flip a card for the current player
     /// </summary>
-    /// <param name="player"></param>
     /// <returns></returns>
-    TCard? Flip(TPlayer player);
+    TCard? Flip();
     /// <summary>
-    /// Get the players you can target with <see cref="TryGivePlayerCard(TPlayer, TCard)"/>
+    /// Get the players you can target with <see cref="UseActionCard(TPlayer, TCard)"/>
     /// </summary>
+    /// <param name="card">The card you're targeting with.</param>
     /// <returns></returns>
-    IEnumerable<TPlayer> GetValidTargets();
+    IEnumerable<TPlayer>? GetValidTargets(TCard card);
     /// <summary>
     /// Attempt to give a card to another player.
     /// This can only be a card of type <see cref="CardType.Flip"/>, <see cref="CardType.Freeze"/> or <see cref="CardType.SecondChance"/>.
@@ -71,14 +74,14 @@ public interface IFlipSevenGame<TSelf, TPlayer, TDeck, TCard> : ICardGame<TSelf,
     /// <item><see langword="null"/> if the transfer failed</item>
     /// </list> 
     /// </returns>
-    IEnumerable<TCard>? TryGivePlayerCard(TPlayer player, TCard card);
+    IEnumerable<TCard>? UseActionCard(TPlayer player, TCard card);
     /// <summary>
     /// Flip multiple cards for a the player.
     /// </summary>
     /// <param name="player"></param>
     /// <param name="number"></param>
     /// <returns></returns>
-    IEnumerable<TCard> Flip(TPlayer player, int number);
+    IEnumerable<TCard> ForceFlip(TPlayer player, int number);
     /// <summary>
     /// Freeze a player and force them to bank
     /// </summary>
