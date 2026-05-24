@@ -16,7 +16,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     /// <inheritdoc />
     public ReadOnlyCollection<FlipSevenPlayer> Players => _players.AsReadOnly();
     /// <inheritdoc />
-    public FlipSevenPlayer CurrentPlayer => _currentPlayer;
+    public FlipSevenPlayer CurrentPlayer => _actionCardQueue.Any() ? _actionCardQueue.First().Player : _currentPlayer;
     /// <inheritdoc />
     public int CurrentRound => _currentRound;
     /// <inheritdoc />
@@ -81,7 +81,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         Prompt = $"{_currentPlayer.Name}: Choose an action!";
     }
 
-    #region player actions
+    #region Player actions
     /// <inheritdoc />
     public void Bank()
     {
@@ -114,13 +114,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         switch (card.CardType)
         {
             case CardType.SecondChance:
-                if (target.Hand.Any(c => c.CardType == CardType.SecondChance))
-                {
-                    Log($"{target.Name} already has a {card.Name}! It's not called \"third chance\"...");
-                    Prompt = $"{_currentPlayer.Name} choose another player.";
-                    return null;
-                }
-                target.AddCardToHand(card);
+                GiveSecondChance(target, card);
                 result = [];
                 break;
             case CardType.Flip:
@@ -138,12 +132,24 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         }
 
         _actionCardQueue.RemoveAt(0);
-        MoveToNextPlayer();
+        if (!_actionCardQueue.Any() && _currentPlayer.IsOutForRound)
+            MoveToNextPlayer();
         return result;
     }
     #endregion
 
     #region Action cards
+    /// <inheritdoc />
+    public void GiveSecondChance(FlipSevenPlayer target, FlipSevenCard secondChance)
+    {
+        if (target.Hand.Any(c => c.CardType == CardType.SecondChance) && !PlayersCanHaveMultipleSecondChances)
+        {
+            Log($"{target.Name} already has a {secondChance.Name}! It's not called \"third chance\"...");
+            Prompt = $"{_currentPlayer.Name} choose another player.";
+            return;
+        }
+        target.AddCardToHand(secondChance);
+    }
     /// <inheritdoc />
     public IEnumerable<FlipSevenCard> ForceFlip(FlipSevenPlayer target, int number)
     {

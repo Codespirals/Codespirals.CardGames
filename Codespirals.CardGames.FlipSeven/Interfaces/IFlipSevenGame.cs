@@ -76,6 +76,12 @@ public interface IFlipSevenGame<TSelf, TPlayer, TDeck, TCard> : ICardGame<TSelf,
     /// </returns>
     IEnumerable<TCard>? UseActionCard(TPlayer player, TCard card);
     /// <summary>
+    /// Give the chosen player a second chance card
+    /// </summary>
+    /// <param name="target"></param>
+    /// <param name="secondChance"></param>
+    void GiveSecondChance(FlipSevenPlayer target, FlipSevenCard secondChance);
+    /// <summary>
     /// Flip multiple cards for a the player.
     /// </summary>
     /// <param name="player"></param>
