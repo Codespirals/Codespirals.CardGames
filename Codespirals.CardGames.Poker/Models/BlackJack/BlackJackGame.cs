@@ -92,40 +92,40 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
 
     #region Choices
     /// <inheritdoc/>
-    public PokerCard? Hit(BlackJackPlayer player)
+    public PokerCard? Hit()
     {
         var card = Deck.Draw();
         if (card is null)
             return null;
 
-        player.AddCardToHand(card);
-        Log($"{player.Name} drew a {card.Name}.");
+        _currentPlayer.AddCardToHand(card);
+        Log($"{_currentPlayer.Name} drew a {card.Name}.");
         MoveToNextPlayer();
         return card;
     }
 
     /// <inheritdoc/>
-    public PokerCard? DoubleDown(BlackJackPlayer player)
+    public PokerCard? DoubleDown()
     {
         var card = Deck.Draw();
         if (card is null)
             return null;
 
-        player.Bet(Math.Clamp(player.CurrentBet, 0, player.TotalPoints));
-        player.AddCardToHand(card);
-        player.Stand();
+        _currentPlayer.Bet(Math.Clamp(_currentPlayer.CurrentBet, 0, _currentPlayer.TotalPoints));
+        _currentPlayer.AddCardToHand(card);
+        _currentPlayer.Stand();
 
-        Log($"{player.Name} doubled down! Their bet is now {player.CurrentBet}.");
-        Log($"{player.Name} drew a {card.Name}.");
+        Log($"{_currentPlayer.Name} doubled down! Their bet is now {_currentPlayer.CurrentBet}.");
+        Log($"{_currentPlayer.Name} drew a {card.Name}.");
         MoveToNextPlayer();
         return card;
     }
 
     /// <inheritdoc/>
-    public void Stand(BlackJackPlayer player)
+    public void Stand()
     {
-        player.Stand();
-        Log($"{player.Name} is standing on {player.HandValue}.");
+        _currentPlayer.Stand();
+        Log($"{_currentPlayer.Name} is standing on {_currentPlayer.HandValue}.");
         MoveToNextPlayer();
     }
     #endregion

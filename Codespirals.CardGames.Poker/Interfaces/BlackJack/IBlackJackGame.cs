@@ -39,22 +39,19 @@ public interface IBlackJackGame<TSelf, TPlayer, TDeck, TCard> : ICardGame<TSelf,
     /// <returns></returns>
     static abstract TSelf SetUp(int players, int startingCash, int minBet = 1, int winningScore = 21, int automaticallyIncreaseStakeAfterRound = 1, int drawAtStartOfRound = 2, bool dealerCanCountCards = false, TDeck? deck = default);
     /// <summary>
-    /// Make the player draw a card
+    /// The current player draws a card
     /// </summary>
-    /// <param name="player"></param>
     /// <returns></returns>
-    TCard? Hit(TPlayer player);
+    TCard? Hit();
     /// <summary>
-    /// Make the player double down on their bet
+    /// The current player doubles down on their bet
     /// </summary>
-    /// <param name="player"></param>
     /// <returns></returns>
-    TCard? DoubleDown(TPlayer player);
+    TCard? DoubleDown();
     /// <summary>
-    /// Make the player stick to their current hand
+    /// The current player sticks to their current hand
     /// </summary>
-    /// <param name="player"></param>
-    void Stand(TPlayer player);
+    void Stand();
     /// <summary>
     /// Make the dealer play his round.
     /// </summary>

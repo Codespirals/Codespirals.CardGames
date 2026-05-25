@@ -59,6 +59,11 @@ public class FlipSevenInConsole
         if (input.Equals(nameof(Flip), StringComparison.InvariantCultureIgnoreCase))
         {
             Flip(player);
+            while (_game.ActionCardQueue.Any())
+            {
+                var action = _game.ActionCardQueue.First();
+                UseTargetedCard(action.Player, action.ActionCard);
+            }
         }
         else if (input.Equals(nameof(Bank), StringComparison.InvariantCultureIgnoreCase))
         {
@@ -69,12 +74,8 @@ public class FlipSevenInConsole
     private void Flip(FlipSevenPlayer player)
     {
         ConsoleHelper.SetColorForPlayer(_game.Players.IndexOf(player));
-        var drawnCard = _game.Flip(player);
+        var drawnCard = _game.Flip();
         Console.WriteLine($"{player.Name} flipped a {drawnCard.Name}!");
-        if (drawnCard.CardType is CardType.Freeze or CardType.Flip)
-        {
-            UseTargetedCard(player, drawnCard);
-        }
         if (player.State == PlayerStates.Busted)
         {
             Console.ForegroundColor = ConsoleColor.DarkRed;
@@ -88,10 +89,6 @@ public class FlipSevenInConsole
         foreach (var card in drawnCards)
         {
             Console.WriteLine($"{player.Name} flipped a {card.Name}!");
-            if (card.CardType is CardType.Freeze or CardType.Flip)
-            {
-                UseTargetedCard(player, card);
-            }
         }
         if (player.State == PlayerStates.Busted)
         {
@@ -121,27 +118,28 @@ public class FlipSevenInConsole
         Console.WriteLine($"{user.Name} input the number to the right of the player you want to use this {card.Name} on!");
         Console.WriteLine($"Your targets are:");
         var i = 1;
-        var targets = _game.GetValidTargets().ToList();
-        foreach (var option in targets)
+        var validTargets = _game.GetValidTargets(card)?.ToList() ?? [];
+        foreach (var option in validTargets)
         {
             Console.WriteLine($"For {option.Name} (Saved:{option.TotalPoints} | Hand:{option.HandPoints}) - Type: {i}");
             i++;
         }
-        var selectedPlayerIndex = ConsoleHelper.ReadUntilInt(1, targets.Count);
-        var target = targets[selectedPlayerIndex - 1];
+        var selectedPlayerIndex = ConsoleHelper.ReadUntilInt(1, validTargets.Count);
+        var target = validTargets[selectedPlayerIndex - 1];
 
-        if (card.CardType == CardType.Flip)
+        var result = _game.UseActionCard(target, card);
+
+        if (result is null)
         {
-            if (!user.Equals(target))
-                Console.WriteLine($"{user.Name} is forcing {target.Name} to do a flip!");
-            else
-                Console.WriteLine($"{user.Name} is flipping out!");
-
-            Flip(target, card.Value);
+            Console.WriteLine($"Error while trying to use {card.Name} on {target.Name}...");
         }
-        else if (card.CardType == CardType.Freeze)
+        else if (!result.Any())
         {
-            Freeze(user, target);
+            Console.WriteLine($"{target.Name} was frozen.");
+        }
+        else
+        {
+            Console.WriteLine($"{target.Name} drew: {string.Join(" | ", result.Select(c => c.Name))}");
         }
     }
     private void End()

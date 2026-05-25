@@ -106,23 +106,23 @@ internal class BlackjackInConsole
     private void Hit(BlackJackPlayer player)
     {
         ConsoleHelper.SetColorForPlayer(_game.Players.IndexOf(player));
-        var drawnCard = _game.Hit(player);
-        Console.WriteLine($"{player.Name} drew a {drawnCard.Name}!");
+        var drawnCard = _game.Hit();
+        Console.WriteLine($"{player.Name} drew a {drawnCard?.Name}!");
         Console.WriteLine($"{player.Name} currently has {player.HandValue}.");
     }
     private void DoubleDown(BlackJackPlayer player)
     {
         ConsoleHelper.SetColorForPlayer(_game.Players.IndexOf(player));
         Console.WriteLine($"{player.Name} is doubling down!");
-        var drawnCard = _game.DoubleDown(player);
-        Console.WriteLine($"{player.Name} drew a {drawnCard.Name}!");
+        var drawnCard = _game.DoubleDown();
+        Console.WriteLine($"{player.Name} drew a {drawnCard?.Name}!");
         Console.WriteLine($"{player.Name} currently has {player.HandValue}.");
     }
     private void Stand(BlackJackPlayer player)
     {
         ConsoleHelper.SetColorForPlayer(_game.Players.IndexOf(player));
         Console.WriteLine($"{player.Name} is standing on {player.HandValue}.");
-        _game.Stand(player);
+        _game.Stand();
     }
 
     private void End()
