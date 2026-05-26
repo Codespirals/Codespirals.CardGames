@@ -173,9 +173,9 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     #endregion
 
     /// <inheritdoc />
-    public IEnumerable<FlipSevenPlayer>? GetValidTargets(FlipSevenCard card)
+    public IEnumerable<FlipSevenPlayer>? GetValidTargets(FlipSevenCard? card)
     {
-        if (!card.IsActionCard)
+        if (card is null || !card.IsActionCard)
             return null;
         if (!PlayersCanHaveMultipleSecondChances && card.CardType is CardType.SecondChance)
             return _players.Where(p => !p.IsOutForRound && !p.Hand.Any(c => c.CardType == CardType.SecondChance));
