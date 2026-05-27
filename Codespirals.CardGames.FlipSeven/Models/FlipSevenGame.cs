@@ -297,8 +297,6 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
             return card;
         }
 
-        player.AddCardToHand(card);
-
         // is number and player already has number
         if (card.CardType == CardType.Number && player.Hand.Any(c => c.CardType == CardType.Number && c.Value == card.Value))
         {
@@ -307,8 +305,8 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
             if (hasSecondChance is not null)
             {
                 Log($"Phew, {player.Name} had a {hasSecondChance.Name} to save them!");
-                player.Discard(card);
                 player.Discard(hasSecondChance);
+                Deck.PutOnDiscardPile(card);
             }
             else
             {
@@ -316,7 +314,10 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
                 player.Bust();
             }
         }
-        else if (player.NumberCardsInHand == NumbersToFlip)
+
+        player.AddCardToHand(card);
+
+        if (player.NumberCardsInHand == NumbersToFlip)
         {
             Log($"Wow, {player.Name} managed to get {NumbersToFlip} Number cards!");
             EndRound();
