@@ -60,18 +60,12 @@ public class FlipSevenPlayer : IFlipSevenPlayer<FlipSevenDeck, FlipSevenCard>
     }
 
     /// <inheritdoc />
-    public int Bank()
-    {
-        State = PlayerStates.Banked;
-        return HandPoints;
-    }
+    public void Bank()
+        => State = PlayerStates.Banked;
 
     /// <inheritdoc />
-    public int Freeze()
-    {
-        State = PlayerStates.Frozen;
-        return HandPoints;
-    }
+    public void Freeze()
+        => State = PlayerStates.Frozen;
 
     /// <inheritdoc />
     public void Bust()

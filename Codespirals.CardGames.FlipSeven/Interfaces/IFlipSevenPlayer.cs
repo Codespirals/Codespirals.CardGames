@@ -21,10 +21,10 @@ public interface IFlipSevenPlayer<TDeck, TCard> : IPlayer<TCard>, ICanPlayRounds
     /// The player adds their current <see cref="HandPoints"/> to their <see cref="IHasPoints.TotalPoints"/> and is out for the round
     /// </summary>
     /// <returns></returns>
-    int Bank();
+    void Bank();
     /// <summary>
     /// The player is forced to <see cref="Bank"/>
     /// </summary>
     /// <returns></returns>
-    int Freeze();
+    void Freeze();
 }

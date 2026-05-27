@@ -93,7 +93,7 @@ public interface IFlipSevenGame<TSelf, TPlayer, TDeck, TCard> : ICardGame<TSelf,
     /// </summary>
     /// <param name="player"></param>
     /// <returns></returns>
-    int? Freeze(TPlayer player);
+    void Freeze(TPlayer player);
     /// <summary>
     /// Get the winner of the round. Returns <see langword="null"/> if no winner has been decided yet
     /// </summary>

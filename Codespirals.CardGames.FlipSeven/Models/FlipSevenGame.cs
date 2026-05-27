@@ -122,9 +122,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
                 result = newCards;
                 break;
             case CardType.Freeze:
-                var gainedPoints = Freeze(target);
-                if (gainedPoints is null)
-                    return null;
+                Freeze(target);
                 result = [];
                 break;
             default:
@@ -148,6 +146,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
             Prompt = $"{_currentPlayer.Name} choose another player.";
             return;
         }
+        Log($"The {secondChance.Name} was given to {target.Name}.");
         target.AddCardToHand(secondChance);
     }
     /// <inheritdoc />
@@ -163,12 +162,12 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         }
     }
     /// <inheritdoc />
-    public int? Freeze(FlipSevenPlayer target)
+    public void Freeze(FlipSevenPlayer target)
     {
         if (target.IsOutForRound)
-            return null;
+            return;
         Log($"{target.Name} got frozen on {target.HandPoints}.");
-        return target.Freeze();
+        target.Freeze();
     }
     #endregion
 
@@ -187,6 +186,12 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     {
         if (_players.All(p => p.IsOutForRound) || GameOver)
         {
+            EndRound();
+            return;
+        }
+        if (_currentPlayer.NumberCardsInHand == NumbersToFlip && !_currentPlayer.IsOutForRound)
+        {
+            Log($"Wow, {_currentPlayer.Name} managed to get {NumbersToFlip} Number cards!");
             EndRound();
             return;
         }
@@ -248,13 +253,13 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
             return;
 
         Log($"Adding everyone's points to their total:");
-        foreach (var item in CalculateCurrentPotentialPointGain())
+        foreach (var item in CalculateCurrentPotentialPointGain().OrderBy(p => p.Winnings))
         {
             item.Player.AddPoints(item.Winnings);
             if (item.Winnings < 1)
                 Log($"{item.Player.Name} had got nothing this round.");
             else if (item.Player.NumberCardsInHand == NumbersToFlip)
-                Log($"{item.Player.Name} flipped {NumbersToFlip}! They bank {item.Winnings} which includes a {FlipNumberBonus} Bonus");
+                Log($"{item.Player.Name} flipped {NumbersToFlip}! They bank {item.Winnings} which includes {FlipNumberBonus} Bonus points!");
             else
                 Log($"{item.Player.Name} banked {item.Winnings}.");
             Log($"{item.Player.Name} has {item.Player.TotalPoints} in total.");
@@ -266,6 +271,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     {
         if (!GameOver)
             return null;
+        Log($"GAME OVER");
         var winner = _players.MaxBy(p => p.TotalPoints);
         Log($"{winner?.Name} wins!");
         return winner;
@@ -319,11 +325,6 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
 
         player.AddCardToHand(card);
 
-        if (player.NumberCardsInHand == NumbersToFlip && !player.IsBusted)
-        {
-            Log($"Wow, {player.Name} managed to get {NumbersToFlip} Number cards!");
-            EndRound();
-        }
         return card;
     }
 }
