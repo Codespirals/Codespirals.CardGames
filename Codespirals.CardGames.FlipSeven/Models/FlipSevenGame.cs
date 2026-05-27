@@ -16,7 +16,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     /// <inheritdoc />
     public ReadOnlyCollection<FlipSevenPlayer> Players => _players.AsReadOnly();
     /// <inheritdoc />
-    public FlipSevenPlayer CurrentPlayer => _actionCardQueue.Any() ? _actionCardQueue.First().Player : _currentPlayer;
+    public FlipSevenPlayer CurrentPlayer => ActionCardQueue.Any() ? ActionCardQueue.First().Player : _currentPlayer;
     /// <inheritdoc />
     public int CurrentRound => _currentRound;
     /// <inheritdoc />
@@ -130,7 +130,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         }
 
         _actionCardQueue.RemoveAt(0);
-        if (!_actionCardQueue.Any() && _currentPlayer.IsOutForRound)
+        if (!ActionCardQueue.Any())
             MoveToNextPlayer();
         return result;
     }
@@ -195,7 +195,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
             EndRound();
             return;
         }
-        if (_actionCardQueue.Any())
+        if (ActionCardQueue.Any())
         {
             Prompt = $"There are active action cards that have to be played!";
             return;
