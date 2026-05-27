@@ -200,7 +200,10 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         _currentPlayer = _players[nextPlayerIndex];
 
         if (_currentPlayer.IsOutForRound)
+        {
             MoveToNextPlayer();
+            return;
+        }
 
         Log($"It's {_currentPlayer.Name}'s turn.");
         Prompt = $"{_currentPlayer.Name}: Choose an action!";
@@ -254,7 +257,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
                 Log($"{item.Player.Name} flipped {NumbersToFlip}! They bank {item.Winnings} which includes a {FlipNumberBonus} Bonus");
             else
                 Log($"{item.Player.Name} banked {item.Winnings}.");
-            Log($"They have {item.Player.TotalPoints} in total now.");
+            Log($"{item.Player.Name} has {item.Player.TotalPoints} in total.");
         }
         Prompt = $"Start the next round!";
     }
@@ -306,7 +309,6 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
             {
                 Log($"Phew, {player.Name} had a {hasSecondChance.Name} to save them!");
                 player.Discard(hasSecondChance);
-                Deck.PutOnDiscardPile(card);
             }
             else
             {
@@ -317,7 +319,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
 
         player.AddCardToHand(card);
 
-        if (player.NumberCardsInHand == NumbersToFlip)
+        if (player.NumberCardsInHand == NumbersToFlip && !player.IsBusted)
         {
             Log($"Wow, {player.Name} managed to get {NumbersToFlip} Number cards!");
             EndRound();
