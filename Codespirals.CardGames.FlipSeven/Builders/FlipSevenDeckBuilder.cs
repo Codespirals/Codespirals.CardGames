@@ -26,12 +26,12 @@ public class FlipSevenDeckBuilder : IDeckBuilder<FlipSevenDeckBuilder, FlipSeven
     /// <returns></returns>
     public FlipSevenDeckBuilder WithNumberCards(int highestNumber = 12)
     {
-        _deck.AddStartingCard(FlipSevenCard.GenerateNumberCard(0));
+        _deck.AddStartingCard(FlipSevenCardGenerator.GenerateNumberCard(0));
         for (var v = highestNumber; v > 0; v--)
         {
             for (var i = 0; i < v; i++)
             {
-                _deck.AddStartingCard(FlipSevenCard.GenerateNumberCard(v));
+                _deck.AddStartingCard(FlipSevenCardGenerator.GenerateNumberCard(v));
             }
         }
         return this;
@@ -45,7 +45,7 @@ public class FlipSevenDeckBuilder : IDeckBuilder<FlipSevenDeckBuilder, FlipSeven
     {
         foreach (var value in values)
         {
-            _deck.AddStartingCard(FlipSevenCard.GenerateBonusAddCard(value));
+            _deck.AddStartingCard(FlipSevenCardGenerator.GenerateBonusAddCard(value));
         }
         return this;
     }
@@ -59,7 +59,7 @@ public class FlipSevenDeckBuilder : IDeckBuilder<FlipSevenDeckBuilder, FlipSeven
     {
         for (var i = 1; i <= number; i++)
         {
-            _deck.AddStartingCard(FlipSevenCard.GenerateMultiplierCard(multiplier));
+            _deck.AddStartingCard(FlipSevenCardGenerator.GenerateMultiplierCard(multiplier));
         }
         return this;
     }
@@ -73,7 +73,7 @@ public class FlipSevenDeckBuilder : IDeckBuilder<FlipSevenDeckBuilder, FlipSeven
     {
         for (var i = 1; i <= number; i++)
         {
-            _deck.AddStartingCard(FlipSevenCard.GenerateFlipCard(draw));
+            _deck.AddStartingCard(FlipSevenCardGenerator.GenerateFlipCard(draw));
         }
         return this;
     }
@@ -86,7 +86,7 @@ public class FlipSevenDeckBuilder : IDeckBuilder<FlipSevenDeckBuilder, FlipSeven
     {
         for (var i = 1; i <= number; i++)
         {
-            _deck.AddStartingCard(FlipSevenCard.GenerateFreezeCard());
+            _deck.AddStartingCard(FlipSevenCardGenerator.GenerateFreezeCard());
         }
         return this;
     }
@@ -99,7 +99,7 @@ public class FlipSevenDeckBuilder : IDeckBuilder<FlipSevenDeckBuilder, FlipSeven
     {
         for (var i = 1; i <= number; i++)
         {
-            _deck.AddStartingCard(FlipSevenCard.GenerateSecondChanceCard());
+            _deck.AddStartingCard(FlipSevenCardGenerator.GenerateSecondChanceCard());
         }
         return this;
     }

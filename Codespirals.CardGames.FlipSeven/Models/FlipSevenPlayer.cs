@@ -88,6 +88,9 @@ public class FlipSevenPlayer : IFlipSevenPlayer<FlipSevenDeck, FlipSevenCard>
 
     private int CalculateHandValue()
     {
+        if (IsBusted)
+            return 0;
+
         var points = NumberCardsInHand == _game.NumbersToFlip ? _game.FlipNumberBonus : 0;
         foreach (var card in _hand.OrderBy(c => c.CardType))
         {

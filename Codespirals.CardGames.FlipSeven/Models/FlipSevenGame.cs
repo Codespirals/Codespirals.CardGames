@@ -100,13 +100,13 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     }
 
     /// <inheritdoc />
-    public IEnumerable<FlipSevenCard>? UseActionCard(FlipSevenPlayer target, FlipSevenCard card)
+    public IEnumerable<FlipSevenCard>? UseActionCard(FlipSevenPlayer target, FlipSevenCard? card)
     {
-        if (target.IsOutForRound || !card.IsActionCard)
+        if (target.IsOutForRound || card is null || !card.IsActionCard)
             return null;
 
         if (_currentPlayer == target)
-            Log($"{_currentPlayer.Name} is taking {card.Name} for themselves!");
+            Log($"{_currentPlayer.Name} is taking the {card.Name} themselves!");
         else
             Log($"{_currentPlayer.Name} is giving {card.Name} to {target.Name}!");
 
@@ -126,7 +126,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
                 result = [];
                 break;
             default:
-                return null;
+                break;
         }
 
         _actionCardQueue.RemoveAt(0);
@@ -223,6 +223,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
             Deck.PutOnDiscardPile(queueItem.ActionCard);
         _actionCardQueue = [];
         Log($"Round {CurrentRound} has ended.");
+        Log(new string('=', 20));
         PayOut();
     }
 
@@ -256,8 +257,11 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         foreach (var item in CalculateCurrentPotentialPointGain().OrderBy(p => p.Winnings))
         {
             item.Player.AddPoints(item.Winnings);
+            // technically it's not currently possible to lose points, but hey, if you want to add negative "add" cards, that's possible
             if (item.Winnings < 1)
-                Log($"{item.Player.Name} had got nothing this round.");
+                Log($"{item.Player.Name} LOST {Math.Abs(item.Winnings)} points... Ouch.");
+            else if (item.Winnings == 0)
+                Log($"{item.Player.Name} gained no points this round.");
             else if (item.Player.NumberCardsInHand == NumbersToFlip)
                 Log($"{item.Player.Name} flipped {NumbersToFlip}! They bank {item.Winnings} which includes {FlipNumberBonus} Bonus points!");
             else

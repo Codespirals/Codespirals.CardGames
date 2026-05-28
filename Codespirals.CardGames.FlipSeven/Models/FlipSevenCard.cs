@@ -12,23 +12,11 @@ public class FlipSevenCard : IFlipSevenCard
     /// <inheritdoc/>
     public bool IsActionCard => CardType is CardType.Flip or CardType.Freeze or CardType.SecondChance;
 
-    private FlipSevenCard(CardType cardType, int value = 0)
+    internal FlipSevenCard(CardType cardType, int value = 0)
     {
         CardType = cardType;
         Value = value;
     }
-    public static FlipSevenCard GenerateNumberCard(int value)
-        => new FlipSevenCard(CardType.Number, value);
-    public static FlipSevenCard GenerateMultiplierCard(int value)
-        => new FlipSevenCard(CardType.Multiplier, value);
-    public static FlipSevenCard GenerateBonusAddCard(int value)
-        => new FlipSevenCard(CardType.BonusAdd, value);
-    public static FlipSevenCard GenerateSecondChanceCard()
-        => new FlipSevenCard(CardType.SecondChance);
-    public static FlipSevenCard GenerateFlipCard(int value)
-        => new FlipSevenCard(CardType.Flip, value);
-    public static FlipSevenCard GenerateFreezeCard()
-        => new FlipSevenCard(CardType.Freeze);
 
     /// <inheritdoc/>
     public override string ToString()
@@ -37,12 +25,12 @@ public class FlipSevenCard : IFlipSevenCard
     private string GetName()
         => CardType switch
         {
+            CardType.Number => $"{Value}",
+            CardType.Multiplier => $"x{Value}",
+            CardType.BonusAdd => Value > 0 ? $"+{Value}" : $"{Value}",
             CardType.Freeze => FlipSevenConstants.FREEZENAME,
             CardType.Flip => $"{FlipSevenConstants.FLIPNAME} {Value}",
             CardType.SecondChance => FlipSevenConstants.SECONDCHANCENAME,
-            CardType.BonusAdd => $"+{Value}",
-            CardType.Multiplier => $"x{Value}",
-            CardType.Number => $"{Value}",
             _ => $"???"
         };
 }
