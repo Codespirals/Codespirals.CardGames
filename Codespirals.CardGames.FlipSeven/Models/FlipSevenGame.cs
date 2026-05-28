@@ -76,7 +76,8 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         {
             player.Reactivate();
         }
-        _currentPlayer = Players[_currentRound - 1 % _players.Count];
+        var nextPlayerIndex = (_currentRound - 1) % _players.Count;
+        _currentPlayer = _players[nextPlayerIndex];
         Log($"It's {_currentPlayer.Name}'s turn.", _currentPlayer.Id);
         Prompt = $"{_currentPlayer.Name}: Choose an action!";
     }
