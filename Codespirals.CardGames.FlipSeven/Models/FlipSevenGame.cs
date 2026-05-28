@@ -331,7 +331,6 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
             {
                 Log($"{player.Name} got busted...", player.Id);
                 player.Bust();
-                return card;
             }
         }
 
