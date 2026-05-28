@@ -260,7 +260,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         {
             item.Player.AddPoints(item.Winnings);
             // technically it's not currently possible to lose points, but hey, if you want to add negative "add" cards, that's possible
-            if (item.Winnings < 1)
+            if (item.Winnings < 0)
                 Log($"{item.Player.Name} LOST {Math.Abs(item.Winnings)} points... Ouch.", item.Player.Id);
             else if (item.Winnings == 0)
                 Log($"{item.Player.Name} gained no points this round.", item.Player.Id);
@@ -318,7 +318,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         // is number and player already has number
         if (card.CardType == CardType.Number && player.Hand.Any(c => c.CardType == CardType.Number && c.Value == card.Value))
         {
-            Log($"Oh no, {player.Name} already has a {card.Name}.", player.Id);
+            Log($"Oh no, {player.Name} already has a {card.Name}!", player.Id);
             var hasSecondChance = player.Hand.FirstOrDefault(c => c.CardType == CardType.SecondChance);
             if (hasSecondChance is not null)
             {
@@ -331,11 +331,11 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
             {
                 Log($"{player.Name} got busted...", player.Id);
                 player.Bust();
+                return card;
             }
         }
 
         player.AddCardToHand(card);
-
         return card;
     }
 }
