@@ -8,6 +8,7 @@ public class FlipSevenPlayer : IFlipSevenPlayer<FlipSevenDeck, FlipSevenCard>
     private readonly FlipSevenGame _game;
     private readonly List<FlipSevenCard> _hand = [];
 
+    internal int Id => _game.Players.IndexOf(this);
     /// <inheritdoc />
     public string Name { get; set; }
     /// <inheritdoc />

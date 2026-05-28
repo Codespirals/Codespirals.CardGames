@@ -16,9 +16,11 @@ public interface IHasActivityLog<TEntry>
     /// The entries
     /// </summary>
     ReadOnlyCollection<TEntry> LogEntries { get; }
+
     /// <summary>
     /// Create a log entry
     /// </summary>
     /// <param name="text"></param>
-    void Log(string text);
+    /// <param name="actorId"></param>
+    void Log(string text, int? actorId = null);
 }

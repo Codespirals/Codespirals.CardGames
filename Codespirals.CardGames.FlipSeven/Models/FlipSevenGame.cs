@@ -77,7 +77,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
             player.Reactivate();
         }
         _currentPlayer = Players[_currentRound - 1 % _players.Count];
-        Log($"It's {_currentPlayer.Name}'s turn.");
+        Log($"It's {_currentPlayer.Name}'s turn.", _currentPlayer.Id);
         Prompt = $"{_currentPlayer.Name}: Choose an action!";
     }
 
@@ -87,7 +87,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     {
         if (_currentPlayer.IsOutForRound)
             return;
-        Log($"{_currentPlayer.Name} is banking their {_currentPlayer.HandPoints} points.");
+        Log($"{_currentPlayer.Name} is banking their {_currentPlayer.HandPoints} points.", _currentPlayer.Id);
         MoveToNextPlayer();
         return;
     }
@@ -106,9 +106,9 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
             return null;
 
         if (_currentPlayer == target)
-            Log($"{_currentPlayer.Name} is taking the {card.Name} themselves!");
+            Log($"{_currentPlayer.Name} is taking the {card.Name} themselves!", _currentPlayer.Id);
         else
-            Log($"{_currentPlayer.Name} is giving {card.Name} to {target.Name}!");
+            Log($"{_currentPlayer.Name} is giving the {card.Name} to {target.Name}!", _currentPlayer.Id);
 
         IEnumerable<FlipSevenCard>? result = null;
         switch (card.CardType)
@@ -120,10 +120,12 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
             case CardType.Flip:
                 var newCards = ForceFlip(target, card.Value);
                 result = newCards;
+                Deck.PutOnDiscardPile(card);
                 break;
             case CardType.Freeze:
                 Freeze(target);
                 result = [];
+                Deck.PutOnDiscardPile(card);
                 break;
             default:
                 break;
@@ -142,17 +144,17 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     {
         if (target.Hand.Any(c => c.CardType == CardType.SecondChance) && !PlayersCanHaveMultipleSecondChances)
         {
-            Log($"{target.Name} already has a {secondChance.Name}! It's not called \"third chance\"...");
+            Log($"{target.Name} already has a {secondChance.Name}! It's not called \"third chance\"...", _currentPlayer.Id);
             Prompt = $"{_currentPlayer.Name} choose another player.";
             return;
         }
-        Log($"The {secondChance.Name} was given to {target.Name}.");
+        Log($"The {secondChance.Name} was given to {target.Name}.", target.Id);
         target.AddCardToHand(secondChance);
     }
     /// <inheritdoc />
     public IEnumerable<FlipSevenCard> ForceFlip(FlipSevenPlayer target, int number)
     {
-        Log($"{target.Name} has to flip {number}!");
+        Log($"{target.Name} has to flip {number}!", target.Id);
         for (int i = 0; i < number; i++)
         {
             var card = Flip(target);
@@ -166,7 +168,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     {
         if (target.IsOutForRound)
             return;
-        Log($"{target.Name} got frozen on {target.HandPoints}.");
+        Log($"{target.Name} got frozen on {target.HandPoints}.", target.Id);
         target.Freeze();
     }
     #endregion
@@ -191,7 +193,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         }
         if (_currentPlayer.NumberCardsInHand == NumbersToFlip && !_currentPlayer.IsOutForRound)
         {
-            Log($"Wow, {_currentPlayer.Name} managed to get {NumbersToFlip} Number cards!");
+            Log($"Wow, {_currentPlayer.Name} managed to get {NumbersToFlip} Number cards!", _currentPlayer.Id);
             EndRound();
             return;
         }
@@ -210,7 +212,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
             return;
         }
 
-        Log($"It's {_currentPlayer.Name}'s turn.");
+        Log($"It's {_currentPlayer.Name}'s turn.", _currentPlayer.Id);
         Prompt = $"{_currentPlayer.Name}: Choose an action!";
     }
 
@@ -259,14 +261,14 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
             item.Player.AddPoints(item.Winnings);
             // technically it's not currently possible to lose points, but hey, if you want to add negative "add" cards, that's possible
             if (item.Winnings < 1)
-                Log($"{item.Player.Name} LOST {Math.Abs(item.Winnings)} points... Ouch.");
+                Log($"{item.Player.Name} LOST {Math.Abs(item.Winnings)} points... Ouch.", item.Player.Id);
             else if (item.Winnings == 0)
-                Log($"{item.Player.Name} gained no points this round.");
+                Log($"{item.Player.Name} gained no points this round.", item.Player.Id);
             else if (item.Player.NumberCardsInHand == NumbersToFlip)
-                Log($"{item.Player.Name} flipped {NumbersToFlip}! They bank {item.Winnings} which includes {FlipNumberBonus} Bonus points!");
+                Log($"{item.Player.Name} flipped {NumbersToFlip}! They bank {item.Winnings} which includes {FlipNumberBonus} Bonus points!", item.Player.Id);
             else
-                Log($"{item.Player.Name} banked {item.Winnings}.");
-            Log($"{item.Player.Name} has {item.Player.TotalPoints} in total.");
+                Log($"{item.Player.Name} banked {item.Winnings}.", item.Player.Id);
+            Log($"{item.Player.Name} has {item.Player.TotalPoints} in total.", item.Player.Id);
         }
         Prompt = $"Start the next round!";
     }
@@ -277,13 +279,16 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
             return null;
         Log($"GAME OVER");
         var winner = _players.MaxBy(p => p.TotalPoints);
-        Log($"{winner?.Name} wins!");
+        Log($"{winner?.Name} wins!", winner?.Id);
         return winner;
     }
 
     /// <inheritdoc/>
-    public void Log(string text)
-        => _logEntries.Add(new LogEntry(text, CurrentRound));
+    public void Log(string text, int? actorId = null)
+        => _logEntries.Add(new LogEntry(text, CurrentRound, actorId ?? -1));
+
+    private int GetPlayerId(FlipSevenPlayer? player)
+        => player is not null ? Players.IndexOf(player) : -1;
 
     private FlipSevenCard? Flip(FlipSevenPlayer player)
     {
@@ -294,14 +299,14 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         if (card is null)
             return null;
 
-        Log($"{player.Name} flipped a {card.Name}.");
-        // action cards need to be played immediately
+        Log($"{player.Name} flipped a {card.Name}.", player.Id);
+        // action cards need to be played immediately 
         if (card.IsActionCard)
         {
             var targets = GetValidTargets(card);
             if (targets is null || !targets.Any())
             {
-                Log($"There are no valid players to give a {card.Name} to, so it has to be discarded.");
+                Log($"There are no valid players to give a {card.Name} to, so it has to be discarded.", player.Id);
                 Deck.PutOnDiscardPile(card);
                 return card;
             }
@@ -313,16 +318,18 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         // is number and player already has number
         if (card.CardType == CardType.Number && player.Hand.Any(c => c.CardType == CardType.Number && c.Value == card.Value))
         {
-            Log($"Oh no, {player.Name} already has a {card.Name}.");
+            Log($"Oh no, {player.Name} already has a {card.Name}.", player.Id);
             var hasSecondChance = player.Hand.FirstOrDefault(c => c.CardType == CardType.SecondChance);
             if (hasSecondChance is not null)
             {
-                Log($"Phew, {player.Name} had a {hasSecondChance.Name} to save them!");
+                Log($"Phew, {player.Name} had a {hasSecondChance.Name} to save them!", player.Id);
                 player.Discard(hasSecondChance);
+                Deck.PutOnDiscardPile(card);
+                return card;
             }
             else
             {
-                Log($"{player.Name} got busted...");
+                Log($"{player.Name} got busted...", player.Id);
                 player.Bust();
             }
         }
