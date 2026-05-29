@@ -89,6 +89,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         if (_currentPlayer.IsOutForRound)
             return;
         Log($"{_currentPlayer.Name} is banking their {_currentPlayer.HandPoints} points.", _currentPlayer.Id);
+        _currentPlayer.Bank();
         MoveToNextPlayer();
         return;
     }
