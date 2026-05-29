@@ -259,7 +259,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
             return;
 
         Log($"Adding everyone's points to their total:");
-        foreach (var item in CalculateCurrentPotentialPointGain().OrderBy(p => p.Winnings))
+        foreach (var item in CalculateCurrentPotentialPointGain())
         {
             item.Player.AddPoints(item.Winnings);
             // technically it's not currently possible to lose points, but hey, if you want to add negative "add" cards, that's possible
