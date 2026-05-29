@@ -156,13 +156,14 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     public IEnumerable<FlipSevenCard> ForceFlip(FlipSevenPlayer target, int number)
     {
         Log($"{target.Name} has to flip {number}!", target.Id);
+        List<FlipSevenCard> result = [];
         for (int i = 0; i < number; i++)
         {
             var card = Flip(target);
-            if (card is null)
-                yield break;
-            yield return card;
+            if (target.IsBusted)
+                break;
         }
+        return result;
     }
     /// <inheritdoc />
     public void Freeze(FlipSevenPlayer target)
