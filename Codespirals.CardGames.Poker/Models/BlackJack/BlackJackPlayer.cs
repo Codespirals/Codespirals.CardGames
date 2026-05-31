@@ -1,7 +1,6 @@
-﻿using Codespirals.CardGames.Poker.BlackJack;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 
-namespace Codespirals.CardGames.Poker;
+namespace Codespirals.CardGames.Poker.BlackJack;
 
 /// <inheritdoc cref="IBlackJackPlayer{TCard}"/>
 public class BlackJackPlayer : IBlackJackPlayer<PokerCard>
@@ -10,6 +9,7 @@ public class BlackJackPlayer : IBlackJackPlayer<PokerCard>
     internal readonly List<PokerCard> _hand = [];
     internal bool _isOutForRound;
 
+    internal int Id => _game.Players.IndexOf(this);
     /// <inheritdoc/>
     public string Name { get; set; }
     /// <summary>

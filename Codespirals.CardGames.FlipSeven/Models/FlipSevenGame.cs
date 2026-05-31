@@ -48,8 +48,9 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         }
         _currentPlayer = _players.First();
         Deck = deck ?? FlipSevenDeckBuilder.CreateStandardDeck();
-        NumbersToFlip = numbersToFlip;
         WinningScore = winningScore;
+        NumbersToFlip = Math.Clamp(numbersToFlip, 2, Deck.CardPool.Where(c => c.CardType is CardType.Number).Max(x => x.Value));
+        FlipNumberBonus = flipNumberBonus;
         Deck.Shuffle();
         Log("Starting a new game of Flip Seven.");
         Prompt = "Start playing!";
@@ -228,7 +229,6 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
             Deck.PutOnDiscardPile(queueItem.ActionCard);
         _actionCardQueue = [];
         Log($"Round {CurrentRound} has ended.");
-        Log(new string('=', 20));
         PayOut();
     }
 
@@ -257,6 +257,8 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     {
         if (Players.Any(p => !p.IsOutForRound))
             return;
+
+        Log(new string('=', 20));
 
         if (Players.All(p => p.HandPoints == 0))
         {
@@ -289,7 +291,10 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
             return null;
         Log($"GAME OVER");
         var winner = _players.MaxBy(p => p.TotalPoints);
-        Log($"{winner?.Name} wins!", winner?.Id);
+        if (winner is null)
+            return null;
+        Prompt = $"{winner?.Name} wins!";
+        Log(Prompt, winner?.Id);
         return winner;
     }
 

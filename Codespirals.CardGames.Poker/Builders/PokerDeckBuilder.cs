@@ -30,6 +30,8 @@ public class PokerDeckBuilder : IDeckBuilder<PokerDeckBuilder, PokerDeck, PokerC
     /// <returns></returns>
     public PokerDeckBuilder WithNumberCards(Suit[] suits, int min = 2, int max = 10)
     {
+        min = Math.Clamp(min, 1, byte.MaxValue);
+        max = Math.Clamp(max, min, byte.MaxValue);
         foreach (var suit in suits)
         {
             for (var i = min; i < max; i++)
@@ -49,6 +51,7 @@ public class PokerDeckBuilder : IDeckBuilder<PokerDeckBuilder, PokerDeck, PokerC
     /// <returns></returns>
     public PokerDeckBuilder WithNamedCards(Suit[] suits, NamedCard cardType, int value)
     {
+        value = Math.Clamp(value, 1, short.MaxValue);
         foreach (var suit in suits)
         {
             _deck.AddStartingCard(PokerCardGenerator.GenerateNamedCard(cardType, value, suit));
@@ -66,6 +69,8 @@ public class PokerDeckBuilder : IDeckBuilder<PokerDeckBuilder, PokerDeck, PokerC
     /// <returns></returns>
     public PokerDeckBuilder WithExtraCards(ExtraCard cardType, int value, int number, Suit suit = Suit.Unknown)
     {
+        number = Math.Clamp(number, 1, byte.MaxValue);
+        value = Math.Clamp(value, 1, short.MaxValue);
         for (var i = 0; i < number; i++)
         {
             _deck.AddStartingCard(PokerCardGenerator.GenerateExtraCard(cardType, value, suit));
@@ -87,6 +92,7 @@ public class PokerDeckBuilder : IDeckBuilder<PokerDeckBuilder, PokerDeck, PokerC
     /// <returns></returns>
     public PokerDeck BuildMultiple(int number)
     {
+        number = Math.Clamp(number, 1, byte.MaxValue);
         var temp = _deck.StartingCards.ToList().AsReadOnly();
         for (var i = 0; i > number; i++)
         {

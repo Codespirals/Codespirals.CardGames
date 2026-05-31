@@ -8,7 +8,6 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
     private readonly List<BlackJackPlayer> _players = [];
     private BlackJackPlayer _currentPlayer;
     private int _currentRound = 0;
-    private int _automaticallyIncreaseStakeAfterRound = 0;
     private bool _dealerCanCountCards;
     private List<LogEntry> _logEntries = [];
 
@@ -29,6 +28,8 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
     /// <inheritdoc/>
     public int DrawAtStartOfRound { get; private set; } = 2;
     /// <inheritdoc/>
+    public int IncreaseStakeAfterRound { get; private set; } = 1;
+    /// <inheritdoc/>
     public bool RoundActive => _players.Any(p => !p.IsOutForRound);
     /// <inheritdoc/>
     public bool GameOver => Players.Except([Dealer]).All(p => p.TappedOut);
@@ -39,18 +40,18 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
     public ReadOnlyCollection<LogEntry> LogEntries => _logEntries.AsReadOnly();
 
     /// <inheritdoc/>
-    public BlackJackGame(int players, int minBet, int startingCash, int automaticallyIncreaseStakeAfterRound, int drawAtStartOfRound, int winningScore, bool dealerCanCountCards, PokerDeck? deck = null)
+    private BlackJackGame(int players, int minBet = 1, int startingCash = 100, int automaticallyIncreaseStakeAfterRound = 1, int drawAtStartOfRound = 2, int winningScore = 21, bool dealerCanCountCards = true, PokerDeck? deck = null)
     {
         Dealer = BlackJackPlayer.GeneratePlayer(this, "Dealer", Int32.MaxValue);
         _dealerCanCountCards = dealerCanCountCards;
         _players.Add(Dealer);
         _currentPlayer = Dealer;
 
-        _automaticallyIncreaseStakeAfterRound = automaticallyIncreaseStakeAfterRound;
         for (var i = 0; i < players; i++)
         {
             _players.Add(BlackJackPlayer.GeneratePlayer(this, i, startingCash));
         }
+        IncreaseStakeAfterRound = automaticallyIncreaseStakeAfterRound;
         BuyIn = minBet;
         BlackJackScore = winningScore;
         DrawAtStartOfRound = drawAtStartOfRound;
@@ -62,10 +63,10 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
     }
 
     /// <inheritdoc/>
-    public static BlackJackGame SetUp(int players) 
-        => SetUp(players:players, minBet:1, startingCash:100, automaticallyIncreaseStakeAfterRound:1, drawAtStartOfRound:2, winningScore:21, dealerCanCountCards:true, deck:null);
+    public static BlackJackGame SetUp(int players)
+        => new(players);
     /// <inheritdoc/>
-    public static BlackJackGame SetUp(int players, int minBet, int startingCash = 100, int automaticallyIncreaseStakeAfterRound = 1, int drawAtStartOfRound = 2, int winningScore = 21, bool dealerCanCountCards = true, PokerDeck? deck = null)
+    public static BlackJackGame SetUp(int players, int minBet = 1, int startingCash = 100, int automaticallyIncreaseStakeAfterRound = 1, int drawAtStartOfRound = 2, int winningScore = 21, bool dealerCanCountCards = true, PokerDeck? deck = null)
         => new(players:players, minBet:minBet, startingCash:startingCash, automaticallyIncreaseStakeAfterRound:automaticallyIncreaseStakeAfterRound, drawAtStartOfRound:drawAtStartOfRound, winningScore:winningScore, dealerCanCountCards:dealerCanCountCards, deck:deck);
 
     /// <inheritdoc/>
@@ -101,7 +102,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
             return null;
 
         _currentPlayer.AddCardToHand(card);
-        Log($"{_currentPlayer.Name} drew a {card.Name}.");
+        Log($"{_currentPlayer.Name} drew a {card.Name}.", _currentPlayer.Id);
         MoveToNextPlayer();
         return card;
     }
@@ -117,8 +118,8 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
         _currentPlayer.AddCardToHand(card);
         _currentPlayer.Stand();
 
-        Log($"{_currentPlayer.Name} doubled down! Their bet is now {_currentPlayer.CurrentBet}.");
-        Log($"{_currentPlayer.Name} drew a {card.Name}.");
+        Log($"{_currentPlayer.Name} doubled down! Their bet is now {_currentPlayer.CurrentBet}.", _currentPlayer.Id);
+        Log($"{_currentPlayer.Name} drew a {card.Name}.", _currentPlayer.Id);
         MoveToNextPlayer();
         return card;
     }
@@ -127,7 +128,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
     public void Stand()
     {
         _currentPlayer.Stand();
-        Log($"{_currentPlayer.Name} is standing on {_currentPlayer.HandValue}.");
+        Log($"{_currentPlayer.Name} is standing on {_currentPlayer.HandValue}.", _currentPlayer.Id);
         MoveToNextPlayer();
     }
     #endregion
@@ -155,7 +156,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
             MoveToNextPlayer();
             return;
         }
-        Log($"It's {_currentPlayer.Name}'s turn.");
+        Log($"It's {_currentPlayer.Name}'s turn.", _currentPlayer.Id);
         Prompt = $"{_currentPlayer.Name}: Choose an action!";
     }
 
@@ -165,7 +166,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
         if (Dealer.IsOutForRound)
             return null;
 
-        Log($"It's the dealer's turn.");
+        Log($"It's the dealer's turn.", Dealer.Id);
         var averageValueOfCardPool = _dealerCanCountCards ? Deck.CardPool.Average(c => c.Value) : 7.3;
         if (Dealer.HandValue <= BlackJackScore - Math.Ceiling(averageValueOfCardPool / 2))
         {
@@ -173,13 +174,13 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
             if (newCard is null)
                 return null;
             Dealer.AddCardToHand(newCard);
-            Log($"The dealer drew a card.");
+            Log($"The dealer drew a card.", Dealer.Id);
             return true;
         }
         else
         {
             Dealer.Stand();
-            Log($"The dealer is standing on their cards.");
+            Log($"The dealer is standing on their cards.", Dealer.Id);
             return false;
         }
     }
@@ -233,23 +234,25 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
         if (Players.Any(p => !p.IsOutForRound))
             return;
 
+        Log(new string('=', 20));
+
         Log($"Paying out to all players:");
-        Log($"The dealer ended the round with {Dealer.HandValue}");
+        Log($"The dealer ended the round with {Dealer.HandValue}", Dealer.Id);
         foreach (var item in CalculateCurrentPotentialPointGain())
         {
             item.Player.AddPoints(item.Winnings);
             if (item.Winnings < 1)
-                Log($"{item.Player.Name} had {item.Player.HandValue} and lost...");
+                Log($"{item.Player.Name} had {item.Player.HandValue} and lost...", item.Player.Id);
             else if (item.Winnings == BuyIn)
-                Log($"{item.Player.Name} had {item.Player.HandValue} and drew with the dealer! +{item.Winnings}");
+                Log($"{item.Player.Name} had {item.Player.HandValue} and drew with the dealer! +{item.Winnings}", item.Player.Id);
             else if (item.Player.HandValue == BlackJackScore && item.Player.Hand.Count == 2)
-                Log($"{item.Player.Name} got a blackjack! +{item.Winnings}");
+                Log($"{item.Player.Name} got a blackjack! +{item.Winnings}", item.Player.Id);
             else
-                Log($"{item.Player.Name} had {item.Player.HandValue} and won! +{item.Winnings}");
+                Log($"{item.Player.Name} had {item.Player.HandValue} and won! +{item.Winnings}", item.Player.Id);
         }
 
-        if (_automaticallyIncreaseStakeAfterRound > 0)
-            RaiseTheStakes(_automaticallyIncreaseStakeAfterRound);
+        if (IncreaseStakeAfterRound > 0)
+            RaiseTheStakes(IncreaseStakeAfterRound);
         Prompt = $"Start the next round!";
     }
 
@@ -261,6 +264,6 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
     }
 
     /// <inheritdoc/>
-    public void Log(string text)
-        => _logEntries.Add(new LogEntry(text, CurrentRound));
+    public void Log(string text, int? actorId = null)
+        => _logEntries.Add(new LogEntry(text, CurrentRound, actorId ?? -1));
 }

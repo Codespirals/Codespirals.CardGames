@@ -26,6 +26,10 @@ public interface IBlackJackGame<TSelf, TPlayer, TDeck, TCard> : ICardGame<TSelf,
     /// </summary>
     int DrawAtStartOfRound { get; }
     /// <summary>
+    /// Automatically increase the stakes at the end of the round by this much
+    /// </summary>
+    int IncreaseStakeAfterRound { get; }
+    /// <summary>
     /// Set up a new game with extended parameters
     /// </summary>
     /// <param name="deck"></param>
