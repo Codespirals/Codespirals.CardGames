@@ -33,7 +33,6 @@ internal class BlackjackInConsole
         ConsoleHelper.SeperatorLine('#');
         Console.WriteLine($"Starting round {_game.CurrentRound}");
         Console.WriteLine($"The current buy in is {_game.BuyIn}");
-        Console.WriteLine(_game.Prompt);
         while (_game.RoundActive)
         {
             ShowDealer();

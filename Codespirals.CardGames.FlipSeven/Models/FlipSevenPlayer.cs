@@ -12,7 +12,7 @@ public class FlipSevenPlayer : IFlipSevenPlayer<FlipSevenDeck, FlipSevenCard>
     /// <inheritdoc />
     public string Name { get; set; }
     /// <inheritdoc />
-    public ReadOnlyCollection<FlipSevenCard> Hand => _hand.AsReadOnly();
+    public ReadOnlyCollection<FlipSevenCard> Hand => _hand.OrderBy(c => c.CardType).ThenBy(c => c.Value).ToList().AsReadOnly();
     /// <inheritdoc />
     public int NumberCardsInHand => _hand.Count(c => c.CardType == CardType.Number);
     /// <inheritdoc />
@@ -114,5 +114,5 @@ public class FlipSevenPlayer : IFlipSevenPlayer<FlipSevenDeck, FlipSevenCard>
     }
     /// <inheritdoc />
     public override string ToString()
-        => $"{Name} {(Hand.Count != 0 ? "Hand: " : "")}{string.Join('|', Hand.OrderBy(c => c.CardType).Select(c => c.Name))} Hand total: {HandPoints} Banked:{TotalPoints}";
+        => $"{Name} {(Hand.Count != 0 ? "Hand: " : "")}{string.Join('|', Hand)} | Current Points: {HandPoints} | Banked: {TotalPoints}";
 }

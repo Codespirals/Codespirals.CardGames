@@ -12,7 +12,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     private List<(FlipSevenPlayer Player, FlipSevenCard ActionCard)> _actionCardQueue = [];
 
     /// <inheritdoc />
-    public FlipSevenDeck Deck { get; } = FlipSevenDeckBuilder.CreateStandardDeck();
+    public FlipSevenDeck Deck { get; }
     /// <inheritdoc />
     public ReadOnlyCollection<FlipSevenPlayer> Players => _players.AsReadOnly();
     /// <inheritdoc />
@@ -20,11 +20,11 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     /// <inheritdoc />
     public int CurrentRound => _currentRound;
     /// <inheritdoc />
-    public int WinningScore { get; set; } = 200;
+    public int WinningScore { get; set; }
     /// <inheritdoc />
-    public int NumbersToFlip { get; set; } = 7;
+    public int NumbersToFlip { get; set; }
     /// <inheritdoc />
-    public int FlipNumberBonus { get; set; } = 15;
+    public int FlipNumberBonus { get; set; }
     /// <inheritdoc />
     public bool PlayersCanHaveMultipleSecondChances { get; set; }
     /// <inheritdoc />
@@ -257,6 +257,13 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     {
         if (Players.Any(p => !p.IsOutForRound))
             return;
+
+        if (Players.All(p => p.HandPoints == 0))
+        {
+            Log($"Nobody gained any points this round...");
+            Prompt = $"Start the next round!";
+            return;
+        }
 
         Log($"Adding everyone's points to their total:");
         foreach (var item in CalculateCurrentPotentialPointGain())

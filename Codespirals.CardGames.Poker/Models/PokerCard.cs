@@ -12,7 +12,7 @@ public class PokerCard : IPokerCard
     public string? Emoji => GetSymbol();
     public bool IsFaceDown { get; internal set; }
 
-    private PokerCard(string name, int value, Suit suit)
+    internal PokerCard(string name, int value, Suit suit)
     {
         _suit = suit;
         _name = name;
@@ -23,7 +23,7 @@ public class PokerCard : IPokerCard
             _emoji = char.ConvertFromUtf32(Convert.ToInt32("01F0A0", 16) + (((int)_suit - 1) * 16) + _value);
     }
 
-    private PokerCard(NamedCards cardType, int value, Suit suit)
+    internal PokerCard(NamedCard cardType, int value, Suit suit)
     {
         _suit = suit;
         _name = cardType.ToString();
@@ -34,20 +34,20 @@ public class PokerCard : IPokerCard
             _emoji = char.ConvertFromUtf32(Convert.ToInt32("01F0A0", 16) + (((int)_suit - 1) * 16) + (int)cardType);
     }
 
-    private PokerCard(ExtraCards cardType, int value, Suit suit = Suit.Unknown)
+    internal PokerCard(ExtraCard cardType, int value, Suit suit = Suit.Unknown)
     {
         _suit = suit;
         _value = value;
         // joker
-        if (cardType is ExtraCards.Joker)
+        if (cardType is ExtraCard.Joker)
         {
-            _name = ExtraCards.Joker.ToString();
+            _name = ExtraCard.Joker.ToString();
             _emoji = PokerConstants.JOKEREMOJI;
         }
         // fool
-        else if (cardType is ExtraCards.Fool)
+        else if (cardType is ExtraCard.Fool)
         {
-            _name = ExtraCards.Fool.ToString();
+            _name = ExtraCard.Fool.ToString();
             _emoji = PokerConstants.FOOLEMOJI;
         }
         else
@@ -55,13 +55,6 @@ public class PokerCard : IPokerCard
             _name = "";
         }
     }
-
-    public static PokerCard GenerateNumberCard(string name, int value, Suit suit)
-        => new(name, value, suit);
-    public static PokerCard GenerateNamedCard(NamedCards cardType, int value, Suit suit)
-        => new(cardType, value, suit);
-    public static PokerCard GenerateExtraCard(ExtraCards cardType, int value, Suit suit)
-        => new(cardType, value, suit);
 
     public override string ToString()
         => GetName();

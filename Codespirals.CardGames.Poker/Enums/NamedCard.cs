@@ -1,5 +1,5 @@
 ﻿namespace Codespirals.CardGames.Poker;
-public enum NamedCards
+public enum NamedCard
 {
     Ace = 1,
     Jack = 11,

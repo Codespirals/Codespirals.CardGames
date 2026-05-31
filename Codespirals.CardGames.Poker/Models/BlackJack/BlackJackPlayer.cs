@@ -114,4 +114,7 @@ public class BlackJackPlayer : IBlackJackPlayer<PokerCard>
         }
         return value;
     }
+
+    /// <inheritdoc/>
+    public override string ToString() => $"{Name} Current Bet: {CurrentBet}";
 }

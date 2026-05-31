@@ -13,7 +13,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
     private List<LogEntry> _logEntries = [];
 
     /// <inheritdoc/>
-    public PokerDeck Deck { get; }
+    public PokerDeck Deck { get; } = PokerDeckBuilder.CreateBlackJackDeck();
     /// <inheritdoc/>
     public ReadOnlyCollection<BlackJackPlayer> Players => _players.ToList().AsReadOnly();
     /// <inheritdoc/>
@@ -25,7 +25,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
     /// <inheritdoc/>
     public int BlackJackScore { get; private set; } = 21;
     /// <inheritdoc/>
-    public int BuyIn { get; private set; }
+    public int BuyIn { get; private set; } = 1;
     /// <inheritdoc/>
     public int DrawAtStartOfRound { get; private set; } = 2;
     /// <inheritdoc/>
@@ -39,32 +39,34 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
     public ReadOnlyCollection<LogEntry> LogEntries => _logEntries.AsReadOnly();
 
     /// <inheritdoc/>
-    public BlackJackGame(int players, int minBet = 1, int blackJackScore = 21, int startingCash = 100, int automaticallyIncreaseStakeAfterRound = 1, int drawAtStartOfRound = 2, bool dealerCanCountCards = false, PokerDeck? deck = null)
+    public BlackJackGame(int players, int minBet, int startingCash, int automaticallyIncreaseStakeAfterRound, int drawAtStartOfRound, int winningScore, bool dealerCanCountCards, PokerDeck? deck = null)
     {
         Dealer = BlackJackPlayer.GeneratePlayer(this, "Dealer", Int32.MaxValue);
+        _dealerCanCountCards = dealerCanCountCards;
         _players.Add(Dealer);
         _currentPlayer = Dealer;
+
         _automaticallyIncreaseStakeAfterRound = automaticallyIncreaseStakeAfterRound;
         for (var i = 0; i < players; i++)
         {
             _players.Add(BlackJackPlayer.GeneratePlayer(this, i, startingCash));
         }
         BuyIn = minBet;
-        BlackJackScore = blackJackScore;
+        BlackJackScore = winningScore;
         DrawAtStartOfRound = drawAtStartOfRound;
         Deck = deck ?? PokerDeckBuilder.CreateBlackJackDeck();
         Deck.Shuffle();
-        _dealerCanCountCards = dealerCanCountCards;
         Log("Starting a new game of Blackjack.");
         Log($"The starting buyin is {BuyIn}");
         Prompt = "Start playing!";
     }
 
     /// <inheritdoc/>
-    public static BlackJackGame SetUp(int players) => SetUp(players, 100, 1, 21, 1, 2, true, null);
+    public static BlackJackGame SetUp(int players) 
+        => SetUp(players:players, minBet:1, startingCash:100, automaticallyIncreaseStakeAfterRound:1, drawAtStartOfRound:2, winningScore:21, dealerCanCountCards:true, deck:null);
     /// <inheritdoc/>
-    public static BlackJackGame SetUp(int players, int startingCash, int minBet = 1, int winningScore = 21, int automaticallyIncreaseStakeAfterRound = 1, int drawAtStartOfRound = 2, bool dealerCanCountCards = false, PokerDeck? deck = null)
-        => new(players, startingCash, minBet, winningScore, automaticallyIncreaseStakeAfterRound, drawAtStartOfRound, dealerCanCountCards, deck);
+    public static BlackJackGame SetUp(int players, int minBet, int startingCash = 100, int automaticallyIncreaseStakeAfterRound = 1, int drawAtStartOfRound = 2, int winningScore = 21, bool dealerCanCountCards = true, PokerDeck? deck = null)
+        => new(players:players, minBet:minBet, startingCash:startingCash, automaticallyIncreaseStakeAfterRound:automaticallyIncreaseStakeAfterRound, drawAtStartOfRound:drawAtStartOfRound, winningScore:winningScore, dealerCanCountCards:dealerCanCountCards, deck:deck);
 
     /// <inheritdoc/>
     public void StartRound()
