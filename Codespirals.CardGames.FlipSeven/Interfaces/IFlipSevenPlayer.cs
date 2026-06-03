@@ -1,8 +1,7 @@
 ﻿namespace Codespirals.CardGames.FlipSeven;
 
 /// <inheritdoc/>
-public interface IFlipSevenPlayer<TDeck, TCard> : IPlayer<TCard>, ICanPlayRounds, IHasPoints, ICanBust
-    where TDeck : IDeck<TCard>
+public interface IFlipSevenPlayer<TCard> : IPlayer<TCard>, ICanPlayRounds, IHasPoints, ICanBust
     where TCard : IFlipSevenCard
 {
     /// <summary>

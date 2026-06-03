@@ -10,7 +10,7 @@ namespace Codespirals.CardGames.FlipSeven;
 /// <typeparam name="TCard"></typeparam>
 public interface IFlipSevenGame<TSelf, TPlayer, TDeck, TCard> : ICardGame<TSelf, TDeck, TCard>, IRoundBased, IHasPlayers<TPlayer>, IPlayersHavePoints<TPlayer>, IHasPrompt, IHasActivityLog<LogEntry>
     where TSelf : IFlipSevenGame<TSelf, TPlayer, TDeck, TCard>
-    where TPlayer : IFlipSevenPlayer<TDeck, TCard>
+    where TPlayer : IFlipSevenPlayer<TCard>
     where TDeck : IDeck<TCard>
     where TCard : IFlipSevenCard
 {

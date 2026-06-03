@@ -8,7 +8,7 @@
 /// <typeparam name="TCard"></typeparam>
 public interface IBlackJackGame<TSelf, TPlayer, TDeck, TCard> : ICardGame<TSelf, TDeck, TCard>, IRoundBased, IHasPlayers<TPlayer>, IHasBets<TPlayer>, IHasActivityLog<LogEntry>, IHasPrompt
     where TSelf : IBlackJackGame<TSelf, TPlayer, TDeck, TCard>
-    where TPlayer : IBlackJackPlayer<TCard>
+    where TPlayer : IBlackJackPlayer<TCard, TDeck>
     where TDeck : IDeck<TCard>
     where TCard : IPokerCard
 {

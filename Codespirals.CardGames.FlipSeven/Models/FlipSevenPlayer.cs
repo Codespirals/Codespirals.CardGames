@@ -3,16 +3,10 @@
 namespace Codespirals.CardGames.FlipSeven;
 
 /// <inheritdoc />
-public class FlipSevenPlayer : IFlipSevenPlayer<FlipSevenDeck, FlipSevenCard>
+public class FlipSevenPlayer : Player<FlipSevenCard>, IFlipSevenPlayer<FlipSevenCard>
 {
-    private readonly FlipSevenGame _game;
     private readonly List<FlipSevenCard> _hand = [];
 
-    internal int Id => _game.Players.IndexOf(this);
-    /// <inheritdoc />
-    public string Name { get; set; }
-    /// <inheritdoc />
-    public ReadOnlyCollection<FlipSevenCard> Hand => _hand.OrderBy(c => c.CardType).ThenBy(c => c.Value).ToList().AsReadOnly();
     /// <inheritdoc />
     public int NumberCardsInHand => _hand.Count(c => c.CardType == CardType.Number);
     /// <inheritdoc />
@@ -25,39 +19,9 @@ public class FlipSevenPlayer : IFlipSevenPlayer<FlipSevenDeck, FlipSevenCard>
     public bool IsOutForRound => State != PlayerStates.Playing;
     /// <inheritdoc />
     public PlayerStates State { get; private set; }
-    private FlipSevenPlayer(FlipSevenGame game, string name)
-    {
-        _game = game;
-        Name = name;
-    }
-    private FlipSevenPlayer(FlipSevenGame game, int number) : this(game, $"Player {number}")
+    internal FlipSevenPlayer(string name) : base(name)
     {
 
-    }
-    /// <inheritdoc />
-    public static FlipSevenPlayer GeneratePlayer(FlipSevenGame game, string name)
-        => new FlipSevenPlayer(game, name);
-    /// <inheritdoc />
-    public static FlipSevenPlayer GeneratePlayer(FlipSevenGame game, int number)
-        => new FlipSevenPlayer(game, number);
-
-    /// <inheritdoc />
-    public void AddCardToHand(FlipSevenCard card)
-        => _hand.Add(card);
-
-    /// <inheritdoc />
-    public void Discard(FlipSevenCard card)
-    {
-        _game.Deck.PutOnDiscardPile(card);
-        _hand.Remove(card);
-    }
-
-    /// <inheritdoc />
-    public void DiscardAll()
-    {
-        foreach (var card in _hand)
-            _game.Deck.PutOnDiscardPile(card);
-        _hand.Clear();
     }
 
     /// <inheritdoc />
@@ -92,7 +56,7 @@ public class FlipSevenPlayer : IFlipSevenPlayer<FlipSevenDeck, FlipSevenCard>
         if (IsBusted)
             return 0;
 
-        var points = NumberCardsInHand == _game.NumbersToFlip ? _game.FlipNumberBonus : 0;
+        var points = 0;
         foreach (var card in _hand.OrderBy(c => c.CardType))
         {
             switch (card.CardType)

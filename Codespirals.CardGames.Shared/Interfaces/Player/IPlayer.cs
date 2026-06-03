@@ -29,12 +29,13 @@ public interface IPlayer<TCard> : IPlayer
     /// <param name="card"></param>
     void AddCardToHand(TCard card);
     /// <summary>
-    /// Remove a card from the <see cref="Hand"/>
+    /// Remove a card from the <see cref="IPlayer{TCard}.Hand"/> and return it
     /// </summary>
     /// <param name="card"></param>
-    void Discard(TCard card);
+    TCard? Discard(TCard card);
     /// <summary>
-    /// Empty the <see cref="Hand"/>
+    /// Empty the <see cref="IPlayer{TCard}.Hand"/> and return all discarded cards
     /// </summary>
-    void DiscardAll();
+    /// <returns>The discarded cards</returns>
+    IEnumerable<TCard> DiscardAll();
 }

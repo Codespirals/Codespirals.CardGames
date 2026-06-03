@@ -60,7 +60,7 @@ public abstract class Deck<TCard> : IDeck<TCard>
     /// <inheritdoc/>
     public void PutOnDiscardPile(TCard card) => _discardPile.Add(card);
     /// <inheritdoc/>
-    public void PutOnDiscardPile(TCard[] cards) => _discardPile.AddRange(cards);
+    public void PutOnDiscardPile(IEnumerable<TCard> cards) => _discardPile.AddRange(cards);
     /// <inheritdoc/>
     public void ReturnDiscardPileToCardPool()
     {

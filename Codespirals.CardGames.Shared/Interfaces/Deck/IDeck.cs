@@ -60,7 +60,7 @@ public interface IDeck<TCard>
     /// Put multiple <typeparamref name="TCard"/>s on the <see cref="DiscardPile"/>
     /// </summary>
     /// <param name="cards"></param>
-    void PutOnDiscardPile(TCard[] cards);
+    void PutOnDiscardPile(IEnumerable<TCard> cards);
     /// <summary>
     /// Shuffle the <see cref="DiscardPile"/> back into the <see cref="CardPool"/>
     /// </summary>

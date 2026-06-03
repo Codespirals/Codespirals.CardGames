@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Codespirals.CardGames.Poker.BlackJack;
 
 /// <inheritdoc/>
-public interface IBlackJackPlayer<TCard> : IPlayer<TCard>, ICanPlayRounds, ICanBet, ICanBust, IHasPoints
+public interface IBlackJackPlayer<TCard, TDeck> : IPlayer<TCard>, ICanPlayRounds, ICanBet, ICanBust, IHasPoints
     where TCard : IPokerCard
 {
     /// <summary>
