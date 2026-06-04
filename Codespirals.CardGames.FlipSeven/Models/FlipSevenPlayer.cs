@@ -14,11 +14,11 @@ public class FlipSevenPlayer : Player<FlipSevenCard>, IFlipSevenPlayer<FlipSeven
     /// <inheritdoc />
     public int TotalPoints { get; private set; } = 0;
     /// <inheritdoc />
-    public bool IsBusted => State == PlayerStates.Busted;
+    public bool IsBusted => State == PlayerState.Busted;
     /// <inheritdoc />
-    public bool IsOutForRound => State != PlayerStates.Playing;
+    public bool IsOutForRound => State != PlayerState.Playing;
     /// <inheritdoc />
-    public PlayerStates State { get; private set; }
+    public PlayerState State { get; private set; }
     internal FlipSevenPlayer(string name) : base(name)
     {
 
@@ -26,25 +26,25 @@ public class FlipSevenPlayer : Player<FlipSevenCard>, IFlipSevenPlayer<FlipSeven
 
     /// <inheritdoc />
     public void Bank()
-        => State = PlayerStates.Banked;
+        => State = PlayerState.Banked;
 
     /// <inheritdoc />
     public void Freeze()
-        => State = PlayerStates.Frozen;
+        => State = PlayerState.Frozen;
 
     /// <inheritdoc />
     public void Bust()
-        => DeactivateForRound();
+        => State = PlayerState.Busted;
 
     /// <inheritdoc />
     public void DeactivateForRound()
-        => State = PlayerStates.Busted;
+        => State = PlayerState.Busted;
 
     /// <inheritdoc />
     public void Reactivate()
     {
         DiscardAll();
-        State = PlayerStates.Playing;
+        State = PlayerState.Playing;
     }
 
     /// <inheritdoc />

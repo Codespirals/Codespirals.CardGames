@@ -45,17 +45,18 @@ internal class BlackjackInConsole
         Console.WriteLine($"Round {_game.CurrentRound} is over! Calculating winnings!");
 
         ConsoleHelper.SetColorForPlayer(_game.Players.IndexOf(_game.Dealer));
-        Console.WriteLine($"The dealer had {string.Join('|', _game.Dealer.Hand.Select(c => c.Name))} ({_game.Dealer.HandValue})");
+        Console.WriteLine($"The dealer had {string.Join('|', _game.Dealer.Hand.Select(c => c.Name))} ({_game.CalculateHandValue(_game.Dealer)})");
 
         foreach (var item in _game.CalculateCurrentPotentialPointGain())
         {
+            var handValue = _game.CalculateHandValue(item.Player);
             ConsoleHelper.SetColorForPlayer(_game.Players.IndexOf(item.Player));
-            Console.WriteLine($"{item.Player.Name} had {string.Join('|', item.Player.Hand.Select(c => c.Name))} ({item.Player.HandValue})");
+            Console.WriteLine($"{item.Player.Name} had {string.Join('|', item.Player.Hand.Select(c => c.Name))} ({handValue})");
             if (item.Winnings < 1)
                 Console.WriteLine($"{item.Player.Name} lost...");
             else if (item.Winnings == _game.BuyIn)
                 Console.WriteLine($"{item.Player.Name} drew with the dealer! +{item.Winnings}");
-            else if (item.Player.HandValue == _game.BlackJackScore && item.Player.Hand.Count == 2)
+            else if (handValue == _game.BlackJackScore && item.Player.Hand.Count == 2)
                 Console.WriteLine($"{item.Player.Name} got a blackjack! +{item.Winnings}");
             else
                 Console.WriteLine($"{item.Player.Name} won! +{item.Winnings}");
@@ -81,9 +82,10 @@ internal class BlackjackInConsole
         ConsoleHelper.SetColorForPlayer(_game.Players.IndexOf(player));
         ConsoleHelper.SeperatorLine();
         Console.WriteLine($"It's {player.Name}'s turn!");
-        Console.WriteLine($"They have {string.Join("|", player.Hand.Select(c => c.Name))} ({player.HandValue})");
+        var handValue = _game.CalculateHandValue(player);
+        Console.WriteLine($"They have {string.Join("|", player.Hand.Select(c => c.Name))} ({handValue})");
         Console.WriteLine(_game.Prompt);
-        if (player.HandValue > 17)
+        if (handValue > 17)
             Console.WriteLine($"What will you do? {nameof(Hit)} or {nameof(Stand)}?");
         else
             Console.WriteLine($"What will you do? {nameof(Hit)}, {nameof(DoubleDown)} or {nameof(Stand)}?");
@@ -107,7 +109,7 @@ internal class BlackjackInConsole
         ConsoleHelper.SetColorForPlayer(_game.Players.IndexOf(player));
         var drawnCard = _game.Hit();
         Console.WriteLine($"{player.Name} drew a {drawnCard?.Name}!");
-        Console.WriteLine($"{player.Name} currently has {player.HandValue}.");
+        Console.WriteLine($"{player.Name} currently has {_game.CalculateHandValue(player)}.");
     }
     private void DoubleDown(BlackJackPlayer player)
     {
@@ -115,12 +117,12 @@ internal class BlackjackInConsole
         Console.WriteLine($"{player.Name} is doubling down!");
         var drawnCard = _game.DoubleDown();
         Console.WriteLine($"{player.Name} drew a {drawnCard?.Name}!");
-        Console.WriteLine($"{player.Name} currently has {player.HandValue}.");
+        Console.WriteLine($"{player.Name} currently has {_game.CalculateHandValue(player)}.");
     }
     private void Stand(BlackJackPlayer player)
     {
         ConsoleHelper.SetColorForPlayer(_game.Players.IndexOf(player));
-        Console.WriteLine($"{player.Name} is standing on {player.HandValue}.");
+        Console.WriteLine($"{player.Name} is standing on {_game.CalculateHandValue(player)}.");
         _game.Stand();
     }
 

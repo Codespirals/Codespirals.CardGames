@@ -1,14 +1,12 @@
-﻿using System.Collections.ObjectModel;
-
-namespace Codespirals.CardGames.Poker.BlackJack;
+﻿namespace Codespirals.CardGames.Poker.BlackJack;
 
 /// <inheritdoc cref="IBlackJackPlayer{TCard, TDeck}"/>
 public class BlackJackPlayer : Player<PokerCard>, IBlackJackPlayer<PokerCard, PokerDeck>
 {
     internal readonly List<PokerCard> _hand = [];
-    internal bool _isOutForRound;
-    internal int _maxScore = 21;
 
+    /// <inheritdoc/>
+    public PlayerState State { get; private set; }
     /// <summary>
     /// How much cash this player still has to bet with
     /// </summary>
@@ -16,17 +14,14 @@ public class BlackJackPlayer : Player<PokerCard>, IBlackJackPlayer<PokerCard, Po
     /// <inheritdoc/>
     public int CurrentBet { get; private set; }
     /// <inheritdoc/>
-    public bool IsOutForRound => _isOutForRound || IsBusted || TappedOut;
+    public bool IsOutForRound => State != PlayerState.Playing || TappedOut;
     /// <inheritdoc/>
-    public bool IsBusted => HandValue > _maxScore;
+    public bool IsBusted => State == PlayerState.Busted;
     /// <inheritdoc/>
     public bool TappedOut => TotalPoints <= 0 && CurrentBet <= 0;
-    /// <inheritdoc/>
-    public int HandValue => CalculateHandValue();
 
-    internal BlackJackPlayer(string name, int startingCash, int maxScore = 21) : base(name)
+    internal BlackJackPlayer(string name, int startingCash) : base(name)
     {
-        _maxScore = maxScore;
         TotalPoints = startingCash;
     }
 
@@ -39,14 +34,18 @@ public class BlackJackPlayer : Player<PokerCard>, IBlackJackPlayer<PokerCard, Po
 
     /// <inheritdoc/>
     public void Stand()
-        => DeactivateForRound();
+        => State = PlayerState.Standing;
 
     /// <inheritdoc/>
     public void Bust()
     {
         CurrentBet = 0;
-        _isOutForRound = true;
+        State = PlayerState.Busted;
     }
+
+    /// <inheritdoc/>
+    public void DeactivateForRound()
+        => Stand();
 
     /// <inheritdoc/>
     public void AddPoints(int points = 0)
@@ -56,33 +55,13 @@ public class BlackJackPlayer : Player<PokerCard>, IBlackJackPlayer<PokerCard, Po
     }
 
     /// <inheritdoc/>
-    public void DeactivateForRound()
-        => _isOutForRound = true;
-    
-    /// <inheritdoc/>
     public void Reactivate()
     {
-        _hand.Clear();
         CurrentBet = 0;
-        _isOutForRound = false;
-    }
-
-    private int CalculateHandValue()
-    {
-        var value = _hand.Sum(c => c.Value);
-        foreach (var ace in _hand.Where(c => c.Value == 11))
-        {
-            if (value <= _maxScore)
-                break;
-            value -= 10;
-        }
-        if (value > _maxScore)
-        {
-            Bust();
-        }
-        return value;
+        State = PlayerState.Playing;
     }
 
     /// <inheritdoc/>
-    public override string ToString() => $"{Name} | Cash: {TotalPoints} | Bet: {CurrentBet}";
+    public override string ToString() 
+        => $"{Name} | Cash: {TotalPoints} | Bet: {CurrentBet}";
 }

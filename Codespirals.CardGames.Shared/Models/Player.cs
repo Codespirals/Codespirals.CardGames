@@ -42,13 +42,9 @@ public abstract class Player<TCard> : IPlayer<TCard>
     /// <inheritdoc/>
     public IEnumerable<TCard> DiscardAll()
     {
-        foreach (var card in _hand)
-        {
-            var discardedCard = Discard(card);
-            if (discardedCard is null)
-                continue;
-            yield return discardedCard;
-        }
+        List<TCard> cards = _hand;
+        _hand.Clear();
+        return cards;
     }
 
     /// <inheritdoc/>

@@ -1,5 +1,5 @@
 ﻿namespace Codespirals.CardGames.FlipSeven;
-public enum PlayerStates
+public enum PlayerState
 {
     Playing,
     Banked,

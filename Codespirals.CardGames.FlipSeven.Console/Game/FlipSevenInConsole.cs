@@ -31,7 +31,7 @@ public class FlipSevenInConsole
         _game.StartRound();
         while (_game.RoundActive)
         {
-            var currentPlayer = _game.GetCurrentPlayer();
+            var currentPlayer = _game.CurrentPlayer;
             PlayerTurn(currentPlayer);
             _game.MoveToNextPlayer();
         }
@@ -76,7 +76,7 @@ public class FlipSevenInConsole
         ConsoleHelper.SetColorForPlayer(_game.Players.IndexOf(player));
         var drawnCard = _game.Flip();
         Console.WriteLine($"{player.Name} flipped a {drawnCard.Name}!");
-        if (player.State == PlayerStates.Busted)
+        if (player.State == PlayerState.Busted)
         {
             Console.ForegroundColor = ConsoleColor.DarkRed;
             Console.WriteLine($"Oh no... busted");
@@ -90,7 +90,7 @@ public class FlipSevenInConsole
         {
             Console.WriteLine($"{player.Name} flipped a {card.Name}!");
         }
-        if (player.State == PlayerStates.Busted)
+        if (player.State == PlayerState.Busted)
         {
             Console.ForegroundColor = ConsoleColor.DarkRed;
             Console.WriteLine($"Oh no... busted");

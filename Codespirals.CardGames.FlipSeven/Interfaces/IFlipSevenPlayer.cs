@@ -15,7 +15,7 @@ public interface IFlipSevenPlayer<TCard> : IPlayer<TCard>, ICanPlayRounds, IHasP
     /// <summary>
     /// The player state
     /// </summary>
-    PlayerStates State { get; }
+    PlayerState State { get; }
     /// <summary>
     /// The player adds their current <see cref="HandPoints"/> to their <see cref="IHasPoints.TotalPoints"/> and is out for the round
     /// </summary>

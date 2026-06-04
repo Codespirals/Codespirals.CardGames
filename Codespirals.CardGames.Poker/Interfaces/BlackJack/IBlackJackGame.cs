@@ -57,6 +57,10 @@ public interface IBlackJackGame<TSelf, TPlayer, TDeck, TCard> : ICardGame<TSelf,
     /// </summary>
     void Stand();
     /// <summary>
+    /// The value of the player's hand
+    /// </summary>
+    public int CalculateHandValue(TPlayer player);
+    /// <summary>
     /// Make the dealer play his round.
     /// </summary>
     /// <remarks>The dealer counts cards. The house has an advantage.</remarks>
