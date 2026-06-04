@@ -6,13 +6,15 @@ Sometimes I'm playing a card game and I think "These mechanics are interesting..
 
 This repository is the result of those thoughts. Well... those thoughts and procrastination. I should be working on my real projects. 😢
 
-Anyhow, the "Games" folder contains built .exe of the games I've made, but of course you shouldn't download exe files from strangers on the internet.
-
-Feel free to comb through the code and compile it yourself! 
-
 (If you find possible improvements feel free to notify me)
 
 ## Games
+
+### BlackJack
+
+#### Description
+
+Play against a dealer and try to get as close to, but not over, 21 as possible.
 
 ### Flip 7
 
@@ -22,7 +24,7 @@ Feel free to comb through the code and compile it yourself!
 
 Slowly build your score or risk it all for a few points more?
 
-Hit me.
+Who will be first to 200 total points?
 
 #### Implementations
 
