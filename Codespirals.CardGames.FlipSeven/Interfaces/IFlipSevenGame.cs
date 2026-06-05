@@ -43,7 +43,7 @@ public interface IFlipSevenGame<TSelf, TPlayer, TDeck, TCard> : ICardGame<TSelf,
     /// <summary>
     /// Active action cards get added to this queue to be used
     /// </summary>
-    ReadOnlyCollection<(FlipSevenPlayer Player, FlipSevenCard ActionCard)> ActionCardQueue { get; } 
+    ReadOnlyCollection<(TPlayer Player, TCard ActionCard)> ActionCardQueue { get; } 
     /// <summary>
     /// Remove the current player from the round and bank the points
     /// </summary>
@@ -80,7 +80,7 @@ public interface IFlipSevenGame<TSelf, TPlayer, TDeck, TCard> : ICardGame<TSelf,
     /// </summary>
     /// <param name="target"></param>
     /// <param name="secondChance"></param>
-    void GiveSecondChance(FlipSevenPlayer target, FlipSevenCard secondChance);
+    void GiveSecondChance(TPlayer target, TCard secondChance);
     /// <summary>
     /// Flip multiple cards for a the player.
     /// </summary>
@@ -94,6 +94,12 @@ public interface IFlipSevenGame<TSelf, TPlayer, TDeck, TCard> : ICardGame<TSelf,
     /// <param name="player"></param>
     /// <returns></returns>
     void Freeze(TPlayer player);
+    /// <summary>
+    /// Get the value of the cards in a player's hand
+    /// </summary>
+    /// <param name="player"></param>
+    /// <returns></returns>
+    int CalculateHandValueForPlayer(TPlayer player);
     /// <summary>
     /// Get the winner of the round. Returns <see langword="null"/> if no winner has been decided yet
     /// </summary>

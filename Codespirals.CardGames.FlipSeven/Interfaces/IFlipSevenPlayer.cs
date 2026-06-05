@@ -5,10 +5,6 @@ public interface IFlipSevenPlayer<TCard> : IPlayer<TCard>, ICanPlayRounds, IHasP
     where TCard : IFlipSevenCard
 {
     /// <summary>
-    /// How many points this user has in their hands at this moment
-    /// </summary>
-    int HandPoints { get; }
-    /// <summary>
     /// How many <see cref="CardType.Number"/> <typeparamref name="TCard"/>s this user currently has
     /// </summary>
     int NumberCardsInHand { get; }

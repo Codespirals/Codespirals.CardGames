@@ -10,8 +10,6 @@ public class FlipSevenPlayer : Player<FlipSevenCard>, IFlipSevenPlayer<FlipSeven
     /// <inheritdoc />
     public int NumberCardsInHand => _hand.Count(c => c.CardType == CardType.Number);
     /// <inheritdoc />
-    public int HandPoints => CalculateHandValue();
-    /// <inheritdoc />
     public int TotalPoints { get; private set; } = 0;
     /// <inheritdoc />
     public bool IsBusted => State == PlayerState.Busted;
@@ -51,32 +49,7 @@ public class FlipSevenPlayer : Player<FlipSevenCard>, IFlipSevenPlayer<FlipSeven
     public void AddPoints(int points)
         => TotalPoints += points;
 
-    private int CalculateHandValue()
-    {
-        if (IsBusted)
-            return 0;
-
-        var points = 0;
-        foreach (var card in _hand.OrderBy(c => c.CardType))
-        {
-            switch (card.CardType)
-            {
-                case CardType.Number:
-                    points += card.Value;
-                    break;
-                case CardType.Multiplier:
-                    points *= 2;
-                    break;
-                case CardType.BonusAdd:
-                    points += card.Value;
-                    break;
-                default:
-                    break;
-            }
-        }
-        return points;
-    }
     /// <inheritdoc />
     public override string ToString()
-        => $"{Name} {(Hand.Count != 0 ? "Hand: " : "")}{string.Join('|', Hand)} | Current Points: {HandPoints} | Banked: {TotalPoints}";
+        => $"{Name} {(Hand.Count != 0 ? "Hand: " : "")}{string.Join('|', Hand)} | Banked: {TotalPoints}";
 }

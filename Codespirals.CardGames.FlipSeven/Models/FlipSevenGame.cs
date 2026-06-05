@@ -93,7 +93,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     {
         if (_currentPlayer.IsOutForRound)
             return;
-        Log($"{_currentPlayer.Name} is banking their {_currentPlayer.HandPoints} points.", GetPlayerId(_currentPlayer));
+        Log($"{_currentPlayer.Name} is banking their {CalculateHandValueForPlayer(_currentPlayer)} points.", GetPlayerId(_currentPlayer));
         _currentPlayer.Bank();
         MoveToNextPlayer();
         return;
@@ -176,21 +176,12 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     {
         if (target.IsOutForRound)
             return;
-        Log($"{target.Name} got frozen on {target.HandPoints}.", GetPlayerId(target));
+        Log($"{target.Name} got frozen on {CalculateHandValueForPlayer(target)}.", GetPlayerId(target));
         target.Freeze();
     }
     #endregion
 
-    /// <inheritdoc />
-    public IEnumerable<FlipSevenPlayer>? GetValidTargets(FlipSevenCard? card)
-    {
-        if (card is null || !card.IsActionCard)
-            return null;
-        if (!PlayersCanHaveMultipleSecondChances && card.CardType is CardType.SecondChance)
-            return _players.Where(p => !p.IsOutForRound && !p.Hand.Any(c => c.CardType == CardType.SecondChance));
-        return _players.Where(p => !p.IsOutForRound);
-    }
-
+    #region auto methods
     /// <inheritdoc />
     public void MoveToNextPlayer()
     {
@@ -237,36 +228,17 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     }
 
     /// <inheritdoc />
-    public IEnumerable<(FlipSevenPlayer Player, int Winnings)> CalculateCurrentPotentialPointGain()
-    {
-        (FlipSevenPlayer Player, int WinningMultiplier)[] results = [];
-        foreach (var player in Players)
-        {
-            var winnings = -1;
-            if (player.State == PlayerState.Busted)
-                winnings = 0;
-            else if (player.NumberCardsInHand == NumbersToFlip)
-                winnings = player.HandPoints + FlipNumberBonus;
-            else
-                winnings = player.HandPoints;
-
-            results = results.Append((player, winnings)).ToArray();
-        }
-        return results;
-    }
-
-    /// <inheritdoc />
     public void PayOut()
     {
         if (Players.Any(p => !p.IsOutForRound))
             return;
 
         Log(new string('=', 20));
+        Prompt = $"Start the next round!";
 
-        if (Players.All(p => p.HandPoints == 0))
+        if (Players.All(p => CalculateHandValueForPlayer(p) == 0))
         {
             Log($"Nobody gained any points this round...");
-            Prompt = $"Start the next round!";
             return;
         }
 
@@ -285,7 +257,6 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
                 Log($"{item.Player.Name} banked {item.Winnings}.", GetPlayerId(item.Player));
             Log($"{item.Player.Name} has {item.Player.TotalPoints} in total.", GetPlayerId(item.Player));
         }
-        Prompt = $"Start the next round!";
     }
     /// <inheritdoc />
     public FlipSevenPlayer? GetWinner()
@@ -301,10 +272,68 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         Log(Prompt, GetPlayerId(winner));
         return winner;
     }
+    #endregion
+
+    #region unlogged methods
+    /// <inheritdoc />
+    public int CalculateHandValueForPlayer(FlipSevenPlayer player)
+    {
+        if (player.IsBusted)
+            return 0;
+
+        var points = 0;
+        foreach (var card in player.Hand.OrderBy(c => c.CardType))
+        {
+            switch (card.CardType)
+            {
+                case CardType.Number:
+                    points += card.Value;
+                    break;
+                case CardType.Multiplier:
+                    points *= 2;
+                    break;
+                case CardType.BonusAdd:
+                    points += card.Value;
+                    break;
+                default:
+                    break;
+            }
+        }
+        return points;
+    }
+    /// <inheritdoc />
+    public IEnumerable<FlipSevenPlayer>? GetValidTargets(FlipSevenCard? card)
+    {
+        if (card is null || !card.IsActionCard)
+            return null;
+        if (!PlayersCanHaveMultipleSecondChances && card.CardType is CardType.SecondChance)
+            return _players.Where(p => !p.IsOutForRound && !p.Hand.Any(c => c.CardType == CardType.SecondChance));
+        return _players.Where(p => !p.IsOutForRound);
+    }
+    /// <inheritdoc />
+    public IEnumerable<(FlipSevenPlayer Player, int Winnings)> CalculateCurrentPotentialPointGain()
+    {
+        (FlipSevenPlayer Player, int WinningMultiplier)[] results = [];
+        foreach (var player in Players)
+        {
+            var winnings = -1;
+            if (player.State == PlayerState.Busted)
+                winnings = 0;
+            else if (player.NumberCardsInHand == NumbersToFlip)
+                winnings = CalculateHandValueForPlayer(player) + FlipNumberBonus;
+            else
+                winnings = CalculateHandValueForPlayer(player);
+
+            results = results.Append((player, winnings)).ToArray();
+        }
+        return results;
+    }
 
     /// <inheritdoc/>
     public void Log(string text, int? actorId = null)
         => _logEntries.Add(new LogEntry(text, CurrentRound, actorId ?? -1));
+    #endregion
+
 
     private int GetPlayerId(FlipSevenPlayer? player)
         => player is not null ? Players.IndexOf(player) : -1;
@@ -329,7 +358,6 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
                 Deck.PutOnDiscardPile(drawnCard);
                 return drawnCard;
             }
-            Prompt = $"{player.Name} Choose a player to give the card to!";
             _actionCardQueue.Add((player, drawnCard));
             return drawnCard;
         }
@@ -369,8 +397,14 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
             playerInActionQueue = ActionCardQueue.Any() ? ActionCardQueue.First().Player : null;
         }
         if (playerInActionQueue is null)
+        {
+            Prompt = $"{_currentPlayer.Name}: Choose an action!";
             return _currentPlayer;
+        }
         else
+        {
+            Prompt = $"{playerInActionQueue.Name} Choose a player to give the card to!";
             return playerInActionQueue;
+        }
     }
 }
