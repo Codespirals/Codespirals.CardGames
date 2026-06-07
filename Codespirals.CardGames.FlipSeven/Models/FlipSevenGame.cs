@@ -43,18 +43,21 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     {
         // add deck
         Deck = deck ?? FlipSevenDeckBuilder.CreateStandardDeck();
+
+        // set... settings
+        var highestCardValue = Deck.HighestNumberCard;
+        WinningScore = Math.Clamp(winningScore, highestCardValue, short.MaxValue);
+        NumbersToFlip = Math.Clamp(numbersToFlip, 2, highestCardValue);
+        FlipNumberBonus = Math.Clamp(flipNumberBonus, 0, WinningScore);
+
         // add players
-        var maxPlayers = (int)Math.Floor(Deck.StartingCards.Count(c => c.CardType is CardType.Number) / (decimal)numbersToFlip);
+        var maxPlayers = (int)Math.Floor(Deck.TotalNumberCards / (decimal)NumbersToFlip);
         for (var i = 0; i < Math.Clamp(players, 2, maxPlayers); i++)
         {
             _players.Add(FlipSevenPlayerGenerator.GeneratePlayer(i+1));
         }
         _currentPlayer = _players.First();
-        // set... settings
-        var highestCardValue = Deck.StartingCards.Where(c => c.CardType is CardType.Number).Max(c => c.Value);
-        WinningScore = Math.Clamp(winningScore, highestCardValue, short.MaxValue);
-        NumbersToFlip = Math.Clamp(numbersToFlip, 2, highestCardValue);
-        FlipNumberBonus = Math.Clamp(flipNumberBonus, 0, winningScore);
+
         // finish
         Deck.Shuffle();
         CurrentRound = 0;
@@ -187,12 +190,6 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     {
         if (_players.All(p => p.IsOutForRound) || GameOver)
         {
-            EndRound();
-            return;
-        }
-        if (_currentPlayer.NumberCardsInHand == NumbersToFlip && !_currentPlayer.IsOutForRound)
-        {
-            Log($"Wow, {_currentPlayer.Name} managed to get {NumbersToFlip} Number cards!", GetPlayerId(_currentPlayer));
             EndRound();
             return;
         }
@@ -347,14 +344,16 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         if (drawnCard is null)
             return null;
 
-        Log($"{player.Name} flipped a {drawnCard.Name}.", GetPlayerId(player));
+        var id = GetPlayerId(player);
+
+        Log($"{player.Name} flipped a {drawnCard.Name}.", id);
         // action cards need to be played immediately 
         if (drawnCard.IsActionCard)
         {
             var targets = GetValidTargets(drawnCard);
             if (targets is null || !targets.Any())
             {
-                Log($"There are no valid players to give a {drawnCard.Name} to, so it has to be discarded.", GetPlayerId(player));
+                Log($"There are no valid players to give a {drawnCard.Name} to, so it has to be discarded.", id);
                 Deck.PutOnDiscardPile(drawnCard);
                 return drawnCard;
             }
@@ -365,11 +364,11 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         // is number and player already has number
         if (drawnCard.CardType == CardType.Number && player.Hand.Any(c => c.CardType == CardType.Number && c.Value == drawnCard.Value))
         {
-            Log($"Oh no, {player.Name} already has a {drawnCard.Name}!", GetPlayerId(player));
+            Log($"Oh no, {player.Name} already has a {drawnCard.Name}!", id);
             var hasSecondChance = player.Hand.FirstOrDefault(c => c.CardType == CardType.SecondChance);
             if (hasSecondChance is not null)
             {
-                Log($"Phew, {player.Name} had a {hasSecondChance.Name} to save them!", GetPlayerId(player));
+                Log($"Phew, {player.Name} had a {hasSecondChance.Name} to save them!", id);
                 var successfullDiscard = player.Discard(hasSecondChance);
                 if (successfullDiscard is null)
                     return null;
@@ -379,12 +378,18 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
             }
             else
             {
-                Log($"{player.Name} got busted...", GetPlayerId(player));
+                Log($"{player.Name} got busted...", id);
                 player.Bust();
             }
         }
 
         player.AddCardToHand(drawnCard);
+
+        if (!player.IsOutForRound && player.NumberCardsInHand == NumbersToFlip)
+        {
+            Log($"Wow, {player.Name} managed to flip {NumbersToFlip}!", id);
+            EndRound();
+        }
         return drawnCard;
     }
 
