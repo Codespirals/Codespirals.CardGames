@@ -5,6 +5,7 @@ namespace Codespirals.CardGames.Poker.BlackJack;
 /// <inheritdoc cref="IBlackJackGame{TSelf, TPlayer, TDeck, TCard}"/>
 public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, PokerDeck, PokerCard>
 {
+    private BlackJackPlayer _dealer;
     private readonly List<BlackJackPlayer> _players = [];
     private bool _dealerCanCountCards;
     private List<LogEntry> _logEntries = [];
@@ -18,7 +19,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
     /// <inheritdoc/>
     public int CurrentRound { get; private set; }
     /// <inheritdoc/>
-    public BlackJackPlayer Dealer { get; }
+    public BlackJackPlayer Dealer => _dealer;
     /// <inheritdoc/>
     public int BlackJackScore { get; }
     /// <inheritdoc/>
@@ -45,7 +46,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
         BlackJackScore = winningScore;
         DrawAtStartOfRound = drawAtStartOfRound;
 
-        Dealer = PokerPlayerGenerator.GenerateBlackJackDealer();
+        _dealer = PokerPlayerGenerator.GenerateBlackJackDealer();
         _dealerCanCountCards = dealerCanCountCards;
         _players.Add(Dealer);
         CurrentPlayer = Dealer;
@@ -108,7 +109,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
         Log($"{CurrentPlayer.Name} drew a {card.Name}.", GetPlayerId(CurrentPlayer));
 
         if (CalculateHandValue(CurrentPlayer) > BlackJackScore)
-            CurrentPlayer.Bust();
+            Bust();
 
         MoveToNextPlayer();
         return card;
@@ -123,10 +124,15 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
 
         CurrentPlayer.Bet(Math.Clamp(CurrentPlayer.CurrentBet, 0, CurrentPlayer.TotalPoints));
         CurrentPlayer.AddCardToHand(card);
-        CurrentPlayer.Stand();
 
         Log($"{CurrentPlayer.Name} doubled down! Their bet is now {CurrentPlayer.CurrentBet}.", GetPlayerId(CurrentPlayer));
         Log($"{CurrentPlayer.Name} drew a {card.Name}.", GetPlayerId(CurrentPlayer));
+
+        if (CalculateHandValue(CurrentPlayer) > BlackJackScore)
+            Bust();
+        else
+            Stand();
+
         MoveToNextPlayer();
         return card;
     }
@@ -137,6 +143,13 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
         CurrentPlayer.Stand();
         Log($"{CurrentPlayer.Name} is standing on {CalculateHandValue(CurrentPlayer)}.", GetPlayerId(CurrentPlayer));
         MoveToNextPlayer();
+    }
+
+    /// <inheritdoc/>
+    public void Bust()
+    {
+        CurrentPlayer.Bust();
+        Log($"Oof... {CurrentPlayer.Name} got busted.", GetPlayerId(CurrentPlayer));
     }
     #endregion
 
@@ -168,13 +181,14 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
     }
 
     /// <inheritdoc/>
-    public bool? PlayDealer()
+    public IEnumerable<PokerCard>? PlayDealer()
     {
         if (Dealer.IsOutForRound)
             return null;
 
         var id = GetPlayerId(Dealer);
         Log($"It's the dealer's turn.", id);
+        // count cards if allowed to
         var averageValueOfCardPool = _dealerCanCountCards ? Deck.CardPool.Average(c => c.Value) : 7.3;
         if (CalculateHandValue(Dealer) <= BlackJackScore - Math.Ceiling(averageValueOfCardPool / 2))
         {
@@ -183,13 +197,15 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
                 return null;
             Dealer.AddCardToHand(newCard);
             Log($"The dealer drew a card.", id);
-            return true;
+            if (CalculateHandValue(Dealer) > BlackJackScore)
+                Dealer.Bust();
+            return [newCard];
         }
         else
         {
             Dealer.Stand();
             Log($"The dealer is standing on their cards.", id);
-            return false;
+            return [];
         }
     }
 
@@ -256,10 +272,12 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
         if (Players.Any(p => !p.IsOutForRound))
             return;
 
-        Log(new string('=', 20));
+        Log(new string('=', 25));
 
         Log($"Paying out to all players:");
         Log($"The dealer ended the round with {CalculateHandValue(Dealer)}", GetPlayerId(Dealer));
+        if (Dealer.IsBusted)
+            Log($"The dealer got busted!", GetPlayerId(Dealer));
         foreach (var item in CalculateCurrentPotentialPointGain())
         {
             var id = GetPlayerId(item.Player);

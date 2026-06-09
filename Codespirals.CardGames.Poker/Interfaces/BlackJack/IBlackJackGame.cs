@@ -50,12 +50,17 @@ public interface IBlackJackGame<TSelf, TPlayer, TDeck, TCard> : ICardGame<TSelf,
     /// <summary>
     /// The current player doubles down on their bet
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The drawn card</returns>
     TCard? DoubleDown();
     /// <summary>
     /// The current player sticks to their current hand
     /// </summary>
+    /// <returns>The drawn card</returns>
     void Stand();
+    /// <summary>
+    /// The current player busts
+    /// </summary>
+    void Bust();
     /// <summary>
     /// The value of the player's hand
     /// </summary>
@@ -64,6 +69,6 @@ public interface IBlackJackGame<TSelf, TPlayer, TDeck, TCard> : ICardGame<TSelf,
     /// Make the dealer play his round.
     /// </summary>
     /// <remarks>The dealer counts cards. The house has an advantage.</remarks>
-    /// <returns>If the dealer drew a card or null if it's the dealer is already out.</returns>
-    public bool? PlayDealer();
+    /// <returns>The cards, if the dealer drew a card, an empty list if the dealer stands or null if the dealer is already out.</returns>
+    public IEnumerable<TCard>? PlayDealer();
 }
