@@ -86,7 +86,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         }
         var nextPlayerIndex = (CurrentRound - 1) % _players.Count;
         _currentPlayer = _players[nextPlayerIndex];
-        Log($"It's {_currentPlayer.Name}'s turn.", GetPlayerId(_currentPlayer));
+        Log($"It's {_currentPlayer.Name}'s turn.", GetPlayerIndex(_currentPlayer));
         Prompt = $"{_currentPlayer.Name}: Choose an action!";
     }
 
@@ -96,7 +96,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     {
         if (_currentPlayer.IsOutForRound)
             return;
-        Log($"{_currentPlayer.Name} is banking their {CalculateHandValueForPlayer(_currentPlayer)} points.", GetPlayerId(_currentPlayer));
+        Log($"{_currentPlayer.Name} is banking their {CalculateHandValueForPlayer(_currentPlayer)} points.", GetPlayerIndex(_currentPlayer));
         _currentPlayer.Bank();
         MoveToNextPlayer();
         return;
@@ -116,9 +116,9 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
             return null;
 
         if (_currentPlayer == target)
-            Log($"{_currentPlayer.Name} is taking the {card.Name} themselves!", GetPlayerId(_currentPlayer));
+            Log($"{_currentPlayer.Name} is taking the {card.Name} themselves!", GetPlayerIndex(_currentPlayer));
         else
-            Log($"{_currentPlayer.Name} is giving the {card.Name} to {target.Name}!", GetPlayerId(_currentPlayer));
+            Log($"{_currentPlayer.Name} is giving the {card.Name} to {target.Name}!", GetPlayerIndex(_currentPlayer));
 
         IEnumerable<FlipSevenCard>? result = null;
         switch (card.CardType)
@@ -154,17 +154,17 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     {
         if (target.Hand.Any(c => c.CardType == CardType.SecondChance) && !PlayersCanHaveMultipleSecondChances)
         {
-            Log($"{target.Name} already has a {secondChance.Name}! It's not called \"third chance\"...", GetPlayerId(_currentPlayer));
+            Log($"{target.Name} already has a {secondChance.Name}! It's not called \"third chance\"...", GetPlayerIndex(_currentPlayer));
             Prompt = $"{_currentPlayer.Name} choose another player.";
             return;
         }
-        Log($"The {secondChance.Name} was given to {target.Name}.", GetPlayerId(target));
+        Log($"The {secondChance.Name} was given to {target.Name}.", GetPlayerIndex(target));
         target.AddCardToHand(secondChance);
     }
     /// <inheritdoc />
     public IEnumerable<FlipSevenCard> ForceFlip(FlipSevenPlayer target, int number)
     {
-        Log($"{target.Name} has to flip {number}!", GetPlayerId(target));
+        Log($"{target.Name} has to flip {number}!", GetPlayerIndex(target));
         List<FlipSevenCard> result = [];
         for (int i = 0; i < number; i++)
         {
@@ -179,7 +179,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     {
         if (target.IsOutForRound)
             return;
-        Log($"{target.Name} got frozen on {CalculateHandValueForPlayer(target)}.", GetPlayerId(target));
+        Log($"{target.Name} got frozen on {CalculateHandValueForPlayer(target)}.", GetPlayerIndex(target));
         target.Freeze();
     }
     #endregion
@@ -208,7 +208,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
             return;
         }
 
-        Log($"It's {_currentPlayer.Name}'s turn.", GetPlayerId(_currentPlayer));
+        Log($"It's {_currentPlayer.Name}'s turn.", GetPlayerIndex(_currentPlayer));
         Prompt = $"{_currentPlayer.Name}: Choose an action!";
     }
 
@@ -245,14 +245,14 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
             item.Player.AddPoints(item.Winnings);
             // technically it's not currently possible to lose points, but hey, if you want to add negative "add" cards, that's possible
             if (item.Winnings < 0)
-                Log($"{item.Player.Name} LOST {Math.Abs(item.Winnings)} points... Ouch.", GetPlayerId(item.Player));
+                Log($"{item.Player.Name} LOST {Math.Abs(item.Winnings)} points... Ouch.", GetPlayerIndex(item.Player));
             else if (item.Winnings == 0)
-                Log($"{item.Player.Name} gained no points this round.", GetPlayerId(item.Player));
+                Log($"{item.Player.Name} gained no points this round.", GetPlayerIndex(item.Player));
             else if (item.Player.NumberCardsInHand == NumbersToFlip)
-                Log($"{item.Player.Name} flipped {NumbersToFlip}! They bank {item.Winnings} which includes {FlipNumberBonus} Bonus points!", GetPlayerId(item.Player));
+                Log($"{item.Player.Name} flipped {NumbersToFlip}! They bank {item.Winnings} which includes {FlipNumberBonus} Bonus points!", GetPlayerIndex(item.Player));
             else
-                Log($"{item.Player.Name} banked {item.Winnings}.", GetPlayerId(item.Player));
-            Log($"{item.Player.Name} has {item.Player.TotalPoints} in total.", GetPlayerId(item.Player));
+                Log($"{item.Player.Name} banked {item.Winnings}.", GetPlayerIndex(item.Player));
+            Log($"{item.Player.Name} has {item.Player.TotalPoints} in total.", GetPlayerIndex(item.Player));
         }
     }
     /// <inheritdoc />
@@ -266,7 +266,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
             return null;
 
         Prompt = $"{winner?.Name} wins!";
-        Log(Prompt, GetPlayerId(winner));
+        Log(Prompt, GetPlayerIndex(winner));
         return winner;
     }
     #endregion
@@ -331,8 +331,8 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         => _logEntries.Add(new LogEntry(text, CurrentRound, actorId ?? -1));
     #endregion
 
-
-    private int GetPlayerId(FlipSevenPlayer? player)
+    /// <inheritdoc/>
+    public int GetPlayerIndex(FlipSevenPlayer? player)
         => player is not null ? Players.IndexOf(player) : -1;
 
     private FlipSevenCard? Flip(FlipSevenPlayer player)
@@ -344,7 +344,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         if (drawnCard is null)
             return null;
 
-        var id = GetPlayerId(player);
+        var id = GetPlayerIndex(player);
 
         Log($"{player.Name} flipped a {drawnCard.Name}.", id);
         // action cards need to be played immediately 

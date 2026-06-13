@@ -20,4 +20,10 @@ public interface IHasPlayers<TPlayer>
     /// Move to next player
     /// </summary>
     void MoveToNextPlayer();
+    /// <summary>
+    /// Get the index of the player
+    /// </summary>
+    /// <param name="player"></param>
+    /// <returns>The index, or -1 if no player provided</returns>
+    int GetPlayerIndex(TPlayer? player);
 }
