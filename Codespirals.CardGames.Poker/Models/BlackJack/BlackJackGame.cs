@@ -13,7 +13,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
     /// <inheritdoc/>
     public PokerDeck Deck { get; }
     /// <inheritdoc/>
-    public ReadOnlyCollection<BlackJackPlayer> Players => _players.ToList().AsReadOnly();
+    public ReadOnlyCollection<BlackJackPlayer> Players => _players.Except([Dealer]).ToList().AsReadOnly();
     /// <inheritdoc/>
     public BlackJackPlayer CurrentPlayer { get; private set; }
     /// <inheritdoc/>
@@ -31,7 +31,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
     /// <inheritdoc/>
     public bool RoundActive => _players.Any(p => !p.IsOutForRound);
     /// <inheritdoc/>
-    public bool GameOver => Players.Except([Dealer]).All(p => p.TappedOut);
+    public bool GameOver => Players.All(p => p.TappedOut);
 
     /// <inheritdoc/>
     public string Prompt { get; private set; } = "";
@@ -86,7 +86,9 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
                 continue;
             Deck.PutOnDiscardPile(player.DiscardAll());
             player.Reactivate();
-            player.Bet(BuyIn);
+            if (player != Dealer)
+                player.Bet(BuyIn);
+
             for (int i = 0; i < DrawAtStartOfRound; i++)
             {
                 var card = Deck.Draw();
@@ -94,7 +96,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
                     player.AddCardToHand(card);
             }
         }
-        CurrentPlayer = Players[1];
+        CurrentPlayer = Players.First();
     }
 
     #region Choices
@@ -187,6 +189,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
             return null;
 
         var id = GetPlayerIndex(Dealer);
+        Prompt = "The dealer is playing";
         Log($"It's the dealer's turn.", id);
         // count cards if allowed to
         var averageValueOfCardPool = _dealerCanCountCards ? Deck.CardPool.Average(c => c.Value) : 7.3;
@@ -195,10 +198,10 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
             var newCard = Deck.Draw();
             if (newCard is null)
                 return null;
+
             Dealer.AddCardToHand(newCard);
             Log($"The dealer drew a card.", id);
-            if (CalculateHandValue(Dealer) > BlackJackScore)
-                Dealer.Bust();
+            var dealerHandValue = CalculateHandValue(Dealer);
             return [newCard];
         }
         else
@@ -235,7 +238,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
     public IEnumerable<(BlackJackPlayer Player, int Winnings)> CalculateCurrentPotentialPointGain()
     {
         (BlackJackPlayer Player, int Winnings)[] results = [];
-        foreach (var player in _players.Except([Dealer]))
+        foreach (var player in Players)
         {
             var winningMultiplier = -1;
             var handValue = CalculateHandValue(player);
@@ -269,16 +272,21 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
     /// <inheritdoc/>
     public void PayOut()
     {
-        if (Players.Any(p => !p.IsOutForRound))
+        if (_players.Any(p => !p.IsOutForRound))
             return;
 
         Log(new string('=', 25));
 
         Log($"Paying out to all players:");
-        Log($"The dealer ended the round with {CalculateHandValue(Dealer)}", GetPlayerIndex(Dealer));
-        if (Dealer.IsBusted)
+        var dealerHandValue = CalculateHandValue(Dealer);
+        Log($"The dealer ended the round with {dealerHandValue}", GetPlayerIndex(Dealer));
+        if (dealerHandValue > BlackJackScore)
+        {
+            Dealer.Bust();
             Log($"The dealer got busted!", GetPlayerIndex(Dealer));
-        foreach (var item in CalculateCurrentPotentialPointGain())
+        }
+        var lockedInWinnings = CalculateCurrentPotentialPointGain();
+        foreach (var item in lockedInWinnings)
         {
             var id = GetPlayerIndex(item.Player);
             var handValue = CalculateHandValue(item.Player);
@@ -307,7 +315,7 @@ public class BlackJackGame : IBlackJackGame<BlackJackGame, BlackJackPlayer, Poke
 
     /// <inheritdoc/>
     public int GetPlayerIndex(BlackJackPlayer? player)
-        => player is not null ? Players.IndexOf(player) : -1;
+        => player is not null ? _players.IndexOf(player) : -1;
 
     /// <inheritdoc/>
     public void Log(string text, int? actorId = null)

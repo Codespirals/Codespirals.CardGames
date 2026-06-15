@@ -24,7 +24,7 @@ public abstract class Deck<TCard> : IDeck<TCard>
     /// <inheritdoc/>
     public TCard? Draw()
     {
-        if (CardPool.Count is 0)
+        if (CardPool.Count < 1)
         {
             if (RefreshOnEmpty)
             {
@@ -67,6 +67,7 @@ public abstract class Deck<TCard> : IDeck<TCard>
         _cardPool.AddRange(_discardPile);
         _discardPile.Clear();
         Reshuffles++;
+        Shuffle();
     }
     /// <inheritdoc/>
     public void Shuffle() => _cardPool = [.. _cardPool.Shuffle()];

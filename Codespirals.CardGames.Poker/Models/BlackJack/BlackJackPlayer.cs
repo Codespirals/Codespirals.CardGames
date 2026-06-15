@@ -4,13 +4,18 @@
 public class BlackJackPlayer : Player<PokerCard>, IBlackJackPlayer<PokerCard, PokerDeck>
 {
     internal readonly List<PokerCard> _hand = [];
+    private int _cash = 100;
 
     /// <inheritdoc/>
     public PlayerState State { get; private set; }
     /// <summary>
     /// How much cash this player still has to bet with
     /// </summary>
-    public int TotalPoints { get; private set; } = 1;
+    public int TotalPoints 
+    {
+        get => _cash;
+        private set => _cash = Math.Clamp(value, 0, int.MaxValue); 
+    }
     /// <inheritdoc/>
     public int CurrentBet { get; private set; }
     /// <inheritdoc/>

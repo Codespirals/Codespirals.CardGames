@@ -15,7 +15,6 @@ public abstract class Player<TCard> : IPlayer<TCard>
     internal readonly List<TCard> _hand = [];
     internal bool _isOutForRound;
 
-    internal int Id { get; set; }
     /// <inheritdoc/>
     public string Name { get; set; }
     /// <inheritdoc/>

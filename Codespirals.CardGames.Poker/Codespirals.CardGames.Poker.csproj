@@ -16,7 +16,7 @@
     <PackageProjectUrl>https://www.codespirals.dev/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Codespirals/Codespirals.CardGames/tree/master/Codespirals.CardGames.Poker</RepositoryUrl>
     <PackageTags>codespirals;poker;games;</PackageTags>
-    <Version>1.1.30.26163</Version>
+    <Version>1.1.35.26166</Version>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -31,7 +31,7 @@
     <Folder Include="Helpers\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Codespirals.CardGames.Shared" Version="1.1.17.26155" />
+    <PackageReference Include="Codespirals.CardGames.Shared" Version="1.1.18.26163" />
   </ItemGroup>
   <ItemGroup>
     <None Update="AutoUpdateVersionNumber.ps1">
