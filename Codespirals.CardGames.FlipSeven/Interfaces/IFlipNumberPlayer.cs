@@ -1,8 +1,11 @@
-﻿namespace Codespirals.CardGames.FlipSeven;
+﻿namespace Codespirals.CardGames.FlipNumber;
 
-/// <inheritdoc/>
-public interface IFlipSevenPlayer<TCard> : IPlayer<TCard>, ICanPlayRounds, IHasPoints, ICanBust
-    where TCard : IFlipSevenCard
+/// <summary>
+/// A player of the game Flip Number
+/// </summary>
+/// <typeparam name="TCard"></typeparam>
+public interface IFlipNumberPlayer<TCard> : IPlayer<TCard>, ICanPlayRounds, IHasPoints, ICanBust
+    where TCard : IFlipNumberCard
 {
     /// <summary>
     /// How many <see cref="CardType.Number"/> <typeparamref name="TCard"/>s this user currently has

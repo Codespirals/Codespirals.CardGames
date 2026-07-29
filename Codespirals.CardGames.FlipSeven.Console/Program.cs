@@ -1,4 +1,4 @@
 ﻿using Codespirals.CardGames.FlipSeven;
 
-var game = FlipSevenInConsole.SetUp();
+var game = FlipNumberInConsole.SetUp();
 game.Start();

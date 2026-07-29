@@ -1,18 +1,18 @@
 ﻿using System.Collections.ObjectModel;
 
-namespace Codespirals.CardGames.FlipSeven;
+namespace Codespirals.CardGames.FlipNumber;
 /// <summary>
-/// A game of Flip Seven
+/// A game of Flip Number
 /// </summary>
 /// <typeparam name="TSelf"></typeparam>
 /// <typeparam name="TPlayer"></typeparam>
 /// <typeparam name="TDeck"></typeparam>
 /// <typeparam name="TCard"></typeparam>
-public interface IFlipSevenGame<TSelf, TPlayer, TDeck, TCard> : ICardGame<TSelf, TDeck, TCard>, IRoundBased, IHasPlayers<TPlayer>, IPlayersHavePoints<TPlayer>, IHasPrompt, IHasActivityLog<LogEntry>
-    where TSelf : IFlipSevenGame<TSelf, TPlayer, TDeck, TCard>
-    where TPlayer : IFlipSevenPlayer<TCard>
+public interface IFlipNumberGame<TSelf, TPlayer, TDeck, TCard> : ICardGame<TSelf, TDeck, TCard>, IRoundBased, IHasPlayers<TPlayer>, IPlayersHavePoints<TPlayer>, IHasPrompt, IHasActivityLog<LogEntry>
+    where TSelf : IFlipNumberGame<TSelf, TPlayer, TDeck, TCard>
+    where TPlayer : IFlipNumberPlayer<TCard>
     where TDeck : IDeck<TCard>
-    where TCard : IFlipSevenCard
+    where TCard : IFlipNumberCard
 {
     /// <summary>
     /// Set up for a new game
@@ -23,7 +23,7 @@ public interface IFlipSevenGame<TSelf, TPlayer, TDeck, TCard> : ICardGame<TSelf,
     /// <param name="winningScore"></param>
     /// <param name="deck"></param>
     /// <returns></returns>
-    abstract static TSelf SetUp(int players, int numbersToFlip = 7, int flipNumberBonus = 15, int winningScore = 200, FlipSevenDeck? deck = null);
+    abstract static TSelf SetUp(int players, int numbersToFlip = 7, int flipNumberBonus = 15, int winningScore = 200, FlipNumberDeck? deck = null);
     /// <summary>
     /// The score needed to win the game. Default should be 200
     /// </summary>
@@ -39,7 +39,7 @@ public interface IFlipSevenGame<TSelf, TPlayer, TDeck, TCard> : ICardGame<TSelf,
     /// <summary>
     /// Dictates wether a player can have more than one second chance
     /// </summary>
-    bool PlayersCanHaveMultipleSecondChances { get; }
+    bool PlayersCanHaveMultipleProtection { get; }
     /// <summary>
     /// Active action cards get added to this queue to be used
     /// </summary>
@@ -62,8 +62,8 @@ public interface IFlipSevenGame<TSelf, TPlayer, TDeck, TCard> : ICardGame<TSelf,
     IEnumerable<TPlayer>? GetValidTargets(TCard card);
     /// <summary>
     /// Attempt to give a card to another player.
-    /// This can only be a card of type <see cref="CardType.Flip"/>, <see cref="CardType.Freeze"/> or <see cref="CardType.SecondChance"/>.
-    /// However a player can only have 1 <see cref="CardType.SecondChance"/> at a time.
+    /// This can only be a card of type <see cref="CardType.Flip"/>, <see cref="CardType.ForceBank"/> or <see cref="CardType.Protection"/>.
+    /// However a player can only have 1 <see cref="CardType.Protection"/> at a time.
     /// </summary>
     /// <param name="player"></param>
     /// <param name="card"></param>

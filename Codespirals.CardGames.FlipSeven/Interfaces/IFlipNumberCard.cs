@@ -1,9 +1,9 @@
-﻿namespace Codespirals.CardGames.FlipSeven;
+﻿namespace Codespirals.CardGames.FlipNumber;
 
 /// <summary>
-/// A card in the game of Flip Seven
+/// A card in the game of Flip Number
 /// </summary>
-public interface IFlipSevenCard : ICard
+public interface IFlipNumberCard : ICard
 {
     /// <summary>
     /// The type of card this is

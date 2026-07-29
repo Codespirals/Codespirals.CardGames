@@ -1,10 +1,10 @@
-﻿namespace Codespirals.CardGames.FlipSeven;
+﻿namespace Codespirals.CardGames.FlipNumber;
 public enum CardType
 {
     Number,
     Multiplier,
     BonusAdd,
-    SecondChance,
+    Protection,
     Flip,
-    Freeze
+    ForceBank
 }

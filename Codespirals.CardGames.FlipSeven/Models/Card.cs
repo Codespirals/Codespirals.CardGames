@@ -1,7 +1,7 @@
-﻿namespace Codespirals.CardGames.FlipSeven;
+﻿namespace Codespirals.CardGames.FlipNumber;
 
-/// <inheritdoc cref="IFlipSevenCard"/>
-public class FlipSevenCard : IFlipSevenCard
+/// <inheritdoc cref="IFlipNumberCard"/>
+public class FlipNumberCard : IFlipNumberCard
 {
     /// <inheritdoc/>
     public int Value { get; init; }
@@ -10,9 +10,9 @@ public class FlipSevenCard : IFlipSevenCard
     /// <inheritdoc/>
     public CardType CardType { get; init; }
     /// <inheritdoc/>
-    public bool IsActionCard => CardType is CardType.Flip or CardType.Freeze or CardType.SecondChance;
+    public bool IsActionCard => CardType is CardType.Flip or CardType.ForceBank or CardType.Protection;
 
-    internal FlipSevenCard(CardType cardType, int value = 0)
+    internal FlipNumberCard(CardType cardType, int value = 0)
     {
         CardType = cardType;
         Value = value;
@@ -28,9 +28,9 @@ public class FlipSevenCard : IFlipSevenCard
             CardType.Number => $"{Value}",
             CardType.Multiplier => $"x{Value}",
             CardType.BonusAdd => Value > 0 ? $"+{Value}" : $"{Value}",
-            CardType.Freeze => FlipSevenConstants.FREEZENAME,
-            CardType.Flip => $"{FlipSevenConstants.FLIPNAME} {Value}",
-            CardType.SecondChance => FlipSevenConstants.SECONDCHANCENAME,
+            CardType.ForceBank => FlipNumberConstants.FORCEBANKNAME,
+            CardType.Flip => $"{FlipNumberConstants.FLIPNAME} {Value}",
+            CardType.Protection => FlipNumberConstants.PROTECTIONNAME,
             _ => $"???"
         };
 }

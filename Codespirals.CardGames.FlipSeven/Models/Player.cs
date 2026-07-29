@@ -1,11 +1,11 @@
 ﻿using System.Collections.ObjectModel;
 
-namespace Codespirals.CardGames.FlipSeven;
+namespace Codespirals.CardGames.FlipNumber;
 
 /// <inheritdoc />
-public class FlipSevenPlayer : Player<FlipSevenCard>, IFlipSevenPlayer<FlipSevenCard>
+public class FlipNumberPlayer : Player<FlipNumberCard>, IFlipNumberPlayer<FlipNumberCard>
 {
-    private readonly List<FlipSevenCard> _hand = [];
+    private readonly List<FlipNumberCard> _hand = [];
 
     /// <inheritdoc />
     public int NumberCardsInHand => _hand.Count(c => c.CardType == CardType.Number);
@@ -17,7 +17,7 @@ public class FlipSevenPlayer : Player<FlipSevenCard>, IFlipSevenPlayer<FlipSeven
     public bool IsOutForRound => State != PlayerState.Playing;
     /// <inheritdoc />
     public PlayerState State { get; private set; }
-    internal FlipSevenPlayer(string name) : base(name)
+    internal FlipNumberPlayer(string name) : base(name)
     {
 
     }

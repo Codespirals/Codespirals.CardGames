@@ -1,19 +1,19 @@
-﻿namespace Codespirals.CardGames.FlipSeven;
+﻿namespace Codespirals.CardGames.FlipNumber;
 
 /// <inheritdoc/>
-public class FlipSevenDeckBuilder : IDeckBuilder<FlipSevenDeckBuilder, FlipSevenDeck, FlipSevenCard>
+public class FlipNumberDeckBuilder : IDeckBuilder<FlipNumberDeckBuilder, FlipNumberDeck, FlipNumberCard>
 {
-    private readonly FlipSevenDeck _deck;
-    private FlipSevenDeckBuilder()
+    private readonly FlipNumberDeck _deck;
+    private FlipNumberDeckBuilder()
     {
-        _deck = new FlipSevenDeck();
+        _deck = new FlipNumberDeck();
     }
     /// <inheritdoc/>
-    public static FlipSevenDeckBuilder Begin()
+    public static FlipNumberDeckBuilder Begin()
         => new();
 
     /// <inheritdoc/>
-    public FlipSevenDeckBuilder RefreshOnEmpty(bool refresh = true)
+    public FlipNumberDeckBuilder RefreshOnEmpty(bool refresh = true)
     {
         _deck.RefreshOnEmpty = true;
         return this;
@@ -25,15 +25,15 @@ public class FlipSevenDeckBuilder : IDeckBuilder<FlipSevenDeckBuilder, FlipSeven
     /// <param name="highestNumber"></param>
     /// <returns></returns>
     /// <remarks>Min:2, Max:255</remarks>
-    public FlipSevenDeckBuilder WithNumberCards(int highestNumber = 12)
+    public FlipNumberDeckBuilder WithNumberCards(int highestNumber = 12)
     {
-        _deck.AddStartingCard(FlipSevenCardGenerator.GenerateNumberCard(0));
+        _deck.AddStartingCard(FlipNumberCardGenerator.GenerateNumberCard(0));
         highestNumber = Math.Clamp(highestNumber, 2, byte.MaxValue);
         for (var v = highestNumber; v > 0; v--)
         {
             for (var i = 0; i < v; i++)
             {
-                _deck.AddStartingCard(FlipSevenCardGenerator.GenerateNumberCard(v));
+                _deck.AddStartingCard(FlipNumberCardGenerator.GenerateNumberCard(v));
             }
         }
         return this;
@@ -44,11 +44,11 @@ public class FlipSevenDeckBuilder : IDeckBuilder<FlipSevenDeckBuilder, FlipSeven
     /// <param name="values"></param>
     /// <returns></returns>
     /// <remarks>Min:1, Max:255</remarks>
-    public FlipSevenDeckBuilder WithBonusCards(int[] values)
+    public FlipNumberDeckBuilder WithBonusCards(int[] values)
     {
         foreach (var value in values)
         {
-            _deck.AddStartingCard(FlipSevenCardGenerator.GenerateBonusAddCard(Math.Clamp(value, 1, byte.MaxValue)));
+            _deck.AddStartingCard(FlipNumberCardGenerator.GenerateBonusAddCard(Math.Clamp(value, 1, byte.MaxValue)));
         }
         return this;
     }
@@ -58,13 +58,13 @@ public class FlipSevenDeckBuilder : IDeckBuilder<FlipSevenDeckBuilder, FlipSeven
     /// <param name="number"></param>
     /// <param name="multiplier"></param>
     /// <returns></returns>
-    public FlipSevenDeckBuilder WithMultipliers(int number = 1, int multiplier = 2)
+    public FlipNumberDeckBuilder WithMultipliers(int number = 1, int multiplier = 2)
     {
         number = Math.Clamp(number, 1, byte.MaxValue);
         multiplier = Math.Clamp(multiplier, 2, byte.MaxValue);
         for (var i = 1; i <= number; i++)
         {
-            _deck.AddStartingCard(FlipSevenCardGenerator.GenerateMultiplierCard(multiplier));
+            _deck.AddStartingCard(FlipNumberCardGenerator.GenerateMultiplierCard(multiplier));
         }
         return this;
     }
@@ -74,13 +74,13 @@ public class FlipSevenDeckBuilder : IDeckBuilder<FlipSevenDeckBuilder, FlipSeven
     /// <param name="number"></param>
     /// <param name="draw"></param>
     /// <returns></returns>
-    public FlipSevenDeckBuilder WithFlipCards(int number = 3, int draw = 3)
+    public FlipNumberDeckBuilder WithFlipCards(int number = 3, int draw = 3)
     {
         number = Math.Clamp(number, 1, byte.MaxValue);
         draw = Math.Clamp(draw, 1, byte.MaxValue);
         for (var i = 1; i <= number; i++)
         {
-            _deck.AddStartingCard(FlipSevenCardGenerator.GenerateFlipCard(draw));
+            _deck.AddStartingCard(FlipNumberCardGenerator.GenerateFlipCard(draw));
         }
         return this;
     }
@@ -89,12 +89,12 @@ public class FlipSevenDeckBuilder : IDeckBuilder<FlipSevenDeckBuilder, FlipSeven
     /// </summary>
     /// <param name="number"></param>
     /// <returns></returns>
-    public FlipSevenDeckBuilder WithFreezes(int number = 3)
+    public FlipNumberDeckBuilder WithFreezes(int number = 3)
     {
         number = Math.Clamp(number, 1, byte.MaxValue);
         for (var i = 1; i <= number; i++)
         {
-            _deck.AddStartingCard(FlipSevenCardGenerator.GenerateFreezeCard());
+            _deck.AddStartingCard(FlipNumberCardGenerator.GenerateFreezeCard());
         }
         return this;
     }
@@ -103,24 +103,24 @@ public class FlipSevenDeckBuilder : IDeckBuilder<FlipSevenDeckBuilder, FlipSeven
     /// </summary>
     /// <param name="number"></param>
     /// <returns></returns>
-    public FlipSevenDeckBuilder WithSecondChances(int number = 3)
+    public FlipNumberDeckBuilder WithSecondChances(int number = 3)
     {
         number = Math.Clamp(number, 1, byte.MaxValue);
         for (var i = 1; i <= number; i++)
         {
-            _deck.AddStartingCard(FlipSevenCardGenerator.GenerateSecondChanceCard());
+            _deck.AddStartingCard(FlipNumberCardGenerator.GenerateSecondChanceCard());
         }
         return this;
     }
     /// <inheritdoc/>
-    public FlipSevenDeck Build()
+    public FlipNumberDeck Build()
     {
         _deck.Reset();
         return _deck;
     }
 
     /// <inheritdoc/>
-    public static FlipSevenDeck CreateStandardDeck()
+    public static FlipNumberDeck CreateStandardDeck()
         => Begin()
         .RefreshOnEmpty()
         .WithNumberCards()

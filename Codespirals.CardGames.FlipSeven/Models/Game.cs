@@ -1,21 +1,21 @@
 ﻿using System.Collections.ObjectModel;
 
-namespace Codespirals.CardGames.FlipSeven;
+namespace Codespirals.CardGames.FlipNumber;
 
 /// <inheritdoc />
-public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, FlipSevenDeck, FlipSevenCard>
+public class FlipNumberGame : IFlipNumberGame<FlipNumberGame, FlipNumberPlayer, FlipNumberDeck, FlipNumberCard>
 {
-    private readonly List<FlipSevenPlayer> _players = [];
-    private FlipSevenPlayer _currentPlayer;
+    private readonly List<FlipNumberPlayer> _players = [];
+    private FlipNumberPlayer _currentPlayer;
     private List<LogEntry> _logEntries = [];
-    private List<(FlipSevenPlayer Player, FlipSevenCard ActionCard)> _actionCardQueue = [];
+    private List<(FlipNumberPlayer Player, FlipNumberCard ActionCard)> _actionCardQueue = [];
 
     /// <inheritdoc />
-    public FlipSevenDeck Deck { get; }
+    public FlipNumberDeck Deck { get; }
     /// <inheritdoc />
-    public ReadOnlyCollection<FlipSevenPlayer> Players => _players.AsReadOnly();
+    public ReadOnlyCollection<FlipNumberPlayer> Players => _players.AsReadOnly();
     /// <inheritdoc />
-    public FlipSevenPlayer CurrentPlayer => GetCurrentPlayerOrActionQueuePlayer();
+    public FlipNumberPlayer CurrentPlayer => GetCurrentPlayerOrActionQueuePlayer();
     /// <inheritdoc />
     public int CurrentRound { get; private set; }
     /// <inheritdoc />
@@ -25,9 +25,9 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     /// <inheritdoc />
     public int FlipNumberBonus { get; }
     /// <inheritdoc />
-    public bool PlayersCanHaveMultipleSecondChances { get; }
+    public bool PlayersCanHaveMultipleProtection { get; }
     /// <inheritdoc />
-    public ReadOnlyCollection<(FlipSevenPlayer Player, FlipSevenCard ActionCard)> ActionCardQueue => _actionCardQueue.AsReadOnly();
+    public ReadOnlyCollection<(FlipNumberPlayer Player, FlipNumberCard ActionCard)> ActionCardQueue => _actionCardQueue.AsReadOnly();
     /// <inheritdoc />
     public bool RoundActive => !_players.All(p => p.IsOutForRound);
     /// <inheritdoc />
@@ -39,10 +39,10 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     public ReadOnlyCollection<LogEntry> LogEntries => _logEntries.AsReadOnly();
 
     /// <inheritdoc />
-    private FlipSevenGame(int players, int numbersToFlip = 7, int flipNumberBonus = 15, int winningScore = 200, FlipSevenDeck? deck = null)
+    private FlipNumberGame(int players, int numbersToFlip = 7, int flipNumberBonus = 15, int winningScore = 200, FlipNumberDeck? deck = null)
     {
         // add deck
-        Deck = deck ?? FlipSevenDeckBuilder.CreateStandardDeck();
+        Deck = deck ?? FlipNumberDeckBuilder.CreateStandardDeck();
 
         // set... settings
         var highestCardValue = Deck.HighestNumberCard;
@@ -54,22 +54,22 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         var maxPlayers = (int)Math.Floor(Deck.TotalNumberCards / (decimal)NumbersToFlip);
         for (var i = 0; i < Math.Clamp(players, 2, maxPlayers); i++)
         {
-            _players.Add(FlipSevenPlayerGenerator.GeneratePlayer(i+1));
+            _players.Add(FlipNumberPlayerGenerator.GeneratePlayer(i+1));
         }
         _currentPlayer = _players.First();
 
         // finish
         Deck.Shuffle();
         CurrentRound = 0;
-        Log("Starting a new game of Flip Seven.");
+        Log("Starting a new game of Flip Number.");
         Prompt = "Start playing!";
     }
 
     /// <inheritdoc />
-    public static FlipSevenGame SetUp(int players)
+    public static FlipNumberGame SetUp(int players)
         => new(players);
     /// <inheritdoc />
-    public static FlipSevenGame SetUp(int players, int numbersToFlip = 7, int flipNumberBonus = 15, int winningScore = 200, FlipSevenDeck? deck = null)
+    public static FlipNumberGame SetUp(int players, int numbersToFlip = 7, int flipNumberBonus = 15, int winningScore = 200, FlipNumberDeck? deck = null)
         => new(players, numbersToFlip, flipNumberBonus, winningScore, deck);
 
     /// <inheritdoc />
@@ -102,7 +102,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         return;
     }
     /// <inheritdoc />
-    public FlipSevenCard? Flip()
+    public FlipNumberCard? Flip()
     {
         var flippedCard = Flip(_currentPlayer);
         MoveToNextPlayer();
@@ -110,7 +110,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     }
 
     /// <inheritdoc />
-    public IEnumerable<FlipSevenCard>? UseActionCard(FlipSevenPlayer target, FlipSevenCard? card)
+    public IEnumerable<FlipNumberCard>? UseActionCard(FlipNumberPlayer target, FlipNumberCard? card)
     {
         if (target.IsOutForRound || card is null || !card.IsActionCard)
             return null;
@@ -120,10 +120,10 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         else
             Log($"{_currentPlayer.Name} is giving the {card.Name} to {target.Name}!", GetPlayerIndex(_currentPlayer));
 
-        IEnumerable<FlipSevenCard>? result = null;
+        IEnumerable<FlipNumberCard>? result = null;
         switch (card.CardType)
         {
-            case CardType.SecondChance:
+            case CardType.Protection:
                 GiveSecondChance(target, card);
                 result = [];
                 break;
@@ -132,7 +132,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
                 result = newCards;
                 Deck.PutOnDiscardPile(card);
                 break;
-            case CardType.Freeze:
+            case CardType.ForceBank:
                 Freeze(target);
                 result = [];
                 Deck.PutOnDiscardPile(card);
@@ -150,9 +150,9 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
 
     #region Action cards
     /// <inheritdoc />
-    public void GiveSecondChance(FlipSevenPlayer target, FlipSevenCard secondChance)
+    public void GiveSecondChance(FlipNumberPlayer target, FlipNumberCard secondChance)
     {
-        if (target.Hand.Any(c => c.CardType == CardType.SecondChance) && !PlayersCanHaveMultipleSecondChances)
+        if (target.Hand.Any(c => c.CardType == CardType.Protection) && !PlayersCanHaveMultipleProtection)
         {
             Log($"{target.Name} already has a {secondChance.Name}! It's not called \"third chance\"...", GetPlayerIndex(_currentPlayer));
             Prompt = $"{_currentPlayer.Name} choose another player.";
@@ -162,10 +162,10 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         target.AddCardToHand(secondChance);
     }
     /// <inheritdoc />
-    public IEnumerable<FlipSevenCard> ForceFlip(FlipSevenPlayer target, int number)
+    public IEnumerable<FlipNumberCard> ForceFlip(FlipNumberPlayer target, int number)
     {
         Log($"{target.Name} has to flip {number}!", GetPlayerIndex(target));
-        List<FlipSevenCard> result = [];
+        List<FlipNumberCard> result = [];
         for (int i = 0; i < number; i++)
         {
             var card = Flip(target);
@@ -175,7 +175,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         return result;
     }
     /// <inheritdoc />
-    public void Freeze(FlipSevenPlayer target)
+    public void Freeze(FlipNumberPlayer target)
     {
         if (target.IsOutForRound)
             return;
@@ -184,7 +184,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     }
     #endregion
 
-    #region auto methods
+    #region System methods
     /// <inheritdoc />
     public void MoveToNextPlayer()
     {
@@ -256,7 +256,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         }
     }
     /// <inheritdoc />
-    public FlipSevenPlayer? GetWinner()
+    public FlipNumberPlayer? GetWinner()
     {
         if (!GameOver)
             return null;
@@ -273,7 +273,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
 
     #region unlogged methods
     /// <inheritdoc />
-    public int CalculateHandValueForPlayer(FlipSevenPlayer player)
+    public int CalculateHandValueForPlayer(FlipNumberPlayer player)
     {
         if (player.IsBusted)
             return 0;
@@ -299,18 +299,18 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         return points;
     }
     /// <inheritdoc />
-    public IEnumerable<FlipSevenPlayer>? GetValidTargets(FlipSevenCard? card)
+    public IEnumerable<FlipNumberPlayer>? GetValidTargets(FlipNumberCard? card)
     {
         if (card is null || !card.IsActionCard)
             return null;
-        if (!PlayersCanHaveMultipleSecondChances && card.CardType is CardType.SecondChance)
-            return _players.Where(p => !p.IsOutForRound && !p.Hand.Any(c => c.CardType == CardType.SecondChance));
+        if (!PlayersCanHaveMultipleProtection && card.CardType is CardType.Protection)
+            return _players.Where(p => !p.IsOutForRound && !p.Hand.Any(c => c.CardType == CardType.Protection));
         return _players.Where(p => !p.IsOutForRound);
     }
     /// <inheritdoc />
-    public IEnumerable<(FlipSevenPlayer Player, int Winnings)> CalculateCurrentPotentialPointGain()
+    public IEnumerable<(FlipNumberPlayer Player, int Winnings)> CalculateCurrentPotentialPointGain()
     {
-        (FlipSevenPlayer Player, int WinningMultiplier)[] results = [];
+        (FlipNumberPlayer Player, int WinningMultiplier)[] results = [];
         foreach (var player in Players)
         {
             var winnings = -1;
@@ -332,10 +332,10 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
     #endregion
 
     /// <inheritdoc/>
-    public int GetPlayerIndex(FlipSevenPlayer? player)
+    public int GetPlayerIndex(FlipNumberPlayer? player)
         => player is not null ? Players.IndexOf(player) : -1;
 
-    private FlipSevenCard? Flip(FlipSevenPlayer player)
+    private FlipNumberCard? Flip(FlipNumberPlayer player)
     {
         if (player.IsOutForRound)
             return null;
@@ -365,7 +365,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         if (drawnCard.CardType == CardType.Number && player.Hand.Any(c => c.CardType == CardType.Number && c.Value == drawnCard.Value))
         {
             Log($"Oh no, {player.Name} already has a {drawnCard.Name}!", id);
-            var hasSecondChance = player.Hand.FirstOrDefault(c => c.CardType == CardType.SecondChance);
+            var hasSecondChance = player.Hand.FirstOrDefault(c => c.CardType == CardType.Protection);
             if (hasSecondChance is not null)
             {
                 Log($"Phew, {player.Name} had a {hasSecondChance.Name} to save them!", id);
@@ -393,7 +393,7 @@ public class FlipSevenGame : IFlipSevenGame<FlipSevenGame, FlipSevenPlayer, Flip
         return drawnCard;
     }
 
-    private FlipSevenPlayer GetCurrentPlayerOrActionQueuePlayer()
+    private FlipNumberPlayer GetCurrentPlayerOrActionQueuePlayer()
     {
         var playerInActionQueue = ActionCardQueue.Any() ? ActionCardQueue.First().Player : null;
         while (playerInActionQueue is not null && playerInActionQueue.IsOutForRound)

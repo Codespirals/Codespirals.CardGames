@@ -1,4 +1,4 @@
-﻿namespace Codespirals.CardGames.FlipSeven;
+﻿namespace Codespirals.CardGames.FlipNumber;
 public enum PlayerState
 {
     Playing,

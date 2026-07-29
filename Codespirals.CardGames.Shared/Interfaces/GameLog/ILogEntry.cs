@@ -10,6 +10,10 @@ namespace Codespirals.CardGames;
 public interface ILogEntry
 {
     /// <summary>
+    /// Timestamp
+    /// </summary>
+    public DateTime Timestamp { get; }
+    /// <summary>
     /// An id to identify who the log entry is about
     /// </summary>
     public int ActorId { get; }

@@ -5,11 +5,11 @@ VisualStudioVersion = 18.2.11408.102
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Codespirals.CardGames.Shared", "Codespirals.CardGames.Shared\Codespirals.CardGames.Shared.csproj", "{29336F04-0EA9-4B82-A3D3-460587F1C524}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Codespirals.CardGames.FlipSeven", "Codespirals.CardGames.FlipSeven\Codespirals.CardGames.FlipSeven.csproj", "{57F69F33-D0CA-4FF8-A8CB-2EB1D5BDBABF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Codespirals.CardGames.FlipNumber", "Codespirals.CardGames.FlipSeven\Codespirals.CardGames.FlipNumber.csproj", "{57F69F33-D0CA-4FF8-A8CB-2EB1D5BDBABF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Codespirals.CardGames.TestingConsole", "Codespirals.CardGames.TestingConsole\Codespirals.CardGames.TestingConsole.csproj", "{0DBDBCB2-5EAE-4D67-9A3F-9C0307D58F27}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Codespirals.CardGames.FlipSeven.Console", "Codespirals.CardGames.FlipSeven.Console\Codespirals.CardGames.FlipSeven.Console.csproj", "{CDB8E695-4C19-416A-97C4-EEF4B7C79D19}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Codespirals.CardGames.FlipNumber.Console", "Codespirals.CardGames.FlipSeven.Console\Codespirals.CardGames.FlipNumber.Console.csproj", "{CDB8E695-4C19-416A-97C4-EEF4B7C79D19}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
 	ProjectSection(SolutionItems) = preProject

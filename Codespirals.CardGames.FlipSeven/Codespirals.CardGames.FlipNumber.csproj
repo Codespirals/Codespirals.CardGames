@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -14,16 +14,13 @@
     <PackageIcon>logo.png</PackageIcon>
     <Copyright>codespirals</Copyright>
     <PackageProjectUrl>https://www.codespirals.dev/</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/Codespirals/Codespirals.CardGames/tree/master/Codespirals.CardGames.FlipSeven</RepositoryUrl>
-    <PackageTags>codespirals;flipseven;games;</PackageTags>
-    <Version>1.1.38.26163</Version>
+    <RepositoryUrl>https://github.com/Codespirals/Codespirals.CardGames/tree/master/Codespirals.CardGames.FlipNumber</RepositoryUrl>
+    <PackageTags>codespirals;games;cardgames;</PackageTags>
+    <Version>1.0.1.26210</Version>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
-  <ItemGroup>
-    <None Remove="README.md" />
-  </ItemGroup>
   <ItemGroup>
     <Resource Include="..\..\Codespirals.Base\Codespirals.Base.Shared\Resources\Images\logo.png">
       <Pack>True</Pack>
@@ -36,7 +33,7 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Codespirals.CardGames.Shared" Version="1.1.17.26155" />
+    <PackageReference Include="Codespirals.CardGames.Shared" Version="1.1.19.26166" />
   </ItemGroup>
   <ItemGroup>
     <None Update="AutoUpdateVersionNumber.ps1">

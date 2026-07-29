@@ -8,6 +8,8 @@ namespace Codespirals.CardGames;
 public record LogEntry : ILogEntry
 {
     /// <inheritdoc/>
+    public DateTime Timestamp { get; } = DateTime.UtcNow;
+    /// <inheritdoc/>
     public string Text { get; init; }
     /// <inheritdoc/>
     public int? Round { get; init; }

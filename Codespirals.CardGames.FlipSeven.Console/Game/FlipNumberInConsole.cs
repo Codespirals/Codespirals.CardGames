@@ -1,12 +1,12 @@
 ﻿namespace Codespirals.CardGames.FlipSeven;
-public class FlipSevenInConsole
+public class FlipNumberInConsole
 {
     private readonly FlipSevenGame _game;
-    private FlipSevenInConsole(int playerCount)
+    private FlipNumberInConsole(int playerCount)
     {
         _game = FlipSevenGame.SetUp(playerCount);
     }
-    public static FlipSevenInConsole SetUp()
+    public static FlipNumberInConsole SetUp()
     {
         Console.ForegroundColor = ConsoleColor.White;
         Console.WriteLine($"Starting a game of Flip7");
@@ -106,7 +106,7 @@ public class FlipSevenInConsole
     private void Bank(FlipSevenPlayer player)
     {
         ConsoleHelper.SetColorForPlayer(_game.Players.IndexOf(player));
-        if (player.HandPoints == 0)
+        if (player.TotalPoints == 0)
             Console.WriteLine($"You have no points to bank... But ok.");
         else
             Console.WriteLine($"{player.Name} chose to bank their points. That's probably sensible.");
@@ -121,7 +121,7 @@ public class FlipSevenInConsole
         var validTargets = _game.GetValidTargets(card)?.ToList() ?? [];
         foreach (var option in validTargets)
         {
-            Console.WriteLine($"For {option.Name} (Saved:{option.TotalPoints} | Hand:{option.HandPoints}) - Type: {i}");
+            Console.WriteLine($"For {option.Name} (Saved:{option.TotalPoints} | Hand:{option.TotalPoints}) - Type: {i}");
             i++;
         }
         var selectedPlayerIndex = ConsoleHelper.ReadUntilInt(1, validTargets.Count);

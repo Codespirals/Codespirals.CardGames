@@ -1,9 +1,9 @@
-﻿namespace Codespirals.CardGames.FlipSeven;
+﻿namespace Codespirals.CardGames.FlipNumber;
 
 /// <summary>
 /// A deck for the game of Flip "7"
 /// </summary>
-public class FlipSevenDeck : Deck<FlipSevenCard>
+public class FlipNumberDeck : Deck<FlipNumberCard>
 {
     /// <summary>
     /// The total count of number cards
